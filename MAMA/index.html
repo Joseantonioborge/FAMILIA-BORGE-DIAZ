@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gestión Financiera · Previsión de Caja</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --cream:#faf8f4;--warm-white:#fffef9;
+      --sage:#7a9e7e;--sage-light:#a8c5ac;--sage-pale:#e8f0e9;
+      --coral:#d97b5a;--coral-light:#f0c4b4;--coral-pale:#fdf0eb;
+      --sky:#5b8fa8;--sky-light:#9dc4d8;--sky-pale:#eaf3f8;
+      --gold:#c4933a;--gold-pale:#fdf5e6;
+      --lav:#8b7ec8;--lav-pale:#f0eeff;--lav-light:#c4bcf0;
+      --amb:#c97c2e;--amb-pale:#fef3e6;--amb-light:#f0c88a;--amb-btn:#d4893a;
+      --text-dark:#2c3e35;--text-mid:#5a6b62;--text-light:#8a9b92;
+      --border:#dde8de;--shadow:rgba(122,158,126,.12);
+      --radius:16px;--radius-sm:10px;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text-dark);min-height:100vh;line-height:1.6}
+
+    /* HEADER */
+    header{background:var(--warm-white);border-bottom:2px solid var(--border);padding:24px 40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px}
+    .header-title h1{font-family:'Playfair Display',serif;font-size:clamp(1.2rem,2.2vw,1.85rem);color:var(--text-dark);font-weight:700}
+    .header-title p{font-size:.83rem;color:var(--text-light);margin-top:2px;font-weight:300}
+    .header-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .badge{display:inline-flex;align-items:center;gap:6px;background:var(--sage-pale);color:var(--sage);font-size:.76rem;font-weight:600;padding:6px 14px;border-radius:99px;border:1px solid var(--sage-light);text-transform:uppercase;letter-spacing:.05em}
+    /* Botón residencias - lavanda */
+    .btn-res{display:inline-flex;align-items:center;gap:8px;padding:10px 18px;background:var(--lav);color:#fff;border:none;border-radius:99px;font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:600;cursor:pointer;transition:.2s;box-shadow:0 2px 12px rgba(139,126,200,.3);white-space:nowrap}
+    .btn-res:hover{background:#7a6db8;transform:translateY(-1px);box-shadow:0 4px 16px rgba(139,126,200,.4)}
+    /* Botón centros día - ámbar */
+    .btn-cd{display:inline-flex;align-items:center;gap:8px;padding:10px 18px;background:var(--amb-btn);color:#fff;border:none;border-radius:99px;font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:600;cursor:pointer;transition:.2s;box-shadow:0 2px 12px rgba(201,124,46,.3);white-space:nowrap}
+    .btn-cd:hover{background:#b86e24;transform:translateY(-1px);box-shadow:0 4px 16px rgba(201,124,46,.4)}
+    .bcnt{background:rgba(255,255,255,.28);padding:2px 8px;border-radius:99px;font-size:.72rem}
+
+    /* LAYOUT */
+    main{max-width:1400px;margin:0 auto;padding:32px 24px 60px}
+    .sec-title{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--text-dark);font-weight:600;margin-bottom:16px;display:flex;align-items:center;gap:10px}
+    .sec-title::before{content:'';display:block;width:4px;height:22px;border-radius:4px;background:var(--sage)}
+    .card{background:var(--warm-white);border:1px solid var(--border);border-radius:var(--radius);padding:28px;box-shadow:0 2px 16px var(--shadow)}
+
+    /* KPI */
+    .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:28px}
+    .kpi{border-radius:var(--radius);padding:22px 24px;border:1px solid transparent}
+    .kpi.green{background:var(--sage-pale);border-color:var(--sage-light)}
+    .kpi.coral{background:var(--coral-pale);border-color:var(--coral-light)}
+    .kpi.sky{background:var(--sky-pale);border-color:var(--sky-light)}
+    .kpi.gold{background:var(--gold-pale);border-color:#e0c87a}
+    .kpi-label{font-size:.74rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text-light);margin-bottom:6px}
+    .kpi-value{font-family:'Playfair Display',serif;font-size:1.7rem;font-weight:700;line-height:1}
+    .kpi.green .kpi-value{color:var(--sage)}.kpi.coral .kpi-value{color:var(--coral)}
+    .kpi.sky .kpi-value{color:var(--sky)}.kpi.gold .kpi-value{color:var(--gold)}
+    .kpi-sub{font-size:.77rem;color:var(--text-light);margin-top:4px}
+
+    /* INPUTS */
+    .inputs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+    .ig{display:flex;flex-direction:column;gap:5px}
+    .ig label{font-size:.74rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--text-mid)}
+    .ig input{padding:10px 14px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:.92rem;font-weight:500;color:var(--text-dark);background:var(--cream);outline:none;transition:.2s}
+    .ig input:focus{border-color:var(--sage);box-shadow:0 0 0 3px rgba(122,158,126,.15);background:var(--warm-white)}
+    .ig .hint{font-size:.7rem;color:var(--text-light)}
+    .ig.hl input{border-color:var(--gold);background:var(--gold-pale)}
+    .extra-sec{margin-top:16px;padding:16px 20px;background:var(--sky-pale);border:1px dashed var(--sky-light);border-radius:var(--radius-sm)}
+    .extra-sec h4{font-size:.79rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--sky);margin-bottom:12px}
+    .extra-row{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end}
+    .extra-row input,.extra-row select{padding:8px 12px;border:1.5px solid var(--sky-light);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:.88rem;background:var(--warm-white);color:var(--text-dark);outline:none}
+    .extra-row input{flex:1;min-width:120px}.extra-row select{min-width:100px}
+    .btn{padding:9px 18px;border:none;border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:600;cursor:pointer;transition:.15s}
+    .btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.12)}
+    .btn-p{background:var(--sage);color:#fff}
+    .btn-o{background:transparent;border:1.5px solid var(--border);color:var(--text-mid)}
+    #extra-list{margin-top:10px;display:flex;flex-direction:column;gap:6px}
+    .etag{display:inline-flex;align-items:center;gap:8px;padding:5px 12px;border-radius:99px;font-size:.77rem;font-weight:500}
+    .etag.income{background:var(--sage-pale);color:var(--sage);border:1px solid var(--sage-light)}
+    .etag.expense{background:var(--coral-pale);color:var(--coral);border:1px solid var(--coral-light)}
+    .etag button{background:none;border:none;cursor:pointer;font-size:.85rem;opacity:.6}.etag button:hover{opacity:1}
+
+    /* CHIPS */
+    .scen-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px}
+    .chip{padding:7px 16px;border-radius:99px;border:1.5px solid var(--border);font-size:.79rem;font-weight:600;cursor:pointer;background:var(--warm-white);color:var(--text-mid);transition:.15s}
+    .chip.active,.chip:hover{background:var(--sage);border-color:var(--sage);color:#fff}
+
+    /* CHARTS */
+    .charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:28px}
+    @media(max-width:860px){.charts-grid{grid-template-columns:1fr}}
+    .chart-wrap{position:relative;height:280px}
+
+    /* TABLE */
+    .tscroll{overflow-x:auto;border-radius:var(--radius-sm);border:1px solid var(--border)}
+    table{width:100%;border-collapse:collapse;font-size:.85rem}
+    thead{background:var(--sage-pale);position:sticky;top:0;z-index:2}
+    thead th{padding:13px 16px;text-align:right;font-size:.71rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--sage);white-space:nowrap}
+    thead th:first-child{text-align:left}
+    tbody tr{border-bottom:1px solid var(--border);transition:background .12s}
+    tbody tr:last-child{border-bottom:none}
+    tbody tr:hover{background:var(--sage-pale)}
+    td{padding:11px 16px;text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+    td:first-child{text-align:left;font-weight:500;color:var(--text-mid)}
+    .ti{color:var(--sage);font-weight:600}.te{color:var(--coral);font-weight:500}
+    .tbp{color:var(--sky);font-weight:700}.tbn{color:#c94040;font-weight:700}
+    .ts{font-weight:600;color:var(--text-dark)}
+    tr.rh td{background:var(--sky-pale)}
+
+    /* STATUS */
+    .statusbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:12px 20px;background:var(--gold-pale);border:1px solid #e0c87a;border-radius:var(--radius-sm);margin-bottom:24px}
+    .statusbar span{font-size:.82rem;color:var(--text-mid)}
+    .statusbar strong{color:var(--gold);font-size:.9rem}
+
+    /* ══════════════════════════════
+       MODALES GENÉRICOS
+    ══════════════════════════════ */
+    .mo{display:none;position:fixed;inset:0;z-index:1000;background:rgba(44,62,53,.45);backdrop-filter:blur(4px);align-items:flex-start;justify-content:center;padding:24px 16px;overflow-y:auto}
+    .mo.open{display:flex;animation:fi .2s ease}
+    @keyframes fi{from{opacity:0}to{opacity:1}}
+    .mbox{background:var(--warm-white);border-radius:20px;width:100%;max-width:1100px;box-shadow:0 20px 60px rgba(0,0,0,.18);display:flex;flex-direction:column;max-height:calc(100vh - 48px);animation:su .25s ease}
+    @keyframes su{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
+    .mhdr{padding:24px 28px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;flex-shrink:0}
+    .mhdr h2{font-family:'Playfair Display',serif;font-size:1.35rem;color:var(--text-dark)}
+    .mhdr p{font-size:.81rem;color:var(--text-light)}
+    .mcls{background:var(--cream);border:1px solid var(--border);border-radius:99px;width:36px;height:36px;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;transition:.15s;flex-shrink:0}
+    .mcls:hover{background:var(--coral-pale);border-color:var(--coral-light)}
+    .mflt{padding:16px 28px;border-bottom:1px solid var(--border);display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;flex-shrink:0;background:var(--cream)}
+    .fg{display:flex;flex-direction:column;gap:4px}
+    .fg label{font-size:.69rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-light)}
+    .fg input,.fg select{padding:8px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:.85rem;background:var(--warm-white);color:var(--text-dark);outline:none;transition:.2s}
+    .fg input{min-width:190px}.fg select{min-width:170px}
+    .fg input:focus,.fg select:focus{border-color:var(--lav);box-shadow:0 0 0 3px rgba(139,126,200,.15)}
+    /* Para el modal de centros de día el focus es ámbar */
+    .fg.cd input:focus,.fg.cd select:focus{border-color:var(--amb);box-shadow:0 0 0 3px rgba(201,124,46,.15)}
+    .fstats{margin-left:auto;font-size:.79rem;color:var(--text-light);white-space:nowrap;align-self:flex-end;padding-bottom:2px}
+    .fstats strong{color:var(--lav)}
+    .fstats.cd-st strong{color:var(--amb)}
+    .mbody{overflow-y:auto;flex:1}
+    .cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(295px,1fr));gap:14px;padding:20px 28px 28px}
+
+    /* CARD RESIDENCIA (lavanda) */
+    .cc{background:var(--warm-white);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;transition:.2s;position:relative;overflow:hidden}
+    .cc::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--lav),var(--sky));border-radius:4px 4px 0 0}
+    .cc:hover{border-color:var(--lav-light);box-shadow:0 4px 20px rgba(139,126,200,.15);transform:translateY(-2px)}
+
+    /* CARD CENTRO DE DÍA (ámbar) */
+    .ccd{background:var(--warm-white);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;transition:.2s;position:relative;overflow:hidden}
+    .ccd::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--amb-btn),var(--gold));border-radius:4px 4px 0 0}
+    .ccd:hover{border-color:var(--amb-light);box-shadow:0 4px 20px rgba(201,124,46,.15);transform:translateY(-2px)}
+
+    .cc-name,.ccd-name{font-family:'Playfair Display',serif;font-size:.93rem;font-weight:600;color:var(--text-dark);line-height:1.3;margin-bottom:3px}
+    .cc-ent,.ccd-ent{font-size:.73rem;color:var(--text-light);margin-bottom:8px;line-height:1.3}
+
+    /* municipio chip residencia */
+    .cc-mun{display:inline-flex;align-items:center;gap:5px;background:var(--lav-pale);color:var(--lav);font-size:.7rem;font-weight:600;padding:3px 10px;border-radius:99px;border:1px solid var(--lav-light);margin-bottom:10px;text-transform:uppercase;letter-spacing:.04em}
+    /* municipio chip centro de día */
+    .ccd-mun{display:inline-flex;align-items:center;gap:5px;background:var(--amb-pale);color:var(--amb);font-size:.7rem;font-weight:600;padding:3px 10px;border-radius:99px;border:1px solid var(--amb-light);margin-bottom:10px;text-transform:uppercase;letter-spacing:.04em}
+
+    .cc-info,.ccd-info{display:flex;flex-direction:column;gap:4px;font-size:.78rem}
+    .cc-row,.ccd-row{display:flex;align-items:flex-start;gap:8px;color:var(--text-mid)}
+    .ic{flex-shrink:0;width:16px;text-align:center;font-size:.82rem}
+    .cc-acts,.ccd-acts{display:flex;gap:7px;margin-top:12px;flex-wrap:wrap}
+    .ab{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:99px;font-size:.72rem;font-weight:600;text-decoration:none;border:1.5px solid;transition:.15s;cursor:pointer;font-family:'DM Sans',sans-serif;background:none}
+    .ab:hover{transform:translateY(-1px)}
+    .ab.call{background:var(--sage-pale);color:var(--sage);border-color:var(--sage-light)}.ab.call:hover{background:var(--sage);color:#fff}
+    .ab.mail{background:var(--sky-pale);color:var(--sky);border-color:var(--sky-light)}.ab.mail:hover{background:var(--sky);color:#fff}
+    .ab.map{background:var(--gold-pale);color:var(--gold);border-color:#e0c87a}.ab.map:hover{background:var(--gold);color:#fff}
+    .ab.tar{background:var(--lav-pale);color:var(--lav);border-color:var(--lav-light)}.ab.tar:hover{background:var(--lav);color:#fff}
+    .ab.tar-cd{background:var(--amb-pale);color:var(--amb);border-color:var(--amb-light)}.ab.tar-cd:hover{background:var(--amb-btn);color:#fff}
+    .pub-tag{font-size:.71rem;font-weight:600;color:var(--sage)}
+    .cap-tag{display:inline-flex;align-items:center;gap:4px;font-size:.71rem;font-weight:600;color:var(--amb)}
+    .nores{text-align:center;padding:60px 20px;color:var(--text-light);font-size:.93rem;grid-column:1/-1}
+    .nores .bi{font-size:3rem;margin-bottom:12px}
+
+    /* MODALES TARIFA */
+    .tm{display:none;position:fixed;inset:0;z-index:2000;align-items:center;justify-content:center;background:rgba(44,62,53,.5);padding:20px}
+    .tm.open{display:flex}
+    .tbox{background:var(--warm-white);border-radius:var(--radius);padding:28px;max-width:460px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.2);animation:su .2s ease}
+    .tbox h3{font-family:'Playfair Display',serif;font-size:1.15rem;margin-bottom:8px;color:var(--text-dark)}
+    .tbox p{font-size:.87rem;color:var(--text-mid);margin-bottom:16px;line-height:1.65}
+    .tnote{background:var(--gold-pale);border:1px solid #e0c87a;border-radius:var(--radius-sm);padding:12px 16px;font-size:.81rem;color:var(--text-mid)}
+    .tnote-cd{background:var(--amb-pale);border:1px solid var(--amb-light);border-radius:var(--radius-sm);padding:12px 16px;font-size:.81rem;color:var(--text-mid)}
+    .tcls{margin-top:16px;width:100%;padding:10px;background:var(--cream);border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;font-size:.85rem;color:var(--text-mid)}
+    .tcls:hover{background:var(--coral-pale)}
+
+    /* Stripe ámbar cabecera modal centros día */
+    .mhdr.cd-hdr{border-top:4px solid var(--amb-btn);border-radius:20px 20px 0 0}
+
+    @media print{.card .extra-sec,.btn,.chip,.btn-res,.btn-cd{display:none}}
+    @media(max-width:600px){header{padding:18px}main{padding:18px 12px 40px}.card{padding:18px}.kpi-grid{grid-template-columns:1fr 1fr}.mbox{border-radius:14px}.mhdr,.mflt{padding:14px 16px}.cgrid{padding:12px 14px 20px;grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="header-title">
+    <h1>📋 Previsión de Caja · Escenario Dependencia</h1>
+    <p>Gestión financiera personal · Horizonte 2026–2036 · Actualizado automáticamente</p>
+  </div>
+  <div class="header-actions">
+    <span class="badge">⚡ Cálculo en tiempo real</span>
+    <button class="btn-res" onclick="openRes()">🏥 Residencias <span class="bcnt" id="cnt-res">156</span></button>
+    <button class="btn-cd"  onclick="openCD()">☀️ Centros de Día <span class="bcnt" id="cnt-cd">67</span></button>
+  </div>
+</header>
+
+<!-- MAIN DASHBOARD -->
+<main>
+
+  <div class="kpi-grid">
+    <div class="kpi green"><div class="kpi-label">Ingresos Anuales</div><div class="kpi-value" id="kpi-income">—</div><div class="kpi-sub">Pensión + Viudedad</div></div>
+    <div class="kpi coral"><div class="kpi-label">Gasto Anual (Residencia)</div><div class="kpi-value" id="kpi-expense">—</div><div class="kpi-sub">Coste promedio residencia</div></div>
+    <div class="kpi sky"><div class="kpi-label">Saldo Inicial</div><div class="kpi-value" id="kpi-balance">—</div><div class="kpi-sub">Cuenta corriente</div></div>
+    <div class="kpi gold"><div class="kpi-label">Saldo estimado fin 2030</div><div class="kpi-value" id="kpi-2030">—</div><div class="kpi-sub">Proyección base</div></div>
+  </div>
+
+  <div class="statusbar" id="statusbar">
+    <span>⚠️ El saldo se agota en: <strong id="dep-year">calculando…</strong></span>
+    <span>·</span>
+    <span>Saldo acumulado 2036: <strong id="bal-2036">—</strong></span>
+  </div>
+
+  <div class="card" style="margin-bottom:28px">
+    <div class="sec-title">Parámetros editables · actualización inmediata</div>
+    <div class="inputs-grid">
+      <div class="ig"><label>Pensión mensual (€)</label><input type="number" id="p-pension" value="1572.96" step="1" min="0" oninput="recalc()"><span class="hint">Pensión de jubilación</span></div>
+      <div class="ig"><label>Pensión viudedad mensual (€)</label><input type="number" id="p-viudedad" value="821.09" step="1" min="0" oninput="recalc()"><span class="hint">Pensión de viudedad</span></div>
+      <div class="ig"><label>Saldo inicial cuenta (€)</label><input type="number" id="p-saldo" value="95000" step="100" min="0" oninput="recalc()"><span class="hint">Ahorro actual disponible</span></div>
+      <div class="ig"><label>IPC anual previsto (%)</label><input type="number" id="p-ipc" value="2" step="0.1" min="0" max="20" oninput="recalc()"><span class="hint">Actualización pensiones e inflación</span></div>
+      <div class="ig"><label>Coste asistencia hogar / mes (€)</label><input type="number" id="p-hogar" value="1800" step="50" min="0" oninput="recalc()"><span class="hint">Sólo año 1 (2026)</span></div>
+      <div class="ig"><label>Coste residencia / mes (€)</label><input type="number" id="p-residencia" value="4000" step="50" min="0" oninput="recalc()"><span class="hint">Desde año de ingreso</span></div>
+      <div class="ig"><label>IPC residencia anual (%)</label><input type="number" id="p-ipc-res" value="2" step="0.1" min="0" max="20" oninput="recalc()"><span class="hint">Actualización coste residencia</span></div>
+      <div class="ig hl"><label>Año inicio residencia</label><input type="number" id="p-res-year" value="2027" step="1" min="2026" max="2040" oninput="recalc()"><span class="hint">Primer año en residencia</span></div>
+    </div>
+    <div class="extra-sec">
+      <h4>➕ Añadir ingreso o gasto extraordinario</h4>
+      <div class="extra-row">
+        <input type="text" id="ex-desc" placeholder="Descripción (ej: Herencia, Seguro…)">
+        <input type="number" id="ex-amount" placeholder="Importe anual (€)" min="0" step="100">
+        <input type="number" id="ex-ys" placeholder="Año inicio" value="2026" min="2026" max="2040">
+        <input type="number" id="ex-ye" placeholder="Año fin (0=solo ese año)" value="0" min="0" max="2040">
+        <select id="ex-type"><option value="income">Ingreso</option><option value="expense">Gasto</option></select>
+        <button class="btn btn-p" onclick="addExtra()">Añadir</button>
+      </div>
+      <div id="extra-list"></div>
+    </div>
+  </div>
+
+  <div style="margin-bottom:20px">
+    <div class="sec-title">Escenarios rápidos</div>
+    <div class="scen-row">
+      <button class="chip active" onclick="loadScen('base',this)">Escenario Base</button>
+      <button class="chip" onclick="loadScen('optimista',this)">Optimista (IPC 1%)</button>
+      <button class="chip" onclick="loadScen('pesimista',this)">Pesimista (IPC 3%)</button>
+      <button class="chip" onclick="loadScen('ayuda',this)">+ Ayuda Dependencia</button>
+    </div>
+  </div>
+
+  <div class="charts-grid">
+    <div class="card"><div class="sec-title">Evolución del saldo</div><div class="chart-wrap"><canvas id="ch-bal"></canvas></div></div>
+    <div class="card"><div class="sec-title">Ingresos vs Gastos anuales</div><div class="chart-wrap"><canvas id="ch-flow"></canvas></div></div>
+  </div>
+
+  <div class="card">
+    <div class="sec-title">Tabla de proyección año a año</div>
+    <div class="tscroll">
+      <table id="ptable"><thead><tr><th>Concepto</th></tr></thead><tbody id="ptbody"></tbody></table>
+    </div>
+    <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn btn-o" onclick="exportCSV()">⬇ Exportar CSV</button>
+      <button class="btn btn-o" onclick="window.print()">🖨 Imprimir</button>
+    </div>
+  </div>
+
+</main>
+
+<!-- ══ MODAL RESIDENCIAS ══ -->
+<div class="mo" id="mod-res" onclick="if(event.target===this)closeRes()">
+  <div class="mbox">
+    <div class="mhdr">
+      <div><h2>🏥 Directorio de Residencias · Bizkaia</h2><p>Residencias para personas mayores · 156 centros registrados · Datos del Registro Oficial</p></div>
+      <button class="mcls" onclick="closeRes()">✕</button>
+    </div>
+    <div class="mflt">
+      <div class="fg"><label>Buscar por nombre</label><input type="text" id="rf-nom" placeholder="Ej: Caser, Colisèe, Domusvi…" oninput="filterRes()"></div>
+      <div class="fg"><label>Municipio</label><select id="rf-mun" onchange="filterRes()"><option value="">Todos los municipios</option></select></div>
+      <div class="fg"><label>Entidad gestora</label><input type="text" id="rf-ent" placeholder="Ej: GSR, Igurco, Sanitas…" oninput="filterRes()"></div>
+      <div class="fstats">Mostrando <strong id="r-shown">156</strong> de 156</div>
+    </div>
+    <div class="mbody"><div class="cgrid" id="r-grid"></div></div>
+  </div>
+</div>
+
+<!-- ══ MODAL CENTROS DE DÍA ══ -->
+<div class="mo" id="mod-cd" onclick="if(event.target===this)closeCD()">
+  <div class="mbox">
+    <div class="mhdr cd-hdr">
+      <div><h2>☀️ Directorio de Centros de Día · Bizkaia</h2><p>Centros de atención diurna con autorización de funcionamiento · 67 centros registrados · Datos del Registro Oficial</p></div>
+      <button class="mcls" onclick="closeCD()">✕</button>
+    </div>
+    <div class="mflt">
+      <div class="fg cd"><label>Buscar por nombre</label><input type="text" id="cd-nom" placeholder="Ej: Gazteluondo, Bilbozar…" oninput="filterCD()"></div>
+      <div class="fg cd"><label>Municipio</label><select id="cd-mun" onchange="filterCD()"><option value="">Todos los municipios</option></select></div>
+      <div class="fg cd"><label>Tipo de gestión</label><select id="cd-tipo" onchange="filterCD()"><option value="">Pública y privada</option><option value="PÚBLICA">Pública</option><option value="PRIVADA">Privada</option></select></div>
+      <div class="fstats cd-st">Mostrando <strong id="cd-shown">67</strong> de 67</div>
+    </div>
+    <div class="mbody"><div class="cgrid" id="cd-grid"></div></div>
+  </div>
+</div>
+
+<!-- ══ MODAL TARIFA RESIDENCIA ══ -->
+<div class="tm" id="tm-res" onclick="if(event.target===this)closeTRes()">
+  <div class="tbox">
+    <h3 id="tr-name"></h3>
+    <p id="tr-text"></p>
+    <div class="tnote">💡 <strong>Consejo:</strong> Solicita siempre presupuesto personalizado indicando el grado de dependencia reconocido (I, II o III) y el tipo de habitación deseado. Los precios concertados con Diputación Foral pueden reducir el coste hasta un 70% según la renta familiar.</div>
+    <button class="tcls" onclick="closeTRes()">Cerrar</button>
+  </div>
+</div>
+
+<!-- ══ MODAL TARIFA CENTRO DE DÍA ══ -->
+<div class="tm" id="tm-cd" onclick="if(event.target===this)closeTCD()">
+  <div class="tbox">
+    <h3 id="tcd-name"></h3>
+    <p id="tcd-text"></p>
+    <div class="tnote-cd">☀️ <strong>Consejo:</strong> Los centros de día públicos o concertados aplican tarifas según la renta del usuario. Consulta con el centro si la plaza está subvencionada a través de la Diputación Foral de Bizkaia o del Ayuntamiento, ya que puede reducir significativamente el coste.</div>
+    <button class="tcls" onclick="closeTCD()">Cerrar</button>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════
+//  DATOS RESIDENCIAS (156)
+// ══════════════════════════════════════
+const RESIDENCIAS=[{"nombre":"ABOITIZ LAGUN ETXEA-FUNDACION BENEFICA","entidad":"FUNDACION BENEFICA ABOITIZ-LAGUN ETXEA","municipio":"EA","direccion":"CL JESUS 002","telefono":"946275204","email":"DIRECCION@GRUPOFERBAR.ES"},{"nombre":"ANDRA MARI- RESIDENCIA","entidad":"RESIDENCIA ASISTIDA ANDRAMARI SL","municipio":"GETXO","direccion":"CL MAIDAGAN 010","telefono":"944300749","email":"ANDRAMARI@ANDRAMARI.ORG"},{"nombre":"ARRATIAKO EGOITZA-HERRI ERAKUNDE AUTONOMOA","entidad":"ARRATIAKO EGOITZA-HERRI ERAKUNDE AUTONOMOA","municipio":"DIMA","direccion":"BA IBARRA 017","telefono":"946315776","email":"EGOITZA@ARRATIA.EUS"},{"nombre":"ARTIBAI EGOITZA","entidad":"ONDARROAKO UDALA","municipio":"ONDARROA","direccion":"CL ARTIBAI KALEA 004","telefono":"946833231","email":"ARTIBAIEGOITZA@ONDARROA.EUS"},{"nombre":"BALLESOL BILBAO","entidad":"INTERCENTROS BALLESOL SA","municipio":"BILBAO","direccion":"CL GORDONIZ 012","telefono":"944595470","email":"DIRECCION.BILBAO@BALLESOL.ES"},{"nombre":"BEATO DOMINGO ITURRATE-RESIDENCIA","entidad":"FUNDACION BEATO DOMINGO ITURRATE","municipio":"GETXO","direccion":"CL GAZTELUMENDI 030","telefono":"944300024","email":"administracion@residenciabeatodomingo.com"},{"nombre":"CASER RESIDENCIAL ARTXANDA","entidad":"CASER RESIDENCIAL SA","municipio":"BILBAO","direccion":"CM SAN ROQUE 038","telefono":"944134111","email":"EBERISTAIN@CASERESIDENCIAL.ES"},{"nombre":"CENTRO ASISTENCIAL ELORRIO","entidad":"INSTITUTO FORAL DE ASISTENCIA SOCIAL DE BIZKAIA I.F.A.S.","municipio":"ELORRIO","direccion":"CL OSPITALKANTOIA 004","telefono":"946583231","email":"ELORRIO.EGOITZA@BIZKAIA.EUS"},{"nombre":"CENTRO ASISTENCIAL LEIOA","entidad":"INSTITUTO FORAL DE ASISTENCIA SOCIAL DE BIZKAIA I.F.A.S.","municipio":"LEIOA","direccion":"BA SANTI MAMI AUZOA 020","telefono":"944649800","email":"LEIOA.EGOITZA@BIZKAIA.EUS"},{"nombre":"CENTRO GERIATRICO ABANDO","entidad":"CENTRO ABANDO SL","municipio":"BILBAO","direccion":"CR BASURTU-KASTREXANA 031","telefono":"944399264","email":"RGENERAL@EUSKALNET.NET"},{"nombre":"CONDE DE ARESTI-RESIDENCIA","entidad":"FUNDACION VIZCAINA DE CARIDAD-RESIDENCIA CONDE DE ARESTI","municipio":"BILBAO","direccion":"CL BRUNO MAURICIO ZABALA 022","telefono":"944156092","email":"DIRECCION@RESIDENCIACONDEARESTI.COM"},{"nombre":"DOMUSVI MIRAFLORES","entidad":"QUAVITAE SERVICIOS ASISTENCIALES SA","municipio":"BILBAO","direccion":"AV MIRAFLORES 017","telefono":"944333756","email":"direccion.miraflores@domusvi.es"},{"nombre":"EL ARENAL-RESIDENCIA","entidad":"RESIDENCIA EL ARENAL SL","municipio":"BILBAO","direccion":"CL CORREO 021","telefono":"944790000","email":"direccion@residenciaelarenal.com"},{"nombre":"EUSEBIO ALDEKOA-RESIDENCIA","entidad":"RESIDENCIA EUSEBIO ALDECOA DE ZEBERIO","municipio":"ZEBERIO","direccion":"BA ELIZONDO 008","telefono":"946481108","email":"REUSEBIOALDEKOA.ZEBERIO@BIZKAIA.ORG"},{"nombre":"FUNDACION ASPALDIKO-RESIDENCIA","entidad":"FUNDACION ASPALDIKO","municipio":"PORTUGALETE","direccion":"BA CAMPANZAR 007","telefono":"944625000","email":"LARRIOLA@ASPALDIKO.ORG"},{"nombre":"FUNDACION ELORDUY","entidad":"FUNDACION ELORDUY","municipio":"BARRIKA","direccion":"CR AYUNTAMIENTO 001","telefono":"946770140","email":"info@elorduy.eus"},{"nombre":"FUNDACION RESIDENCIA CALZADA","entidad":"FUNDACION RESIDENCIA CALZADA","municipio":"GERNIKA-LUMO","direccion":"CL JUAN CALZADA 030","telefono":"946250890","email":"DIRECCION@RESIDENCIACALZADA.COM"},{"nombre":"FUNDACION SANTO HOSPITAL DEL GLORIOSO SAN JUAN BAUTISTA","entidad":"FUNDACION SANTO HOSPITAL DEL GLORIOSO SAN JUAN BAUTISTA","municipio":"PORTUGALETE","direccion":"CL GENERAL CASTAÑOS 075","telefono":"944614148","email":"HOSPITALSANJUANBAUTISTA@TELEFONICA.NET"},{"nombre":"GATIKAKO SANTA MARIA EGOITZA","entidad":"SANTA MARIA DE GATIKA RESIDENCIA GERIATRICA SL","municipio":"GATIKA","direccion":"BO IGARTUA 040","telefono":"946941031","email":"residencia.smgatika@hotmail.com"},{"nombre":"GERIATRICO AITZEA","entidad":"GERIATRICO AITZEA SL","municipio":"GAMIZ-FIKA","direccion":"BA ERGOIEN AUZOA 173","telefono":"946153344","email":"GERIATRICOAITZEA@YAHOO.ES"},{"nombre":"GERIATRICO BIOTZAK","entidad":"GERIATRICO BIOTZAK SA","municipio":"GUEÑES","direccion":"CL ESTARTA 007","telefono":"946690141","email":"biotzak@gmail.com"},{"nombre":"GERIATRICO LOREAK","entidad":"GERIATRICO LOREAK SL","municipio":"BILBAO","direccion":"CL NOVIA SALCEDO 030","telefono":"944277604","email":"GERIATRICOLOREAK@HOTMAIL.COM"},{"nombre":"GURE ETXEA-RESIDENCIA SANTO HOSPITAL Y ASILO DE CARIDAD","entidad":"SANTO HOSPITAL Y ASILO DE CARIDAD DE MUNDAKA","municipio":"MUNDAKA","direccion":"CL LORATEGI 002","telefono":"946876095","email":"MBASKARAN@GEURE-ETXEA.COM"},{"nombre":"HOGAR RESIDENCIA DE SAN JOSE DE ERANDIO","entidad":"AYUNTAMIENTO DE ERANDIO-ERANDIOKO UDALA","municipio":"ERANDIO","direccion":"PL J.A. AGIRRE ETA LEKUBE PLAZA 011","telefono":"944036700","email":"sanjoseegoitza@erandio.eus"},{"nombre":"HOSPITAL ASILO NUESTRA SEÑORA DE LOS DESAMPARADOS","entidad":"HOSPITAL ASILO DE NUESTRA SEÑORA DE LOS DESAMPARADOS DEL VALLE DE CARRANZA","municipio":"KARRANTZA HARANA/VALLE DE CARRANZA","direccion":"CL SOSCAÑO 003","telefono":"946806349","email":"direccion@residenciakarrantza.eus"},{"nombre":"JN BIZKAIA","entidad":"GRUPO RESIDENCIAL J N BIZKAIA SL","municipio":"BILBAO","direccion":"CL MIEMBRO DYA FERNANDO JIMENEZ 011","telefono":"944730034","email":"JNBIZKAIASL@OUTLOOK.ES"},{"nombre":"JUAN ELLACURIA LARRAURI-RESIDENCIA MUNICIPAL","entidad":"AYUNTAMIENTO DE SESTAO-SESTAOKO UDALA","municipio":"SESTAO","direccion":"CL GRAN VIA DE J.A. AGUIRRE 56","telefono":"944964611","email":"DIRECTOR.RESIDENCIA@SESTAO.EUS"},{"nombre":"LA ALEGRIA RESIDENCIA","entidad":"ASOCIACION LA ALEGRIA ATENCION A LOS MAYORES","municipio":"MUSKIZ","direccion":"BA SAN JULIAN 002","telefono":"946708061","email":"ALEGRIA@RESIDENCIALEGRIA.COM"},{"nombre":"LA ARENA RESIDENCIA","entidad":"LA ARENA 95 SL","municipio":"ZIERBENA","direccion":"BA LA ARENA 13","telefono":"946365033","email":"RGENERAL@EUSKALNET.NET"},{"nombre":"LEON TRUCIOS RESIDENCIA","entidad":"CLECE MAYORES SL","municipio":"BALMASEDA","direccion":"CL EL CUBO 009","telefono":"946800601","email":"RLEONTRUCIOS@ZAINTZEN.EUS"},{"nombre":"LOIU GURENA RESIDENCIA","entidad":"RESIDENCIAL AULAGA SL","municipio":"LOIU","direccion":"CM UNBETXIKI BIDEA 009","telefono":"944530049","email":"LOIU@GURENA.COM"},{"nombre":"OIZPE EGOITZA","entidad":"GESTION DE SERVICIOS RESIDENCIALES S COOP","municipio":"MUNITIBAR-ARBATZEGI GERRIKAITZ","direccion":"CL OLABARRI 008","telefono":"946133910","email":"RES.MUNITIBAR@GSR.COOP"},{"nombre":"RESIDENCIA ABELETXE","entidad":"VITALITAS CENTROS RESIDENCIALES SL","municipio":"ERMUA","direccion":"CL ABELETXE 004","telefono":"943257777","email":"NMARTIN@VITALIAPLUS.ES"},{"nombre":"RESIDENCIA ALAI","entidad":"RESIDENCIA ALAI SL","municipio":"BASAURI","direccion":"CL CATALUNYA 038","telefono":"944261643","email":"jc.herrero@juancarlosherrero.com"},{"nombre":"RESIDENCIA ALBIZ SANTIAGO LLANOS","entidad":"BABESTEN SL","municipio":"SESTAO","direccion":"CL FELIX MARIA DE SAMANIEGO 003","telefono":"946572220","email":"direccion@residenciaalbiz.eus"},{"nombre":"RESIDENCIA ANAI-ARTEAN","entidad":"ANAI-ARTEAN SL","municipio":"BILBAO","direccion":"CL SANTUTXU 040","telefono":"944333579","email":"PILARANAIARTEAN@HOTMAIL.ES"},{"nombre":"RESIDENCIA ANAI-CANTERO","entidad":"ANAI-CANTERO SL","municipio":"BILBAO","direccion":"CL DONOSTIA-SAN SEBASTIAN 001","telefono":"944169558","email":"ANAICANTERO1@GMAIL.COM"},{"nombre":"RESIDENCIA ANAI-CANTERO II","entidad":"ANAI-CANTERO SL","municipio":"BILBAO","direccion":"CL ORIXE 040","telefono":"944003109","email":"ORIXE40@HOTMAIL.COM"},{"nombre":"RESIDENCIA ANAI-CANTERO III","entidad":"ANAI-CANTERO SL","municipio":"BILBAO","direccion":"CL ZAMACOLA 079","telefono":"946575441","email":"RESIZAMACOLA1@HOTMAIL.COM"},{"nombre":"RESIDENCIA ANDIA","entidad":"RESIDENCIA ANDIA SL","municipio":"BILBAO","direccion":"CL JULIAN GAIARRE 007","telefono":"944732019","email":"RESIDENCIA.ANDIA@HOTMAIL.COM"},{"nombre":"RESIDENCIA ANDRA MARI","entidad":"RESIDENCIA CENTRO DE DIA ASTARLOA SL","municipio":"DURANGO","direccion":"CL PABLO PEDRO ASTARLOA KALEA 1","telefono":"946032531","email":"JOSULANDETA5@GMAIL.COM"},{"nombre":"RESIDENCIA ANDRA MARI, SANTO HOSPITAL DE OROZKO","entidad":"GESTION DE SERVICIOS RESIDENCIALES S COOP","municipio":"OROZKO","direccion":"CL ANDRA MARI 012","telefono":"946339990","email":"RES.OROZKO@GSR.COOP"},{"nombre":"RESIDENCIA ARANDIA","entidad":"RESIDENCIAS NOSTEM SL","municipio":"ARRIGORRIAGA","direccion":"TR CRISTO 011","telefono":"946076755","email":"DIRECCION.ARANDIA@DOMUSVI.ES"},{"nombre":"RESIDENCIA ARBILDU","entidad":"RESIDENCIA ARBILDU SA","municipio":"ZEBERIO","direccion":"BA ARBILDU 010","telefono":"946481277","email":"INFO@RESIDENCIARBILDU.COM"},{"nombre":"RESIDENCIA ARBOLANTXA","entidad":"RESIDENCIA ARBOLANTXA SL","municipio":"BILBAO","direccion":"TR ARBOLANTXA 007","telefono":"944121133","email":"RESIDENCIABILBAOESTE@GMAIL.COM"},{"nombre":"RESIDENCIA ARGALUZA","entidad":"RESIDENCIA ARGALUZA SL","municipio":"SOPELA","direccion":"CL GATZARRINE 034","telefono":"946765514","email":"INFO@RESIDENCIA-ARGALUZA.COM"},{"nombre":"RESIDENCIA ARGIETXEA","entidad":"ASISTENCIA GERIATRICA ARGIETXEA SL","municipio":"ARRIGORRIAGA","direccion":"CL SANTA ISABEL 053","telefono":"944318030","email":"ARGIETXEA@HOTMAIL.COM"},{"nombre":"RESIDENCIA ARROTEGI","entidad":"GESTION DE SERVICIOS RESIDENCIALES S COOP","municipio":"BUSTURIA","direccion":"BA AXPE 064","telefono":"946870003","email":"res.arrotegi@gsr.coop"},{"nombre":"RESIDENCIA ARTXANDA LA ESPERANZA","entidad":"ARTXANDA BASS SL","municipio":"BILBAO","direccion":"CR ARTXANDA-SANTO DOMINGO 013","telefono":"944456250","email":"ARTXANDA@BIOGER.ES"},{"nombre":"RESIDENCIA ASTARLOA","entidad":"RESIDENCIA CENTRO DE DIA ASTARLOA SL","municipio":"DURANGO","direccion":"CL PABLO PEDRO ASTARLOA KALEA 001","telefono":"946203814","email":"RESIDENCIAASTARLOA@GMAIL.COM"},{"nombre":"RESIDENCIA ASTRABUDUA","entidad":"RESIDENCIA URIZ SL","municipio":"GETXO","direccion":"CL ATXUTEGI KALEA 2-4","telefono":"944911513","email":"jc.herrero@juancarlosherrero.com"},{"nombre":"RESIDENCIA ATSOA","entidad":"CIUDAD RESIDENCIAL ATSOA SL","municipio":"SANTURTZI","direccion":"CL ANTONIO ALZAGA 058","telefono":"944832607","email":"ANA@ATSOA.COM"},{"nombre":"RESIDENCIA AVELLANEDA","entidad":"RESIDENCIA ENCARTACIONES SL","municipio":"SOPUERTA","direccion":"BO EL CARRAL 024","telefono":"946504079","email":"COORDINACION@RESIDENCIAAVELLANEDA.COM"},{"nombre":"RESIDENCIA BEGOÑAKO AMA","entidad":"RESIDENCIA BEGOÑAKO AMA SL","municipio":"BILBAO","direccion":"CL VIRGEN DE BEGOÑA 006","telefono":"944167133","email":"BEGOAMA@HOTMAIL.ES"},{"nombre":"RESIDENCIA BIDEARTE","entidad":"RESIDENCIA BIDEARTE SL","municipio":"GETXO","direccion":"CL BIDEARTE 006","telefono":"944647245","email":"jc.herrero@juancarlosherrero.com"},{"nombre":"RESIDENCIA BIDEBIETA","entidad":"RESIDENCIA BIDEBIETA SL","municipio":"BASAURI","direccion":"CL CATALUNYA 042","telefono":"944408248","email":"IRUTXIBOLA@YAHOO.ES"},{"nombre":"RESIDENCIA BILBOZAR","entidad":"IGURCO CENTROS GERONTOLOGICOS SL","municipio":"BILBAO","direccion":"CL VITORIA-GAZTEIZ 012","telefono":"946792741","email":"psastre@igurco.es"},{"nombre":"RESIDENCIA BIZIA","entidad":"RESIDENCIA BIZIA 2018 SL","municipio":"GATIKA","direccion":"BO ZURBAO 010","telefono":"946278571","email":"LANAKSL@HOTMAIL.COM"},{"nombre":"RESIDENCIA BIZKOTXALDE","entidad":"BABESTEN SL","municipio":"BASAURI","direccion":"CL URIBARRI 003","telefono":"944050000","email":"direccion@residenciabizkotxalde.eus"},{"nombre":"RESIDENCIA BOLUETA","entidad":"RESIDENCIA BOLUETA SL","municipio":"BILBAO","direccion":"CL SAGARMINAGA 009","telefono":"944738630","email":"EGUSRESI@GMAIL.COM"},{"nombre":"RESIDENCIA BOUCO BILBAO ZABALBIDE","entidad":"RESIDENCIAL SENIOR 2000 SL","municipio":"BILBAO","direccion":"CL ZABALBIDE 110 A","telefono":"914260952","email":"DIRECCION.ZABALBIDE@EMEIS.COM"},{"nombre":"RESIDENCIA CALABRIA","entidad":"IGURCO RESIDENCIAS SOCIOSANITARIAS SL","municipio":"FORUA","direccion":"BA ELEXALDE FORUA 034","telefono":"946256073","email":"MMAGUNAZELAIA.FORUA@BIZKAIA.ORG"},{"nombre":"RESIDENCIA CASER RESIDENCIAL TXURDINAGA","entidad":"SERVICIOS INTEGRALES GERONTOLOGICOS Y SANITARIOS SA","municipio":"BILBAO","direccion":"CL GABRIEL ARESTI 040","telefono":"944022570","email":"RTXURDINAGA@CASERESIDENCIAL.ES"},{"nombre":"RESIDENCIA CENTRO ELGUEZABAL","entidad":"CENTRO ELGUEZABAL SL","municipio":"PORTUGALETE","direccion":"CL JULIO GUTIERREZ LUMBRERAS 010","telefono":"944835511","email":"CENTROELGUEZABAL@GMAIL.COM"},{"nombre":"RESIDENCIA COLISÈE - SAN ANTONIO","entidad":"LA SALETA CARE SL","municipio":"BILBAO","direccion":"CL PEREZ GALDOS 019","telefono":"944395040","email":"DSANANTONIO@COLISEE.ES"},{"nombre":"RESIDENCIA COLISÈE BARRIKA","entidad":"LA SALETA CARE SL","municipio":"BARRIKA","direccion":"CL GENERAL 007","telefono":"946774477","email":"DBARRIKA@COLISEE.ES"},{"nombre":"RESIDENCIA COLISÈE BILBAO","entidad":"LA SALETA CARE SL","municipio":"BILBAO","direccion":"AV FERROCARRIL 040","telefono":"944394770","email":"BILBAO@COLISEE.ES"},{"nombre":"RESIDENCIA COLISÈE INDAUTXU","entidad":"LA SALETA CARE SL","municipio":"BILBAO","direccion":"CL EGAÑA 12A","telefono":"944223001","email":"INDAUTXU@COLISEE.ES"},{"nombre":"RESIDENCIA COLISÈE KIRIKIÑO","entidad":"LA SALETA CARE SL","municipio":"BILBAO","direccion":"CL TORRE GOROSTITZAGA 2-4","telefono":"944127400","email":"DKIRIKINO@COLISEE.ES"},{"nombre":"RESIDENCIA COLISÈE LARRAURI","entidad":"LA SALETA CARE SL","municipio":"MUNGIA","direccion":"CL BERMEO BIDEA 033","telefono":"946745307","email":"dlarrauri@colisee.es"},{"nombre":"RESIDENCIA DE ANCIANOS DE OTXANDIO","entidad":"GESTION DE SERVICIOS RESIDENCIALES S COOP","municipio":"OTXANDIO","direccion":"CL OSPITAL KALE 008","telefono":"945461403","email":"RES.OTXANDIO@GSR.COOP"},{"nombre":"RESIDENCIA DOMUSVI RIBERA","entidad":"SARRIKUE SL","municipio":"BILBAO","direccion":"CL RIBERA DE LA 005","telefono":"946792938","email":"DIRECCION.RIBERA@DOMUSVI.ES"},{"nombre":"RESIDENCIA EGOITZ ALAI","entidad":"EGOITZ ALAI SL","municipio":"BERMEO","direccion":"CL ZUBIAUR-TAR KEPA 074","telefono":"946029886","email":"DIRECCION@EGOITZALAI.COM"},{"nombre":"RESIDENCIA EL PILAR","entidad":"RESIDENCIA EL PILAR DE BARAKALDO","municipio":"BARAKALDO","direccion":"CL SAN VICENTE 001","telefono":"944782260","email":"INFO@ELPILAR-RESIDENCIA.COM"},{"nombre":"RESIDENCIA ELEXALDE","entidad":"SERINTE TERCERA EDAD SL","municipio":"GALDAKAO","direccion":"CL HERMANO VICTOR 003","telefono":"944573335","email":"INFO@RESIDENCIAELEXALDE.NET"},{"nombre":"RESIDENCIA ELIZALDE","entidad":"RESIDENCIA OLAEDI SL","municipio":"ERANDIO","direccion":"BO IBAÑEZ BETOLATZA-ERANDIOGOIKOA","telefono":"944531236","email":"INFO@RESIDENCIAELIZALDE.COM"},{"nombre":"RESIDENCIA EMILIA MITXELENA","entidad":"GESTION DE SERVICIOS RESIDENCIALES S COOP","municipio":"TRUCIOS-TURTZIOZ","direccion":"AV LEHENDAKARI AGIRRE 039","telefono":"946809045","email":"RES.TRUCIOS@GSR.COOP"},{"nombre":"RESIDENCIA ETXE GIROA","entidad":"ETXE GIROA SL","municipio":"BILBAO","direccion":"CL ISLAS CANARIAS 002","telefono":"944753266","email":"DIRECCION@ETXEGIROA.COM"},{"nombre":"RESIDENCIA FUNDACION MIRANDA","entidad":"FUNDACION MIRANDA","municipio":"BARAKALDO","direccion":"AV MIRANDA 004","telefono":"944382675","email":"gerencia@fundacionmiranda.org"},{"nombre":"RESIDENCIA FUNDADORA SIERVAS DE JESUS","entidad":"RESIDENCIA FUNDADORA SIERVAS DE JESUS","municipio":"BILBAO","direccion":"AV UNIVERSIDADES 007","telefono":"944465800","email":"RESIDENCIAMF@SIERVASDEJESUS.COM"},{"nombre":"RESIDENCIA GAZTELUONDO","entidad":"URGATZI SL","municipio":"BILBAO","direccion":"CL INTXAURTXUETA 001","telefono":"946567885","email":"direccion@residenciagazteluondo.eus"},{"nombre":"RESIDENCIA GERIATRICA LAS MAGNOLIAS","entidad":"RESIDENCIA GERIATRICA LAS MAGNOLIAS SA","municipio":"MEÑAKA","direccion":"PL MEÑAKABARRENA 011","telefono":"946742424","email":"JOSEDIEZ@RESIDENCIALASMAGNOLIAS.NET"},{"nombre":"RESIDENCIA GERIATRICA ZURE ETXEA","entidad":"GESTION DE SERVICIOS RESIDENCIALES S COOP","municipio":"SOPUERTA","direccion":"BA LAS RIBAS 003","telefono":"946504024","email":"res.sopuerta@gsr.coop"},{"nombre":"RESIDENCIA GERIATRICA ZURE ETXEA BILBAO","entidad":"GESTION DE SERVICIOS RESIDENCIALES S COOP","municipio":"BILBAO","direccion":"CL AUTONOMIA 071","telefono":"944275735","email":"RES.AUTONOMIA@GSR.COOP"},{"nombre":"RESIDENCIA GURE ETXEA II","entidad":"RESIDENCIA GURE ETXEA SL","municipio":"AMOREBIETA-ETXANO","direccion":"BA DUDEA 025","telefono":"946309680","email":"GURETXEA2@GMAIL.COM"},{"nombre":"RESIDENCIA HERMANAS ANGELICAS","entidad":"COMUNIDAD DE RELIGIOSAS ANGELICAS DE BILBAO","municipio":"BILBAO","direccion":"CL PEREZ GALDOS 005","telefono":"944702005","email":"T.SOCIAL.BILBAO@ANGELICAS.ES"},{"nombre":"RESIDENCIA IBARREKOLANDA","entidad":"RESIDENCIA IBARREKOLANDA SL","municipio":"BILBAO","direccion":"PL CELESTINO M. DEL ARENAL 012","telefono":"944347107","email":"jc.herrero@juancarlosherrero.com"},{"nombre":"RESIDENCIA IGURCO UNBE","entidad":"IGURCO RESIDENCIAS SOCIOSANITARIAS SL","municipio":"ERANDIO","direccion":"CL GORRIBIDEA S/N","telefono":"944537002","email":"notificaciones@igurco.es"},{"nombre":"RESIDENCIA IMQ IGURCO ALHONDIGA","entidad":"IGURCO RESIDENCIAS SOCIOSANITARIAS SL","municipio":"BILBAO","direccion":"CL GENERAL CONCHA 020","telefono":"946620739","email":"ALHONDIGA@IGURCO.ES"},{"nombre":"RESIDENCIA IZARO XXI","entidad":"IZARO XXI RESIDENCIAS GERIATRICAS SL","municipio":"BILBAO","direccion":"CL PINTOR LOSADA 021","telefono":"944123128","email":"EGUSRESI@GMAIL.COM"},{"nombre":"RESIDENCIA JADO","entidad":"RESIDENCIA JADO EGOITZA SL","municipio":"BILBAO","direccion":"CL JOSE MARIA UGARTEBURU 022","telefono":"944450517","email":"RESIDENCIAJADO@HOTMAIL.COM"},{"nombre":"RESIDENCIA JANDONIZ DE BEDIA","entidad":"BEL EDAD DE BEDIA SL","municipio":"BEDIA","direccion":"CL JANDONIZ 002","telefono":"946313130","email":"DIRECCIONJANDONIZ@JANDONIZ.ES"},{"nombre":"RESIDENCIA JARDIN DE ENEKURI","entidad":"JARDIN DE ENEKURI SL","municipio":"BILBAO","direccion":"AV FATIMA ETORBIDEA 001","telefono":"944185768","email":"DIRECCION@JARDINDEENEKURI.COM"},{"nombre":"RESIDENCIA JARDINES DE EZTEBE","entidad":"JARDINES DE EZTEBE SL","municipio":"ETXEBARRI","direccion":"CR BILBAO-GALDAKAO S/N","telefono":"946182288","email":"DIRECCION@JARDINESDEEZTEBE.COM"},{"nombre":"RESIDENCIA JOSE MARIA AZKUNA","entidad":"IGURCO CENTROS GERONTOLOGICOS SL","municipio":"AMOREBIETA-ETXANO","direccion":"AV JOSE ANTONIO AGIRRE ETORBIDEA 002","telefono":"946309955","email":"EALLIKA@IGURCO.ES"},{"nombre":"RESIDENCIA JOXE MIEL BARANDIARAN","entidad":"SERVICIOS SOCIALES AITA MENNI SL","municipio":"DURANGO","direccion":"CL JOSE MIEL BARANDIARAN KALEA 001","telefono":"946215438","email":"NMARDARAS.AITAMENNI@HOSPITALARIAS.ES"},{"nombre":"RESIDENCIA LARRABARRENA - SONDIKA","entidad":"URGATZI SL","municipio":"SONDIKA","direccion":"CL ERREMENTERIA 030","telefono":"944535732","email":"larrabarrena@grupourgatzi.eus"},{"nombre":"RESIDENCIA LAS LACERAS","entidad":"RESIDENCIAS NOSTEM SL","municipio":"BALMASEDA","direccion":"CL VIRGEN DE GRACIA 037 B","telefono":"946038141","email":"DIRECCION.LASLACERAS@DOMUSVI.ES"},{"nombre":"RESIDENCIA LEZEAGA BASURTO","entidad":"RESIDENCIA LEZEAGA BASURTO SL","municipio":"BILBAO","direccion":"CL LEZEAGA 032","telefono":"946579919","email":"RESIDENCIALEZEAGA@HOTMAIL.COM"},{"nombre":"RESIDENCIA LOMBARDIA","entidad":"RESIDENCIA LOMBARDIA SL","municipio":"ZALLA","direccion":"AV LANZAGORTA 057","telefono":"946671177","email":"ZUZENDARIA.LOMBARDIA@GRUPODUINTZEN.COM"},{"nombre":"RESIDENCIA LORAMENDI","entidad":"SANITAS MAYORES PAIS VASCO SA","municipio":"ERANDIO","direccion":"CR LEIOA-UNBE ERREPIDEA 033","telefono":"944014500","email":"LORAMENDI.ADM@SANITAS.ES"},{"nombre":"RESIDENCIA MARCELO GANGOITI","entidad":"BABESTEN SL","municipio":"MUSKIZ","direccion":"CL MARCELO GANGOITI KALEA 001","telefono":"946708490","email":"direccion@residenciamgangoiti.eus"},{"nombre":"RESIDENCIA MEZO","entidad":"RESIDENCIA MEZO SL","municipio":"ERANDIO","direccion":"CL MESO KALEA 039","telefono":"946439607","email":"egusresi@gmail.com"},{"nombre":"RESIDENCIA MIRAVILLA","entidad":"BEL EDAD DE BILBAO-MIRAVILLA SL","municipio":"BILBAO","direccion":"CL XENPELAR 011","telefono":"944160580","email":"direccionmiravilla@miravilla.com"},{"nombre":"RESIDENCIA MUNICIPAL DE ANCIANOS DE ORDUÑA","entidad":"URDUÑAKO ARKUPEA SL","municipio":"URDUÑA/ORDUÑA","direccion":"BA SAN FRANCISCO 001","telefono":"945383025","email":"EGOITZA@URDUNA.COM"},{"nombre":"RESIDENCIA MUNICIPAL PERSONAS MAYORES ETXE MAITIA DE BASAURI","entidad":"RESIDENCIA DE ANCIANOS DE BASAURI","municipio":"BASAURI","direccion":"CL NAGUSIA 004","telefono":"944666410","email":"RESIDENCIAADMON@BASAURI.EUS"},{"nombre":"RESIDENCIA MUNICIPAL SAGRADO CORAZON DE JESUS DE GETXO","entidad":"RESIDENCIA MUNICIPAL DEL SAGRADO CORAZON DE JESUS DE GETXO","municipio":"GETXO","direccion":"CL ORMETXE 022","telefono":"944034740","email":"administrazioa.egoitza@getxo.eus"},{"nombre":"RESIDENCIA NUESTRA SEÑORA DE BEGOÑA","entidad":"RESIDENCIA NUESTRA SEÑORA DE BEGOÑA","municipio":"SANTURTZI","direccion":"BA VILLAR 055","telefono":"944836875","email":"info@residencia-santurtzi.eus"},{"nombre":"RESIDENCIA NUESTRA SEÑORA DE LEIRE","entidad":"RESIDENCIAS LOPABI SL","municipio":"BARAKALDO","direccion":"PS DOLORES IBARRURI 006","telefono":"944911513","email":"jc.herrero@juancarlosherrero.com"},{"nombre":"RESIDENCIA NUESTRA SEÑORA DEL SOCORRO","entidad":"RESIDENCIA NUESTRA SEÑORA DEL SOCORRO SL","municipio":"ZIERBENA","direccion":"BA LA CUESTA-ALDAPA 073","telefono":"946365365","email":"METXEBARRIA@RESIDENCIAEGUZKILORE.COM"},{"nombre":"RESIDENCIA ORUE","entidad":"IGURCO RESIDENCIAS SOCIOSANITARIAS SL","municipio":"AMOREBIETA-ETXANO","direccion":"BA SAN MIGUEL DUDEA S/N","telefono":"946300550","email":"notificaciones@igurco.es"},{"nombre":"RESIDENCIA OTXARTAGA","entidad":"PARQUE COMERCIAL GORBEIA SA","municipio":"ORTUELLA","direccion":"BA OTXARTAGA 028","telefono":"946640308","email":"ortuella@bioger.es"},{"nombre":"RESIDENCIA PIEDADEONDO","entidad":"ALDAGARI SL","municipio":"DIMA","direccion":"BA ELEXALDE S/N","telefono":"946311774","email":"PIDADEONDO@GMAIL.COM"},{"nombre":"RESIDENCIA PIÑUDI","entidad":"RESIDENCIA PIÑUDI SL","municipio":"AMOREBIETA-ETXANO","direccion":"CL KARMEN 026","telefono":"946308634","email":"RESIPINUDI@GMAIL.COM"},{"nombre":"RESIDENCIA POBEÑA","entidad":"RESIDENCIAL GENERAL SA","municipio":"MUSKIZ","direccion":"CM A LA ERMITA S/N","telefono":"946707977","email":"RGENERAL@EUSKALNET.NET"},{"nombre":"RESIDENCIA REKALDE","entidad":"REKA BERRI SL","municipio":"BILBAO","direccion":"CL ALFREDO KRAUSS 004","telefono":"944102084","email":"RESIDENCIAREKALDE@HOTMAIL.COM"},{"nombre":"RESIDENCIA RODRIGUEZ ANDOIN V","entidad":"RESIDENCIA ETXEDER SL","municipio":"PORTUGALETE","direccion":"CL GENERAL CASTAÑOS 139","telefono":"944830086","email":"rodriguez@andoinv.com"},{"nombre":"RESIDENCIA SAN ANDRES","entidad":"ANTEPEYA 2002 SL","municipio":"USANSOLO","direccion":"CL ANDER DEUNA 033","telefono":"944570957","email":"INFO@RESIDENCIAS-SANANDRES.COM"},{"nombre":"RESIDENCIA SAN ANDRES II","entidad":"ANTEPEYA 2002 SL","municipio":"GALDAKAO","direccion":"CL HERMANO VICTOR 017","telefono":"944573828","email":"administracion@residencias-sanandres.com"},{"nombre":"RESIDENCIA SAN ESTEBAN","entidad":"OBVIUM OMNIS SA","municipio":"GETXO","direccion":"AV LOS CHOPOS 014","telefono":"944910101","email":"residenciasanesteban@yahoo.es"},{"nombre":"RESIDENCIA SAN ESTEBAN - 2","entidad":"OBVIUM OMNIS SA","municipio":"GETXO","direccion":"AV LOS CHOPOS 014","telefono":"944910101","email":"residenciasanesteban@yahoo.es"},{"nombre":"RESIDENCIA SAN MIGUEL","entidad":"SANJURJO & GONZALEZ ASOCIADOS SL","municipio":"BASAURI","direccion":"CL BASAURI 003","telefono":"944262152","email":"RESANMIGUEL@RESIDENCIASANMIGUEL.ES"},{"nombre":"RESIDENCIA SAN ROKE - SAN ROKE EGOTETXEA","entidad":"GESTION DE SERVICIOS RESIDENCIALES S COOP","municipio":"MARKINA-XEMEIN","direccion":"CL AGUSTIN DEUNA KALEA 006","telefono":"946166221","email":"RES.MARKINA@GSR.COOP"},{"nombre":"RESIDENCIA SANFUENTES","entidad":"CENTRO RESIDENCIAL SANFUENTES SL","municipio":"ABANTO Y CIERVANA-ABANTO ZIERBENA","direccion":"AV LOS CHOPOS 029","telefono":"946363435","email":"RESIDENCIASANFUENTES@GMAIL.COM"},{"nombre":"RESIDENCIA SANTA AGUEDA","entidad":"SOCIEDAD GERIATRICA SANTA AGUEDA SL","municipio":"BARAKALDO","direccion":"CL SOCIEDAD SANTA AGUEDA S/N","telefono":"944378714","email":"DIRECCION@RESIDENCIASANTAAGUEDA.EUS"},{"nombre":"RESIDENCIA SANTA BARBARA","entidad":"ENEMAITE SL","municipio":"GALDAKAO","direccion":"CL HERMANO VICTOR 005","telefono":"944560069","email":"GERENCIA@RESIDENCIA-SANTABARBARA.COM"},{"nombre":"RESIDENCIA SANTA MARIA DE GETXO","entidad":"RESIDENCIA SANTA MARIA DE GETXO SL","municipio":"GETXO","direccion":"CR MAIDAGAN 034","telefono":"944607351","email":"RSM@EUSKALNET.NET"},{"nombre":"RESIDENCIA SANTA TERESA","entidad":"BEURKO RESIDENCIAL VITALITAS SL","municipio":"BARAKALDO","direccion":"AV LA LIBERTAD 069","telefono":"946572575","email":"DIRECCION.BARAKALDO@VITALIAPLUS.ES"},{"nombre":"RESIDENCIA SANTAMARIÑE","entidad":"GESTION DE SERVICIOS RESIDENCIALES S COOP","municipio":"URDULIZ","direccion":"CL GOIETA 029","telefono":"946766371","email":"RES.URDULIZ@GSR.COOP"},{"nombre":"RESIDENCIA SARRIKUE APERRIBAI","entidad":"SARRIKUE SL","municipio":"GALDAKAO","direccion":"BA APERRIBAI ZAHARRA 009","telefono":"944262334","email":"ADMON.APERRIBAI@DOMUSVI.ES"},{"nombre":"RESIDENCIA SARRIKUE ARBIDEA","entidad":"SARRIKUE SL","municipio":"BILBAO","direccion":"CL ARBIDEA 005","telefono":"944738589","email":"direccion.arbidea@domusvi.es"},{"nombre":"RESIDENCIA SENIORS ALTOS HORNOS","entidad":"RESIDENCIAS FAMILIARES PARA MAYORES SL","municipio":"BARAKALDO","direccion":"PZ DARSENA DE PORTU 001","telefono":"946660616","email":"DIRECCION.ALTOSHORNOS@SENIORSRESIDENCIAS.ES"},{"nombre":"RESIDENCIA SOPELANA","entidad":"RESIDENCIA SOPELANA SL","municipio":"SOPELA","direccion":"CL SABINO ARANA 035","telefono":"946764847","email":"res.sopelana@residenciasopelana.com"},{"nombre":"RESIDENCIA TABIRA","entidad":"RESIDENCIA TABIRA BERRI SL","municipio":"DURANGO","direccion":"CL INTXAURRONDO KALEA 027","telefono":"944668852","email":"RESIDENCIATABIRABERRI@HOTMAIL.COM"},{"nombre":"RESIDENCIA TORREZURI","entidad":"BEASKOA ELORRIAGA ETA IRIBAR SL","municipio":"GERNIKA-LUMO","direccion":"CL CARLOS GANGOITI 022","telefono":"946258288","email":"ADMINISTRACION@TORREZURI.COM"},{"nombre":"RESIDENCIA TRUIUONDO","entidad":"NAGUSPEA SL","municipio":"ZAMUDIO","direccion":"PO TORRELARRAGOITI POLIGONOA 006","telefono":"946575500","email":"MERCEDES.DIRECCION@NAGUSPEA.ES"},{"nombre":"RESIDENCIA TXURDINAGABARRI","entidad":"SERVICIOS SOCIALES AITA MENNI SL","municipio":"BILBAO","direccion":"CL MIEMBRO DYA FERNANDO JIMENEZ 008","telefono":"944598047","email":"JLOPEZ.AITAMENNI@HOSPITALARIAS.ES"},{"nombre":"RESIDENCIA USANSOLO","entidad":"RESIDENCIA USANSOLO SL","municipio":"USANSOLO","direccion":"BA GOROSIBAI 024","telefono":"944572224","email":"INFO@RESIDENCIAUSANSOLO.NET"},{"nombre":"RESIDENCIA VIDALIA SANTUTXU","entidad":"VIDALIA SERVICIOS SOCIOSANITARIOS SL","municipio":"BILBAO","direccion":"GP MONSEÑOR REMIGIO GANDASEGUI 001","telefono":"944337014","email":"JUAN.ANTONIO@RESIDENCIASVIDALIA.COM"},{"nombre":"RESIDENCIA VIRGEN DE BEGOÑA","entidad":"GESTORA DE NEGOCIOS BEGOÑALDE SL","municipio":"BILBAO","direccion":"GP BEGOÑALDE 009","telefono":"944458009","email":"RESIDENCIAVIRGENDEBEGONA@HOTMAIL.COM"},{"nombre":"RESIDENCIA VIRGEN DE LA VEGA","entidad":"HERMANOS CASTRO-GRANADO SL","municipio":"GALDAKAO","direccion":"CL HERMANO VICTOR 001","telefono":"944573067","email":"INFO@VIRGENDELAVEGA.NET"},{"nombre":"RESIDENCIA VITALIA SANTUTXU","entidad":"VITALITAS SARRIKO SL","municipio":"BILBAO","direccion":"CL REPUBLICA DE BEGOÑA 001","telefono":"944335701","email":"NOTIFICACIONES@VITALIAPLUS.ES"},{"nombre":"RESIDENCIA VITALITAS SARRIKO","entidad":"VITALITAS SARRIKO SL","municipio":"BILBAO","direccion":"CL LEHENDAKARI AGUIRRE 138","telefono":"944053564","email":"DIRECCION.BILBAO@VITALIAPLUS.ES"},{"nombre":"RESIDENCIA ZAMAKOLA","entidad":"FLOPEG 18 SL","municipio":"BILBAO","direccion":"CL ZAMACOLA 018","telefono":"944153901","email":"ZAMAKOLA18@GMAIL.COM"},{"nombre":"RESIDENCIA ZELAIONDO","entidad":"ZELAIGANE SL","municipio":"BUSTURIA","direccion":"BO SAN CRISTOBAL 019","telefono":"946171122","email":"RZELAIONDO@RESIDENCIAZELAIONDO.COM"},{"nombre":"RESIDENCIA ZORAGARRI","entidad":"ZORAGARRI SL","municipio":"SANTURTZI","direccion":"CL REGALES 020","telefono":"944838279","email":"ZORAGARRISL@GMAIL.COM"},{"nombre":"RESIDENCIA ZORROZGOITI","entidad":"IGURCO CENTROS GERONTOLOGICOS SL","municipio":"BILBAO","direccion":"CM ZORROZGOITI 023","telefono":"944742536","email":"SFERNANDEZ@IGURCO.ES"},{"nombre":"RESIDENCIA ZUETXE BAKIO","entidad":"RESIDENCIA ZUETXE-BAKIO SL","municipio":"BAKIO","direccion":"CL ERREMENTERIA KALEA 029","telefono":"944911513","email":"JC.HERRERO@JUANCARLOSHERRERO.COM"},{"nombre":"RESIDENCIA ZUMAIA","entidad":"ZAIN BERRI SL","municipio":"BILBAO","direccion":"CL ZUMAIA 020","telefono":"944611192","email":"RESIDENCIAZUMAIA@HOTMAIL.COM"},{"nombre":"SAN JOSE ETXE ALAI-RESIDENCIA","entidad":"FUNDACION OBARBURU DE ASISTENCIA","municipio":"MUNGIA","direccion":"CL ELORDUIGOITIA 009","telefono":"946744741","email":"AMANDALUNIZ@ETXEALAI.COM"},{"nombre":"SANCTI SPIRITUS ZAHARREN EGOITZA","entidad":"BERMEOKO UDALA-AYUNTAMIENTO DE BERMEO","municipio":"BERMEO","direccion":"CM TONPOI BIDEA 001","telefono":"946179160","email":"RESIDENTZIA@BERMEO.EUS"},{"nombre":"SANITAS RESIDENCIAL BARAKALDO","entidad":"SANITAS MAYORES PAIS VASCO SA","municipio":"BARAKALDO","direccion":"CL EGUSKIAGIRRE 008","telefono":"944783020","email":"barakaldo.adm@sanitas.es"},{"nombre":"SANTA Y REAL CASA DE MISERICORDIA","entidad":"SANTA CASA DE MISERICORDIA ENTIDAD BENEFICA DE BILBAO","municipio":"BILBAO","direccion":"AV SABINO ARANA 002","telefono":"944411900","email":"direccion@misericordiabilbao.org"},{"nombre":"SERVICIOS GERIATRICOS INDAUTXU - RESIDENCIA","entidad":"SERVICIOS GERIATRICOS INDAUTXU SL","municipio":"BILBAO","direccion":"CL GREGORIO DE LA REVILLA 028","telefono":"944443404","email":"INDAUTXU@GURENA.COM"},{"nombre":"URIBARREN ABAROA RESIDENCIA","entidad":"FUNDACION RESIDENCIA URIBARREN ABAROA","municipio":"LEKEITIO","direccion":"AV IÑIGO ARTIETA 002","telefono":"946840055","email":"gestionfua@uribarren.es"},{"nombre":"ZALLAKO EGUZKI-RESIDENCIA","entidad":"ORGANISMO AUTONOMO LOCAL RESIDENCIA ZALLAKO EGUZKI","municipio":"ZALLA","direccion":"AV SABINO ARANA 002","telefono":"946670254","email":"RESIDENCIAZALLA@ZALLA.EUS"}];
+
+// ══════════════════════════════════════
+//  DATOS CENTROS DE DÍA (67)
+// ══════════════════════════════════════
+const CENTROS_DIA=[{"nombre":"CENTRO DE DIA BIZIGURA","titular":"DIPUTACIÓN FORAL","tipo":"PÚBLICA","municipio":"ABANTO Y CIERVANA-ABANTO ZIERBENA","cp":"48500","direccion":"CL NUEVA AVENIDA 001","telefono":"946568116","capacidad":40},{"nombre":"CENTRO DE DIA NAFARROA","titular":"MUNICIPAL","tipo":"PÚBLICA","municipio":"AMOREBIETA-ETXANO","cp":"48340","direccion":"CL NAFARROA S/N 01","telefono":"946300190","capacidad":30},{"nombre":"CENTRO DE DIA ARANDIA","titular":"DIPUTACIÓN FORAL","tipo":"PÚBLICA","municipio":"ARRIGORRIAGA","cp":"48480","direccion":"TR CRISTO 011","telefono":"946076755","capacidad":50},{"nombre":"CENTRO DE DIA LAS LACERAS","titular":"DIPUTACIÓN FORAL","tipo":"PÚBLICA","municipio":"BALMASEDA","cp":"48800","direccion":"CL VIRGEN DE GRACIA 037 B","telefono":"946038141","capacidad":35},{"nombre":"CENTRO DE DIA DE INTEGRACION SOCIO CULTURAL","titular":"MUNICIPAL","tipo":"PÚBLICA","municipio":"BARAKALDO","cp":"48901","direccion":"CL ENCARTACIONES 006","telefono":"944184500","capacidad":60},{"nombre":"CENTRO DE DIA LASAITASUNA","titular":"SOCIEDAD LIMITADA","tipo":"PRIVADA","municipio":"BARAKALDO","cp":"48901","direccion":"AV ALTOS HORNOS DE VIZCAYA 7-9 B","telefono":"946857384","capacidad":40},{"nombre":"CENTRO DE DIA LAZTANA","titular":"SOCIEDAD LIMITADA","tipo":"PRIVADA","municipio":"BARAKALDO","cp":"48901","direccion":"CL FERRERIAS 048 B","telefono":"722277080","capacidad":53},{"nombre":"CENTRO DE DIA MIRANDA","titular":"FUNDACIÓN","tipo":"PRIVADA","municipio":"BARAKALDO","cp":"48902","direccion":"AV MIRANDA 004","telefono":"944382896","capacidad":60},{"nombre":"CENTRO DE DIA DE LA PAZ","titular":"MUNICIPAL","tipo":"PÚBLICA","municipio":"BARAKALDO","cp":"48903","direccion":"CL LA PAZ S/N","telefono":"944992582","capacidad":20},{"nombre":"BASAURI, CENTRO DE DIA ETXETIC","titular":"DIPUTACIÓN FORAL","tipo":"PÚBLICA","municipio":"BASAURI","cp":"48970","direccion":"RO URIBARRI 002","telefono":"944149475","capacidad":20},{"nombre":"CENTRO DE DIA BIZKOTXALDE","titular":"DIPUTACIÓN FORAL","tipo":"PÚBLICA","municipio":"BASAURI","cp":"48970","direccion":"CL URIBARRI 003","telefono":"944050000","capacidad":50},{"nombre":"CENTRO DE DIA ORMABARRIETA","titular":"DIPUTACIÓN FORAL","tipo":"PÚBLICA","municipio":"BERMEO","cp":"48370","direccion":"CL PINTOR BENITO BARRUETA 012 B","telefono":"946028281","capacidad":25},{"nombre":"CENTRO DE DIA ISOZAKI-ATEA","titular":"DIPUTACIÓN FORAL","tipo":"PÚBLICA","municipio":"BILBAO","cp":"48001","direccion":"CL URIBITARTE 012 B","telefono":"946123589","capacidad":30},{"nombre":"CENTRO DE DIA BASURTO","titular":"SOCIEDAD LIMITADA","tipo":"PRIVADA","municipio":"BILBAO","cp":"48002","direccion":"PZ BASURTUGORTA 006","telefono":"613052151","capacidad":20},{"nombre":"CENTRO DE DIA GAZTELUONDO","titular":"DIPUTACIÓN FORAL","tipo":"PÚBLICA","municipio":"BILBAO","cp":"48002","direccion":"JD INTXAURTXUETA 001","telefono":"946567885","capacidad":60},{"nombre":"CENTRO DE DIA ERREKALDE","titular":"SOCIEDAD LIMITADA","tipo":"PRIVADA","municipio":"BILBAO","cp":"48002","direccion":"CL GORDONIZ 049 A B","telefono":"946756116","capacidad":20},{"nombre":"CENTRO DE DIA SAN ADRIAN","titular":"DIPUTACIÓN FORAL","tipo":"PÚBLICA","municipio":"BILBAO","cp":"48003","direccion":"AV SAN ADRIAN 033 B","telefono":"944700706","capacidad":56},{"nombre":"CENTRO DE ATENCION DIURNA BIDEBERRI","titular":"SOCIEDAD LIMITADA","tipo":"PRIVADA","municipio":"BILBAO","cp":"48003","direccion":"CL CONDE MIRASOL 006","telefono":"944161055","capacidad":20},{"nombre":"CENTRO DE DIA BILBOZAR","titular":"DIPUTACIÓN FORAL","tipo":"PÚBLICA","municipio":"BILBAO","cp":"48003","direccion":"CL VITORIA-GAZTEIZ 012","telefono":"946792741","capacidad":50},{"nombre":"CENTRO DE DIA OTXARKOAGA","titular":"DIPUTACIÓN FORAL","tipo":"PÚBLICA","municipio":"BILBAO","cp":"48004","direccion":"CL ZIZERUENE 004","telefono":"944598154","capacidad":44},{"nombre":"CENTRO DE DIA KARMELO","titular":"DIPUTACIÓN FORAL","tipo":"PÚBLICA","municipio":"BILBAO","cp":"48004","direccion":"CL KARMELO S/N","telefono":"944597632","capacidad":53},{"nombre":"CENTRO DE DIA TXURDINAGABARRI","titular":"DIPUTACIÓN FORAL","tipo":"PÚBLICA","municipio":"BILBAO","cp":"48004","direccion":"CL MIEMBRO DYA FERNANDO JIMENEZ 008","telefono":"944598047","capacidad":100},{"nombre":"CENTRO DE DIA COLISÈE KIRIKIÑO","titular":"SOCIEDAD LIMITADA","tipo":"PRIVADA","municipio":"BILBAO","cp":"48004","direccion":"CL TORRE GOROSTITZAGA 2-4","telefono":"944127400","capacidad":20},{"nombre":"CENTRO DE DIA EL ARENAL","titular":"SOCIEDAD LIMITADA","tipo":"PRIVADA","municipio":"BILBAO","cp":"48005","direccion":"CL CORREO 21 BAJO","telefono":"688658473","capacidad":6},{"nombre":"EGUNON ETXEA-CENTRO DE DIA","titular":"OTRAS I.S.A.L.","tipo":"PRIVADA","municipio":"BILBAO","cp":"48005","direccion":"CL RONDA 018","telefono":"944163955","capacidad":35},{"nombre":"CENTRO DE DIA VIDALIA SANTUTXU","titular":"SOCIEDAD LIMITADA","tipo":"PRIVADA","municipio":"BILBAO","cp":"48006","direccion":"GP MONSEÑOR REMIGIO GANDASEGUI 001","telefono":"944337014","capacidad":12},{"nombre":"CENTRO DE DIA ERCILLA","titular":"SOCIEDAD LIMITADA","tipo":"PRIVADA","municipio":"BILBAO","cp":"48007","direccion":"CL ZURBARAN 002","telefono":"944744258","capacidad":35},{"nombre":"CENTRO DE DIA ETXANIZ","titular":"DIPUTACIÓN FORAL","tipo":"PÚBLICA","municipio":"BILBAO","cp":"48010","direccion":"CL MARCELINO OREJA 003","telefono":"946620535","capacidad":60},{"nombre":"CENTRO DE DIA COLISÈE - SAN ANTONIO","titular":"SOCIEDAD LIMITADA","tipo":"PRIVADA","municipio":"BILBAO","cp":"48010","direccion":"CL PEREZ GALDOS 021","telefono":"944395040","capacidad":40},{"nombre":"CENTRO DE DIA ZORROZGOITI","titular":"DIPUTACIÓN FORAL","tipo":"PÚBLICA","municipio":"BILBAO","cp":"48013","direccion":"CM ZORROZGOITI 023","telefono":"944742536","capacidad":30},{"nombre":"CENTRO DE DIA SOIK","titular":"PERSONA FÍSICA","tipo":"PRIVADA","municipio":"BILBAO","cp":"48014","direccion":"CL AVDA LEHENDAKARI AGUIRRE 65","telefono":"846661862","capacidad":20},{"nombre":"CENTRO DE DIA SARRIKO","titular":"SOCIEDAD LIMITADA","tipo":"PRIVADA","municipio":"BILBAO","cp":"48015","direccion":"CL TXAKOLI 1 001 B","telefono":"944052524","capacidad":26},{"nombre":"CENTRO DE DIA TE MIMO","titular":"PERSONA FÍSICA","tipo":"PRIVADA","municipio":"BILBAO","cp":"48215","direccion":"PL SAN PEDRO 003","telefono":"944752926","capacidad":22},{"nombre":"CENTRO DE DIA DE ARRATIAKO EGOITZA","titular":"MUNICIPAL","tipo":"PÚBLICA","municipio":"DIMA","cp":"48141","direccion":"BO IBARRA 017","telefono":"946315776","capacidad":20},{"nombre":"CENTRO DE DIA EGUZKILORE","titular":"SOCIEDAD LIMITADA","tipo":"PRIVADA","municipio":"DURANGO","cp":"48200","direccion":"CL INTXAURRONDO KALEA 019 02","telefono":"946200338","capacidad":24},{"nombre":"CENTRO DE DIA TABIRA","titular":"SOCIEDAD LIMITADA","tipo":"PRIVADA","municipio":"DURANGO","cp":"48200","direccion":"CL INTXAURRONDO KALEA 027","telefono":"944668852","capacidad":14},{"nombre":"CENTRO DE DIA JOXE MIEL BARANDIARAN","titular":"DIPUTACIÓN FORAL","tipo":"PÚBLICA","municipio":"DURANGO","cp":"48200","direccion":"CL JOSE MIEL BARANDIARAN KALEA 001","telefono":"946215438","capacidad":40},{"nombre":"CENTRO DE DIA SAN JOSE","titular":"MUNICIPAL","tipo":"PÚBLICA","municipio":"ERANDIO","cp":"48950","direccion":"PL J.A. AGUIRRE ETA LEKUBE 011","telefono":"944036700","capacidad":20},{"nombre":"CENTRO DE DIA ABELETXE","titular":"DIPUTACIÓN FORAL","tipo":"PÚBLICA","municipio":"ERMUA","cp":"48260","direccion":"CL ABELETXE 004","telefono":"943257777","capacidad":30},{"nombre":"CENTRO DE DIA ETXEBARRI","titular":"DIPUTACIÓN FORAL","tipo":"PÚBLICA","municipio":"ETXEBARRI","cp":"48450","direccion":"CL AMAMEN ETA AITITEEN KALEA 002","telefono":"946510316","capacidad":20},{"nombre":"CENTRO DE DIA PLAZAKOETXE-GALDAKAO","titular":"DIPUTACIÓN FORAL","tipo":"PÚBLICA","municipio":"GALDAKAO","cp":"48960","direccion":"PE PLAZAKOETXE 003 B","telefono":"944573491","capacidad":24},{"nombre":"CENTRO DE DIA TORREZURI","titular":"SOCIEDAD LIMITADA","tipo":"PRIVADA","municipio":"GERNIKA-LUMO","cp":"48300","direccion":"CL CARLOS GANGOITI 022","telefono":"946258288","capacidad":7},{"nombre":"CENTRO DE DIA FUNDACION RESIDENCIA CALZADA","titular":"FUNDACIÓN","tipo":"PRIVADA","municipio":"GERNIKA-LUMO","cp":"48300","direccion":"CL JUAN CALZADA 030","telefono":"946250890","capacidad":18},{"nombre":"CENTRO DE DIA ACACIAS DE LA DYA","titular":"ASOCIACIÓN","tipo":"PRIVADA","municipio":"GETXO","cp":"48990","direccion":"CL ACACIAS 039 B","telefono":"946023200","capacidad":40},{"nombre":"CENTRO DE DIA AIBOA","titular":"DIPUTACIÓN FORAL","tipo":"PÚBLICA","municipio":"GETXO","cp":"48992","direccion":"CL ORMETXE 022 B","telefono":"944659444","capacidad":30},{"nombre":"CENTRO RURAL POLIVALENTE GURE-ETXEA","titular":"MUNICIPAL","tipo":"PÚBLICA","municipio":"ISPASTER","cp":"48288","direccion":"BO LARRINAGA 001","telefono":"946842999","capacidad":8},{"nombre":"CENTRO DE DIA GALUA","titular":"SOCIEDAD LIMITADA","tipo":"PRIVADA","municipio":"KARRANTZA HARANA/VALLE DE CARRANZA","cp":"48891","direccion":"BA AMBASAGUAS 042","telefono":"635427936","capacidad":20},{"nombre":"CENTRO DE DIA ESTARTETXE DE LEIOA","titular":"DIPUTACIÓN FORAL","tipo":"PÚBLICA","municipio":"LEIOA","cp":"48940","direccion":"CL ESTARTETXE 002 B","telefono":"944803568","capacidad":64},{"nombre":"CENTRO DE DIA URIBARREN ABAROA EGUNEKO ZENTROA","titular":"FUNDACIÓN","tipo":"PRIVADA","municipio":"LEKEITIO","cp":"48280","direccion":"AV IÑIGO ARTIETA 002","telefono":"946840055","capacidad":20},{"nombre":"CENTRO DE DIA LOIU GURENA","titular":"SOCIEDAD LIMITADA","tipo":"PRIVADA","municipio":"LOIU","cp":"48180","direccion":"CM UNBETXIKI BIDEA 009","telefono":"944530049","capacidad":15},{"nombre":"CENTRO DE DIA SAN ROKE","titular":"COOPERATIVA","tipo":"PRIVADA","municipio":"MARKINA-XEMEIN","cp":"48270","direccion":"CL AGUSTIN DEUNA KALEA 006","telefono":"946166221","capacidad":12},{"nombre":"MUNGIA, CENTRO DE DIA ETXETIC","titular":"DIPUTACIÓN FORAL","tipo":"PÚBLICA","municipio":"MUNGIA","cp":"48100","direccion":"CL OLALDE BERESIA 003","telefono":"946073700","capacidad":20},{"nombre":"SAN JOSE ETXE ALAI EGUNEKO ZENTRUA","titular":"FUNDACIÓN","tipo":"PRIVADA","municipio":"MUNGIA","cp":"48116","direccion":"CL ELORDUIGOITIA 009","telefono":"946744741","capacidad":25},{"nombre":"CENTRO DE DIA DE MUSKIZ","titular":"MUNICIPAL","tipo":"PÚBLICA","municipio":"MUSKIZ","cp":"48550","direccion":"AV FUENTE VIEJA 008","telefono":"946706630","capacidad":30},{"nombre":"CENTRO DE DIA ONDARROA","titular":"DIPUTACIÓN FORAL","tipo":"PÚBLICA","municipio":"ONDARROA","cp":"48700","direccion":"CL SAN IGNAZIO KALEA 021","telefono":"946036063","capacidad":25},{"nombre":"CENTRO DE DIA ANDRA MARI, SANTO HOSPITAL DE OROZKO","titular":"MUNICIPAL","tipo":"PÚBLICA","municipio":"OROZKO","cp":"48410","direccion":"CL ANDRA MARI 012","telefono":"946339990","capacidad":25},{"nombre":"CENTRO DE DIA OTXARTAGA","titular":"DIPUTACIÓN FORAL","tipo":"PÚBLICA","municipio":"ORTUELLA","cp":"48530","direccion":"GP OTXARTAGA 028","telefono":"946640308","capacidad":40},{"nombre":"SAN ROQUE-CENTRO DE DIA","titular":"MUNICIPAL","tipo":"PÚBLICA","municipio":"PORTUGALETE","cp":"48920","direccion":"BO CAMPANZAR 007","telefono":"944610755","capacidad":26},{"nombre":"CENTRO DE DIA ASPALDIKO","titular":"FUNDACIÓN","tipo":"PRIVADA","municipio":"PORTUGALETE","cp":"48920","direccion":"BO CAMPANZAR 007","telefono":"944625000","capacidad":70},{"nombre":"CENTRO DE DIA TERCERA EDAD DE SANTURTZI","titular":"MUNICIPAL","tipo":"PÚBLICA","municipio":"SANTURTZI","cp":"48980","direccion":"BA VILLAR 055","telefono":"944205800","capacidad":40},{"nombre":"CENTRO DE DIA DE BULLON","titular":"MUNICIPAL","tipo":"PÚBLICA","municipio":"SANTURTZI","cp":"48980","direccion":"TR BULLON 5-7","telefono":"944938127","capacidad":40},{"nombre":"CENTRO DE DIA SESTAO BERRIA","titular":"DIPUTACIÓN FORAL","tipo":"PÚBLICA","municipio":"SESTAO","cp":"48910","direccion":"PZ CONDE DE VALMASEDA 010 B","telefono":"944723426","capacidad":80},{"nombre":"CENTRO DE DIA UGAO-GANE","titular":"DIPUTACIÓN FORAL","tipo":"PÚBLICA","municipio":"UGAO-MIRABALLES","cp":"48490","direccion":"CL UDIARRAGA 079 B","telefono":"946482952","capacidad":45},{"nombre":"CENTRO DE DIA ORDUÑA / URDUÑA","titular":"MUNICIPAL","tipo":"PÚBLICA","municipio":"URDUÑA/ORDUÑA","cp":"48460","direccion":"BO SAN FRANCISCO 001","telefono":"945383025","capacidad":10},{"nombre":"CENTRO DE DIA ORCONERA VALLE DE TRAPAGA","titular":"MUNICIPAL","tipo":"PÚBLICA","municipio":"VALLE DE TRAPAGA-TRAPAGARAN","cp":"48510","direccion":"PL ORCONERA 6-7 BAJO","telefono":"944925392","capacidad":25},{"nombre":"CENTRO DE DIA ETXETIC ZALLA","titular":"DIPUTACIÓN FORAL","tipo":"PÚBLICA","municipio":"ZALLA","cp":"48860","direccion":"UR TEPEYAC URBANIZAZIOA 011","telefono":"944658641","capacidad":40},{"nombre":"CENTRO DE DIA TRUIUONDO","titular":"DIPUTACIÓN FORAL","tipo":"PÚBLICA","municipio":"ZAMUDIO","cp":"48170","direccion":"PG TORRELARRAGOITI POLIGONOA 006","telefono":"946575500","capacidad":40}];
+
+// ══════════════════════════════════════
+//  MODAL RESIDENCIAS
+// ══════════════════════════════════════
+const cap=s=>s.charAt(0).toUpperCase()+s.slice(1).toLowerCase();
+const isPub=c=>/fundacion|municipal|udala|ayuntamiento|i\.f\.a\.s\.|organismo autonomo/i.test(c.entidad||'');
+
+function openRes(){
+  document.getElementById('mod-res').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeRes(){
+  document.getElementById('mod-res').classList.remove('open');
+  document.body.style.overflow='';
+}
+function filterRes(){
+  const n=document.getElementById('rf-nom').value.trim().toLowerCase();
+  const m=document.getElementById('rf-mun').value;
+  const e=document.getElementById('rf-ent').value.trim().toLowerCase();
+  const f=RESIDENCIAS.filter(c=>(!n||c.nombre.toLowerCase().includes(n))&&(!m||c.municipio===m)&&(!e||c.entidad.toLowerCase().includes(e)));
+  document.getElementById('r-shown').textContent=f.length;
+  renderRes(f);
+}
+function renderRes(list){
+  const g=document.getElementById('r-grid');
+  if(!list.length){g.innerHTML=`<div class="nores"><div class="bi">🔍</div><p>No se encontraron residencias con los filtros aplicados.</p></div>`;return}
+  g.innerHTML=list.map(c=>{
+    const pub=isPub(c);
+    const t1=c.telefono.split('/')[0].trim();
+    const nm=c.nombre.replace(/'/g,"\\'");
+    return`<div class="cc">
+<div class="cc-name">${cap(c.nombre)}</div>
+<div class="cc-ent">${cap(c.entidad)}</div>
+<div class="cc-mun">📍 ${cap(c.municipio)}</div>
+<div class="cc-info">
+<div class="cc-row"><span class="ic">🏠</span><span>${c.direccion}</span></div>
+<div class="cc-row"><span class="ic">📞</span><span>${c.telefono}</span></div>
+<div class="cc-row"><span class="ic">✉️</span><span style="word-break:break-all;font-size:.73rem">${c.email}</span></div>
+${pub?'<div class="cc-row"><span class="ic">🏛️</span><span class="pub-tag">Gestión pública / concertada</span></div>':''}
+</div>
+<div class="cc-acts">
+<a class="ab call" href="tel:${t1}">📞 Llamar</a>
+<a class="ab mail" href="mailto:${c.email}">✉️ Email</a>
+<a class="ab map" href="https://maps.google.com?q=${encodeURIComponent(c.nombre+' '+c.municipio+' Bizkaia')}" target="_blank" rel="noopener">🗺️ Mapa</a>
+<button class="ab tar" onclick="showTRes('${nm}',${pub})">💶 Tarifas</button>
+</div></div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════
+//  MODAL CENTROS DE DÍA
+// ══════════════════════════════════════
+function openCD(){
+  document.getElementById('mod-cd').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeCD(){
+  document.getElementById('mod-cd').classList.remove('open');
+  document.body.style.overflow='';
+}
+function filterCD(){
+  const n=document.getElementById('cd-nom').value.trim().toLowerCase();
+  const m=document.getElementById('cd-mun').value;
+  const t=document.getElementById('cd-tipo').value;
+  const f=CENTROS_DIA.filter(c=>(!n||c.nombre.toLowerCase().includes(n))&&(!m||c.municipio===m)&&(!t||c.tipo===t));
+  document.getElementById('cd-shown').textContent=f.length;
+  renderCD(f);
+}
+function renderCD(list){
+  const g=document.getElementById('cd-grid');
+  if(!list.length){g.innerHTML=`<div class="nores"><div class="bi">🔍</div><p>No se encontraron centros de día con los filtros aplicados.</p></div>`;return}
+  g.innerHTML=list.map(c=>{
+    const isPu=c.tipo==='PÚBLICA';
+    const nm=c.nombre.replace(/'/g,"\\'");
+    return`<div class="ccd">
+<div class="ccd-name">${cap(c.nombre)}</div>
+<div class="ccd-ent">${c.titular}</div>
+<div class="ccd-mun">📍 ${cap(c.municipio)}</div>
+<div class="ccd-info">
+<div class="ccd-row"><span class="ic">🏠</span><span>${c.direccion} · CP ${c.cp}</span></div>
+<div class="ccd-row"><span class="ic">📞</span><span>${c.telefono}</span></div>
+<div class="ccd-row"><span class="ic">🪑</span><span class="cap-tag">${c.capacidad} plazas</span></div>
+<div class="ccd-row"><span class="ic">${isPu?'🏛️':'🏢'}</span><span style="font-size:.71rem;font-weight:600;color:${isPu?'var(--sage)':'var(--amb)'}">Gestión ${isPu?'pública':'privada'}${isPu?' · Posible concertación':''}</span></div>
+</div>
+<div class="ccd-acts">
+<a class="ab call" href="tel:${c.telefono.split('/')[0].trim()}">📞 Llamar</a>
+<a class="ab map" href="https://maps.google.com?q=${encodeURIComponent(c.nombre+' '+c.municipio+' Bizkaia')}" target="_blank" rel="noopener">🗺️ Mapa</a>
+<button class="ab tar-cd" onclick="showTCD('${nm}',${isPu},${c.capacidad})">💶 Tarifas</button>
+</div></div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════
+//  TARIFAS
+// ══════════════════════════════════════
+function showTRes(nombre,pub){
+  const info=pub
+    ?{rango:'600 € – 1.800 € / mes (plaza concertada)',nota:'Centro con gestión pública o concierto con la Diputación Foral de Bizkaia. El coste depende del nivel de renta del usuario según normativa foral vigente. Contacta directamente para conocer los requisitos de acceso.'}
+    :{rango:'3.000 € – 6.000 € / mes',nota:'Centro privado. Las tarifas incluyen alojamiento, manutención, cuidados básicos y atención médica. El precio varía según el grado de dependencia, tipo de habitación (individual/doble) y servicios adicionales contratados.'};
+  document.getElementById('tr-name').textContent=cap(nombre);
+  document.getElementById('tr-text').innerHTML=`<strong>Rango orientativo:</strong> ${info.rango}<br><br>${info.nota}`;
+  document.getElementById('tm-res').classList.add('open');
+}
+function closeTRes(){document.getElementById('tm-res').classList.remove('open')}
+
+function showTCD(nombre,pub,cap_val){
+  const info=pub
+    ?{rango:'300 € – 900 € / mes',nota:`Centro de gestión pública o concertada. El coste real depende de la renta del usuario y del grado de dependencia reconocido. Con plaza concertada por la Diputación Foral de Bizkaia, muchos usuarios pagan entre el 20-40% del precio real. Centro con ${cap_val} plazas.`}
+    :{rango:'700 € – 1.500 € / mes',nota:`Centro de gestión privada. Las tarifas incluyen transporte adaptado, manutención (almuerzo), actividades terapéuticas y seguimiento sociosanitario. El precio varía según el número de días de asistencia y los servicios contratados. Centro con ${cap_val} plazas.`};
+  document.getElementById('tcd-name').textContent=cap(nombre);
+  document.getElementById('tcd-text').innerHTML=`<strong>Rango orientativo:</strong> ${info.rango}<br><br>${info.nota}`;
+  document.getElementById('tm-cd').classList.add('open');
+}
+function closeTCD(){document.getElementById('tm-cd').classList.remove('open')}
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){closeRes();closeCD();closeTRes();closeTCD()}
+});
+
+// ══════════════════════════════════════
+//  INICIALIZAR SELECTS
+// ══════════════════════════════════════
+function initSelects(){
+  // Residencias municipios
+  const rm=[...new Set(RESIDENCIAS.map(c=>c.municipio))].sort();
+  const rsel=document.getElementById('rf-mun');
+  rm.forEach(m=>{const o=document.createElement('option');o.value=m;o.textContent=cap(m);rsel.appendChild(o)});
+  // Centros día municipios
+  const cm=[...new Set(CENTROS_DIA.map(c=>c.municipio))].sort();
+  const csel=document.getElementById('cd-mun');
+  cm.forEach(m=>{const o=document.createElement('option');o.value=m;o.textContent=cap(m);csel.appendChild(o)});
+  // Render inicial
+  renderRes(RESIDENCIAS);
+  renderCD(CENTROS_DIA);
+  // Actualizar contadores cabecera
+  document.getElementById('cnt-res').textContent=RESIDENCIAS.length;
+  document.getElementById('cnt-cd').textContent=CENTROS_DIA.length;
+}
+
+// ══════════════════════════════════════
+//  DASHBOARD FINANCIERO
+// ══════════════════════════════════════
+const YEARS=[2026,2027,2028,2029,2030,2031,2032,2033,2034,2035,2036];
+let extras=[],chBal=null,chFlow=null;
+const fmt=v=>v.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';
+const fmtK=v=>(v/1000).toFixed(1)+' k€';
+const $=id=>document.getElementById(id);
+const gn=id=>parseFloat($(id).value)||0;
+
+function recalc(){
+  const pension=gn('p-pension'),viudedad=gn('p-viudedad'),saldo0=gn('p-saldo');
+  const ipc=gn('p-ipc')/100,hogar=gn('p-hogar'),res=gn('p-residencia');
+  const ipcR=gn('p-ipc-res')/100,resY=parseInt($('p-res-year').value)||2027;
+  const base=(pension+viudedad)*12;
+  const rows=YEARS.map((yr,i)=>{
+    const f=Math.pow(1+ipc,i),income=base*f;
+    let expense=yr<resY?hogar*12:res*12*Math.pow(1+ipcR,yr-resY);
+    let eIn=0,eOut=0;
+    extras.forEach(e=>{const end=e.ye===0?e.ys:e.ye;if(yr>=e.ys&&yr<=end){e.type==='income'?eIn+=e.amount:eOut+=e.amount}});
+    return{yr,income,expense,eIn,eOut,totalIn:income+eIn,totalOut:expense+eOut,sub:income+eIn-expense-eOut};
+  });
+  let bal=saldo0;const bals=[];
+  rows.forEach(r=>{bal+=r.sub;bals.push(bal);r.bal=bal});
+  let dep='Más allá de 2036';
+  for(let i=0;i<bals.length;i++)if(bals[i]<0){dep=YEARS[i].toString();break}
+  $('kpi-income').textContent=fmt(rows[0].income);
+  $('kpi-expense').textContent=fmt(res*12);
+  $('kpi-balance').textContent=fmt(saldo0);
+  const i30=YEARS.indexOf(2030);$('kpi-2030').textContent=i30>=0?fmt(bals[i30]):'—';
+  $('dep-year').textContent=dep;
+  const last=bals[bals.length-1];$('bal-2036').textContent=fmt(last);
+  const sb=$('statusbar');sb.style.background=last<0?'#fdecea':'var(--gold-pale)';sb.style.borderColor=last<0?'#e9a0a0':'#e0c87a';
+  renderTable(rows,bals);renderCharts(rows,bals);
+}
+function renderTable(rows,bals){
+  document.querySelector('#ptable thead tr').innerHTML='<th>Concepto</th>'+YEARS.map(y=>`<th>${y}</th>`).join('');
+  $('ptbody').innerHTML=[
+    `<tr><td>📥 Ingresos pensión</td>${rows.map(r=>`<td class="ti">${fmt(r.income)}</td>`).join('')}</tr>`,
+    rows.some(r=>r.eIn>0)?`<tr><td>📥 Ingresos extraordinarios</td>${rows.map(r=>`<td class="ti">${fmt(r.eIn)}</td>`).join('')}</tr>`:'',
+    `<tr><td>📤 Gasto asistencia / residencia</td>${rows.map(r=>`<td class="te">${fmt(r.expense)}</td>`).join('')}</tr>`,
+    rows.some(r=>r.eOut>0)?`<tr><td>📤 Gastos extraordinarios</td>${rows.map(r=>`<td class="te">${fmt(r.eOut)}</td>`).join('')}</tr>`:'',
+    `<tr class="rh"><td><strong>= Subtotal anual</strong></td>${rows.map(r=>`<td class="${r.sub>=0?'ti':'te'} ts">${fmt(r.sub)}</td>`).join('')}</tr>`,
+    `<tr><td><strong>💰 Saldo acumulado</strong></td>${bals.map(b=>`<td class="${b>=0?'tbp':'tbn'}">${fmt(b)}</td>`).join('')}</tr>`,
+  ].join('');
+}
+function renderCharts(rows,bals){
+  const lb=YEARS.map(String);
+  if(chBal)chBal.destroy();
+  chBal=new Chart($('ch-bal'),{type:'line',data:{labels:lb,datasets:[{label:'Saldo',data:bals,borderColor:'#5b8fa8',backgroundColor:ctx=>{const g=ctx.chart.ctx.createLinearGradient(0,0,0,260);g.addColorStop(0,'rgba(91,143,168,.25)');g.addColorStop(1,'rgba(91,143,168,0)');return g},fill:true,tension:.4,pointBackgroundColor:bals.map(b=>b<0?'#c94040':'#5b8fa8'),pointRadius:5,borderWidth:2.5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+fmt(c.raw)}}},scales:{y:{grid:{color:'#eee'},ticks:{callback:v=>fmtK(v)}},x:{grid:{display:false}}}}});
+  if(chFlow)chFlow.destroy();
+  chFlow=new Chart($('ch-flow'),{type:'bar',data:{labels:lb,datasets:[{label:'Ingresos',data:rows.map(r=>r.totalIn),backgroundColor:'rgba(122,158,126,.75)',borderColor:'rgba(122,158,126,1)',borderWidth:1.5,borderRadius:6},{label:'Gastos',data:rows.map(r=>r.totalOut),backgroundColor:'rgba(217,123,90,.75)',borderColor:'rgba(217,123,90,1)',borderWidth:1.5,borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{font:{family:'DM Sans',size:11}}},tooltip:{callbacks:{label:c=>' '+fmt(c.raw)}}},scales:{y:{grid:{color:'#eee'},ticks:{callback:v=>fmtK(v)}},x:{grid:{display:false}}}}});
+}
+function addExtra(){
+  const desc=$('ex-desc').value.trim()||'Sin descripción';
+  const amount=parseFloat($('ex-amount').value)||0;
+  const ys=parseInt($('ex-ys').value)||2026;
+  const ye=parseInt($('ex-ye').value)||0;
+  const type=$('ex-type').value;
+  if(!amount)return;
+  extras.push({id:Date.now(),desc,amount,ys,ye,type});
+  renderExtras();$('ex-desc').value='';$('ex-amount').value='';recalc();
+}
+function removeExtra(id){extras=extras.filter(e=>e.id!==id);renderExtras();recalc()}
+function renderExtras(){
+  $('extra-list').innerHTML=extras.map(e=>`<span class="etag ${e.type}">${e.type==='income'?'📥':'📤'} ${e.desc} · ${fmt(e.amount)}/año · ${e.ye===0?e.ys:e.ys+'–'+e.ye}<button onclick="removeExtra(${e.id})">✕</button></span>`).join('');
+}
+function loadScen(s,el){
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');
+  extras=extras.filter(e=>e.desc!=='__ayuda__');
+  if(s==='base'){$('p-ipc').value=2;$('p-ipc-res').value=2;$('p-pension').value=1572.96;$('p-viudedad').value=821.09}
+  else if(s==='optimista'){$('p-ipc').value=1;$('p-ipc-res').value=1}
+  else if(s==='pesimista'){$('p-ipc').value=3;$('p-ipc-res').value=3}
+  else if(s==='ayuda'){extras.push({id:Date.now(),desc:'__ayuda__',amount:5000,ys:2026,ye:2036,type:'income'});renderExtras()}
+  recalc();
+}
+function exportCSV(){
+  const rows=[['Concepto',...YEARS].join(';')];
+  document.querySelectorAll('#ptbody tr').forEach(r=>{rows.push([...r.querySelectorAll('td')].map(td=>td.textContent.trim()).join(';'))});
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\uFEFF'+rows.join('\n')],{type:'text/csv;charset=utf-8;'}));a.download='prevision_caja.csv';a.click();
+}
+
+// BOOT
+initSelects();
+recalc();
+</script>
+</body>
+</html>
