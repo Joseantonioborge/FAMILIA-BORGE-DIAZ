@@ -1,1 +1,1049 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hucha Digital — Ayúdanos a construir el futuro de tus finanzas</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #050508;
+    --white: #f5f4f0;
+    --acid: #b8ff57;
+    --electric: #3dffdc;
+    --violet: #8b5cf6;
+    --orange: #ff6b35;
+    --card-bg: rgba(255,255,255,0.04);
+    --border: rgba(255,255,255,0.1);
+  }
 
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+  }
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 9999; opacity: 0.4;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.25rem 3rem;
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    background: rgba(5,5,8,0.7);
+  }
+  .nav-logo {
+    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.5rem;
+    letter-spacing: -0.04em; display: flex; align-items: center; gap: 0.4rem;
+  }
+  .nav-logo span { color: var(--acid); }
+  .nav-right { display: flex; align-items: center; gap: 1rem; }
+  .nav-badge {
+    font-family: 'Courier Prime', monospace; font-size: 0.7rem;
+    color: var(--acid); border: 1px solid var(--acid);
+    padding: 0.3rem 0.8rem; border-radius: 20px; letter-spacing: 0.1em;
+  }
+  /* Ghost admin button — barely perceptible, no label, no title visible */
+  .admin-trigger {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.2);
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: all 0.3s; color: rgba(255,255,255,0.45); font-size: 0.7rem;
+    user-select: none;
+  }
+  .admin-trigger:hover { border-color: var(--acid); color: var(--acid); background: rgba(184,255,87,0.08); }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: grid; grid-template-columns: 1fr 1fr;
+    position: relative; overflow: hidden;
+  }
+  .hero-left {
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 8rem 3rem 4rem 3rem; position: relative; z-index: 2;
+  }
+  .hero-tag {
+    font-family: 'Courier Prime', monospace; font-size: 0.75rem;
+    color: var(--electric); letter-spacing: 0.2em; text-transform: uppercase;
+    margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;
+  }
+  .hero-tag::before { content: ''; width: 40px; height: 1px; background: var(--electric); }
+  h1 {
+    font-family: 'Syne', sans-serif; font-weight: 800;
+    font-size: clamp(3rem, 5vw, 5.5rem);
+    line-height: 0.95; letter-spacing: -0.04em; margin-bottom: 1.5rem;
+  }
+  h1 em { font-style: normal; color: var(--acid); }
+  .hero-sub {
+    font-size: 1.1rem; line-height: 1.7;
+    color: rgba(245,244,240,0.55); max-width: 440px; margin-bottom: 2.5rem;
+  }
+  .hero-cta {
+    display: inline-flex; align-items: center; gap: 0.75rem;
+    background: var(--acid); color: var(--black);
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.95rem;
+    padding: 1rem 2rem; border-radius: 50px;
+    text-decoration: none; border: none; cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s; letter-spacing: 0.02em;
+  }
+  .hero-cta:hover { transform: translateY(-2px); box-shadow: 0 20px 40px rgba(184,255,87,0.25); }
+  .hero-cta:hover svg { transform: translateX(4px); }
+  .hero-cta svg { transition: transform 0.2s; }
+  .hero-stats {
+    display: flex; gap: 2rem;
+    margin-top: 3rem; padding-top: 3rem; border-top: 1px solid var(--border);
+  }
+  .stat-num { display: block; font-family: 'Syne', sans-serif; font-weight: 800; font-size: 2rem; color: var(--acid); letter-spacing: -0.03em; }
+  .stat-label { display: block; font-size: 0.78rem; color: rgba(245,244,240,0.45); letter-spacing: 0.05em; text-transform: uppercase; margin-top: 0.2rem; }
+  .hero-right { position: relative; overflow: hidden; }
+  .hero-right::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(90deg, var(--black) 0%, transparent 30%); z-index: 2;
+  }
+  .img-mosaic {
+    position: absolute; inset: 0;
+    display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr 1fr;
+    gap: 4px; opacity: 0.6; filter: saturate(0.7);
+  }
+  .img-mosaic img { width: 100%; height: 100%; object-fit: cover; }
+  .img-mosaic .span2 { grid-row: span 2; }
+  .orb { position: absolute; border-radius: 50%; filter: blur(120px); pointer-events: none; }
+  .orb-1 { width: 500px; height: 500px; background: rgba(139,92,246,0.15); top: -100px; right: -100px; }
+  .orb-2 { width: 400px; height: 400px; background: rgba(61,255,220,0.08); bottom: -100px; left: 30%; }
+
+  /* ── MARQUEE ── */
+  .marquee-section {
+    padding: 1.5rem 0; border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border); overflow: hidden;
+  }
+  .marquee-track {
+    display: flex; gap: 3rem;
+    animation: marquee 22s linear infinite; width: max-content;
+  }
+  @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  .marquee-item {
+    font-family: 'Syne', sans-serif; font-size: 0.85rem; letter-spacing: 0.15em;
+    text-transform: uppercase; color: rgba(245,244,240,0.3);
+    display: flex; align-items: center; gap: 1rem; white-space: nowrap;
+  }
+  .marquee-item .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--acid); }
+
+  /* ── SECTIONS ── */
+  section { padding: 6rem 3rem; max-width: 1200px; margin: 0 auto; }
+  .section-label {
+    font-family: 'Courier Prime', monospace; font-size: 0.75rem;
+    color: var(--electric); letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 1rem;
+  }
+  h2 {
+    font-family: 'Syne', sans-serif; font-weight: 800;
+    font-size: clamp(2rem, 3.5vw, 3rem); line-height: 1.1;
+    letter-spacing: -0.03em; margin-bottom: 0.75rem;
+  }
+  .section-desc { color: rgba(245,244,240,0.5); max-width: 520px; line-height: 1.7; margin-bottom: 3rem; font-size: 1rem; }
+
+  /* ── FEATURES ── */
+  .features-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; }
+  .feature-card {
+    background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px;
+    padding: 1.75rem; position: relative; overflow: hidden; transition: transform 0.3s, border-color 0.3s;
+  }
+  .feature-card:hover { transform: translateY(-4px); border-color: rgba(184,255,87,0.25); }
+  .feature-icon { font-size: 2rem; margin-bottom: 1rem; display: block; }
+  .feature-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.95rem; margin-bottom: 0.5rem; }
+  .feature-desc { font-size: 0.8rem; color: rgba(245,244,240,0.4); line-height: 1.5; }
+  .feature-card::after {
+    content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--acid), var(--electric)); opacity: 0; transition: opacity 0.3s;
+  }
+  .feature-card:hover::after { opacity: 1; }
+
+  /* ── VISUAL BREAK ── */
+  .visual-break {
+    width: 100%; overflow: hidden;
+    display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 4px;
+    height: 300px; position: relative;
+  }
+  .visual-break::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(0deg, var(--black) 0%, transparent 40%, transparent 60%, var(--black) 100%);
+    z-index: 2; pointer-events: none;
+  }
+  .visual-break img { width: 100%; height: 100%; object-fit: cover; filter: saturate(0.5) brightness(0.6); }
+
+  /* ── SURVEY ── */
+  #survey {
+    background: linear-gradient(135deg, rgba(139,92,246,0.05) 0%, rgba(61,255,220,0.03) 100%);
+    border: 1px solid var(--border); border-radius: 24px;
+    padding: 3rem; max-width: 1200px; margin: 0 auto;
+  }
+  .survey-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; }
+  .survey-block {
+    background: var(--card-bg); border: 1px solid var(--border);
+    border-radius: 16px; padding: 2rem; transition: border-color 0.3s;
+  }
+  .survey-block:hover { border-color: rgba(184,255,87,0.3); }
+  .survey-block.full { grid-column: 1 / -1; }
+  .block-title {
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem;
+    margin-bottom: 0.4rem; display: flex; align-items: center; gap: 0.6rem;
+  }
+  .block-num {
+    background: var(--acid); color: var(--black);
+    width: 24px; height: 24px; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 0.75rem; font-weight: 800; flex-shrink: 0;
+  }
+  .block-sub { font-size: 0.82rem; color: rgba(245,244,240,0.4); margin-bottom: 1.5rem; line-height: 1.5; }
+  .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+  .option-item { position: relative; }
+  .option-item input[type="checkbox"] { position: absolute; opacity: 0; width: 0; height: 0; }
+  .option-item label {
+    display: flex; align-items: center; gap: 0.6rem;
+    padding: 0.65rem 0.85rem; border: 1px solid var(--border); border-radius: 10px;
+    cursor: pointer; font-size: 0.83rem; transition: all 0.2s;
+    background: rgba(255,255,255,0.02); line-height: 1.3;
+  }
+  .option-item label::before {
+    content: ''; width: 16px; height: 16px;
+    border: 1.5px solid rgba(255,255,255,0.25); border-radius: 4px;
+    flex-shrink: 0; transition: all 0.2s;
+  }
+  .option-item input:checked + label { border-color: var(--acid); background: rgba(184,255,87,0.07); color: var(--acid); }
+  .option-item input:checked + label::before {
+    background: var(--acid); border-color: var(--acid);
+    background-image: url("data:image/svg+xml,%3Csvg width='10' height='8' viewBox='0 0 10 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 4l3 3 5-6' stroke='%23050508' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: center;
+  }
+  .option-item label:hover { border-color: rgba(184,255,87,0.4); background: rgba(184,255,87,0.04); }
+  .radio-group { display: flex; flex-direction: column; gap: 0.5rem; }
+  .radio-item { position: relative; }
+  .radio-item input[type="radio"] { position: absolute; opacity: 0; width: 0; height: 0; }
+  .radio-item label {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1rem 1.2rem; border: 1px solid var(--border); border-radius: 12px;
+    cursor: pointer; font-size: 0.88rem; transition: all 0.2s; background: rgba(255,255,255,0.02);
+  }
+  .radio-item label .price { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.05rem; color: rgba(245,244,240,0.4); transition: color 0.2s; }
+  .radio-item input:checked + label { border-color: var(--acid); background: rgba(184,255,87,0.06); }
+  .radio-item input:checked + label .price { color: var(--acid); }
+  .radio-item label:hover { border-color: rgba(184,255,87,0.35); }
+  .slider-wrap { margin-top: 0.5rem; }
+  .slider-wrap input[type="range"] {
+    -webkit-appearance: none; width: 100%; height: 4px;
+    background: rgba(255,255,255,0.1); border-radius: 2px; outline: none; margin: 1rem 0 0.5rem;
+  }
+  .slider-wrap input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%;
+    background: var(--acid); cursor: pointer; box-shadow: 0 0 12px rgba(184,255,87,0.5);
+  }
+  .slider-val { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 2rem; color: var(--acid); letter-spacing: -0.03em; }
+  .slider-labels { display: flex; justify-content: space-between; font-size: 0.72rem; color: rgba(245,244,240,0.3); margin-top: 0.25rem; font-family: 'Courier Prime', monospace; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1.5rem; }
+  .form-field { display: flex; flex-direction: column; gap: 0.4rem; }
+  .form-field label { font-size: 0.78rem; color: rgba(245,244,240,0.45); letter-spacing: 0.05em; text-transform: uppercase; font-family: 'Courier Prime', monospace; }
+  .form-field input, .form-field select, .form-field textarea {
+    background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 10px;
+    padding: 0.8rem 1rem; color: var(--white); font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem; outline: none; transition: border-color 0.2s;
+  }
+  .form-field input:focus, .form-field select:focus, .form-field textarea:focus { border-color: var(--acid); }
+  .form-field select option { background: #1a1a2e; }
+  textarea { resize: none; min-height: 80px; }
+  .submit-row { display: flex; align-items: center; justify-content: space-between; margin-top: 2rem; flex-wrap: wrap; gap: 1rem; }
+  .submit-note { font-size: 0.8rem; color: rgba(245,244,240,0.3); max-width: 300px; line-height: 1.5; }
+  .btn-submit {
+    display: flex; align-items: center; gap: 0.75rem;
+    background: var(--acid); color: var(--black);
+    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1rem;
+    padding: 1.1rem 2.5rem; border-radius: 50px; border: none; cursor: pointer;
+    transition: all 0.2s; letter-spacing: 0.01em;
+  }
+  .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 20px 40px rgba(184,255,87,0.3); }
+  .success-msg { display: none; text-align: center; padding: 3rem; }
+  .success-msg.show { display: block; }
+  .success-icon { font-size: 4rem; margin-bottom: 1rem; display: block; animation: pop 0.5s cubic-bezier(0.175,0.885,0.32,1.275); }
+  @keyframes pop { from { transform: scale(0); } to { transform: scale(1); } }
+  .ticket { display: inline-flex; align-items: center; gap: 0.5rem; font-family: 'Courier Prime', monospace; font-size: 0.72rem; color: rgba(245,244,240,0.35); letter-spacing: 0.08em; margin-bottom: 2.5rem; }
+  .ticket::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--acid); animation: blink 2s infinite; }
+  @keyframes blink { 0%,100%{opacity:1}50%{opacity:0.2} }
+  .progress-steps { display: flex; align-items: center; gap: 0; margin-bottom: 2.5rem; }
+  .step { display: flex; align-items: center; gap: 0.5rem; font-size: 0.78rem; color: rgba(245,244,240,0.3); font-family: 'Courier Prime', monospace; letter-spacing: 0.05em; }
+  .step-num { width: 28px; height: 28px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; font-size: 0.75rem; flex-shrink: 0; transition: all 0.3s; }
+  .step.active .step-num { background: var(--acid); border-color: var(--acid); color: var(--black); font-weight: 700; }
+  .step.active { color: var(--acid); }
+  .step-line { flex: 1; height: 1px; background: rgba(255,255,255,0.1); min-width: 2rem; }
+
+  /* ── INSIGHTS ── */
+  .results-preview {
+    background: var(--card-bg); border: 1px solid var(--border);
+    border-radius: 20px; padding: 2.5rem; margin-top: 4rem; position: relative; overflow: hidden;
+  }
+  .results-preview::before {
+    content: 'LIVE INSIGHTS'; position: absolute; top: 1.5rem; right: 1.5rem;
+    font-family: 'Courier Prime', monospace; font-size: 0.65rem; letter-spacing: 0.15em; color: var(--acid);
+    background: rgba(184,255,87,0.1); border: 1px solid rgba(184,255,87,0.3); padding: 0.25rem 0.6rem; border-radius: 20px;
+  }
+  .results-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; margin-bottom: 1.5rem; color: rgba(245,244,240,0.6); }
+  .bar-item { margin-bottom: 1rem; }
+  .bar-label { display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 0.4rem; color: rgba(245,244,240,0.6); }
+  .bar-label span:last-child { color: var(--acid); font-family: 'Syne', sans-serif; font-weight: 700; }
+  .bar-track { height: 6px; background: rgba(255,255,255,0.06); border-radius: 3px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--violet), var(--electric)); animation: barGrow 1.5s cubic-bezier(0.23,1,0.32,1) forwards; width: 0; animation-play-state: paused; }
+  @keyframes barGrow { to { width: var(--w); } }
+
+  /* ── FOOTER ── */
+  footer { border-top: 1px solid var(--border); padding: 2rem 3rem; display: flex; align-items: center; justify-content: space-between; font-size: 0.8rem; color: rgba(245,244,240,0.25); }
+  .footer-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1rem; }
+  .footer-logo span { color: var(--acid); }
+
+  /* ── REVEAL ── */
+  .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s, transform 0.7s; }
+  .reveal.visible { opacity: 1; transform: none; }
+
+  /* ══════════════════════════════
+     ADMIN LOGIN MODAL
+  ══════════════════════════════ */
+  .admin-overlay {
+    display: none; position: fixed; inset: 0; z-index: 900;
+    background: rgba(5,5,8,0.88); backdrop-filter: blur(20px);
+    align-items: center; justify-content: center;
+  }
+  .admin-overlay.open { display: flex; }
+  .admin-login {
+    background: #0d0d16; border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 22px; padding: 2.5rem; width: 100%; max-width: 420px;
+    position: relative; box-shadow: 0 50px 120px rgba(0,0,0,0.7);
+    animation: slideUp 0.3s cubic-bezier(0.23,1,0.32,1);
+  }
+  @keyframes slideUp { from { opacity:0; transform: translateY(20px); } to { opacity:1; transform: none; } }
+  .admin-close-btn {
+    position: absolute; top: 1rem; right: 1rem;
+    background: rgba(255,255,255,0.06); border: none; border-radius: 8px;
+    width: 32px; height: 32px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: rgba(255,255,255,0.35); font-size: 0.9rem; transition: all 0.2s;
+  }
+  .admin-close-btn:hover { background: rgba(255,255,255,0.12); color: var(--white); }
+  .login-header { display: flex; align-items: center; gap: 0.85rem; margin-bottom: 0.5rem; }
+  .lock-badge {
+    width: 44px; height: 44px; background: rgba(184,255,87,0.08);
+    border: 1px solid rgba(184,255,87,0.2); border-radius: 12px;
+    display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+  }
+  .admin-login h3 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.3rem; letter-spacing: -0.02em; }
+  .admin-sub { font-size: 0.76rem; color: rgba(245,244,240,0.3); margin-bottom: 2rem; font-family: 'Courier Prime', monospace; letter-spacing: 0.06em; }
+  .input-wrap { position: relative; margin-bottom: 0.9rem; }
+  .input-wrap .ico { position: absolute; left: 0.9rem; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.2); font-size: 0.8rem; }
+  .input-wrap input {
+    width: 100%; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px; padding: 0.85rem 1rem 0.85rem 2.6rem;
+    color: var(--white); font-family: 'Courier Prime', monospace; font-size: 0.9rem;
+    outline: none; letter-spacing: 0.08em; transition: border-color 0.2s;
+  }
+  .input-wrap input:focus { border-color: rgba(184,255,87,0.5); }
+  .input-wrap input.shake { animation: shake 0.35s ease; }
+  @keyframes shake { 0%,100%{transform:translateX(0)} 20%,60%{transform:translateX(-6px)} 40%,80%{transform:translateX(6px)} }
+  .login-error {
+    font-size: 0.78rem; color: #ff7070; font-family: 'Courier Prime', monospace;
+    background: rgba(255,70,70,0.08); border: 1px solid rgba(255,70,70,0.2);
+    border-radius: 8px; padding: 0.5rem 0.75rem; margin-bottom: 1rem; display: none;
+  }
+  .login-error.show { display: block; }
+  .btn-login {
+    width: 100%; background: var(--acid); color: var(--black);
+    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 0.95rem;
+    padding: 0.95rem; border-radius: 10px; border: none; cursor: pointer; transition: all 0.2s;
+  }
+  .btn-login:hover { box-shadow: 0 10px 30px rgba(184,255,87,0.3); }
+
+  /* ══════════════════════════════
+     ADMIN DASHBOARD
+  ══════════════════════════════ */
+  .admin-dashboard {
+    display: none; position: fixed; inset: 0; z-index: 950;
+    background: #06060e; overflow-y: auto;
+  }
+  .admin-dashboard.open { display: block; }
+  .dash-nav {
+    position: sticky; top: 0; z-index: 10;
+    background: rgba(6,6,14,0.92); backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    padding: 1rem 2.5rem; display: flex; align-items: center; justify-content: space-between;
+  }
+  .dash-logo { display: flex; align-items: center; gap: 0.75rem; }
+  .dash-logo h4 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.05rem; }
+  .dash-badge {
+    font-family: 'Courier Prime', monospace; font-size: 0.62rem; letter-spacing: 0.15em;
+    color: var(--acid); background: rgba(184,255,87,0.08); border: 1px solid rgba(184,255,87,0.25);
+    padding: 0.2rem 0.6rem; border-radius: 20px;
+  }
+  .dash-actions { display: flex; gap: 0.6rem; align-items: center; }
+  .btn-d {
+    display: inline-flex; align-items: center; gap: 0.45rem;
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.8rem;
+    padding: 0.55rem 1.1rem; border-radius: 8px; border: none; cursor: pointer; transition: all 0.2s;
+  }
+  .btn-d.primary { background: var(--acid); color: var(--black); }
+  .btn-d.primary:hover { box-shadow: 0 8px 20px rgba(184,255,87,0.3); transform: translateY(-1px); }
+  .btn-d.ghost { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.55); border: 1px solid rgba(255,255,255,0.08); }
+  .btn-d.ghost:hover { background: rgba(255,255,255,0.1); color: var(--white); }
+  .btn-d.danger { background: rgba(255,70,70,0.08); color: #ff7070; border: 1px solid rgba(255,70,70,0.18); }
+  .btn-d.danger:hover { background: rgba(255,70,70,0.16); }
+
+  .dash-body { padding: 2rem 2.5rem; max-width: 1280px; margin: 0 auto; }
+  .confirm-strip {
+    background: rgba(255,70,70,0.07); border: 1px solid rgba(255,70,70,0.2); border-radius: 10px;
+    padding: 1rem 1.25rem; display: none; align-items: center; justify-content: space-between;
+    gap: 1rem; margin-bottom: 1.5rem; font-size: 0.85rem;
+  }
+  .confirm-strip.show { display: flex; }
+
+  /* KPIs */
+  .kpi-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 1.25rem; margin-bottom: 2rem; }
+  .kpi {
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 14px; padding: 1.5rem; position: relative; overflow: hidden;
+  }
+  .kpi::after { content:''; position:absolute; bottom:0; left:0; right:0; height:2px; background: var(--kc); }
+  .kpi[data-c="1"] { --kc: linear-gradient(90deg,var(--acid),#5bd600); }
+  .kpi[data-c="2"] { --kc: linear-gradient(90deg,var(--electric),#009abc); }
+  .kpi[data-c="3"] { --kc: linear-gradient(90deg,var(--violet),#c084fc); }
+  .kpi[data-c="4"] { --kc: linear-gradient(90deg,var(--orange),#ff9f69); }
+  .kpi-l { font-size:0.7rem; color:rgba(245,244,240,0.3); letter-spacing:0.1em; text-transform:uppercase; font-family:'Courier Prime',monospace; margin-bottom:0.4rem; }
+  .kpi-v { font-family:'Syne',sans-serif; font-weight:800; font-size:2.2rem; letter-spacing:-0.04em; }
+  .kpi-s { font-size:0.73rem; color:rgba(245,244,240,0.27); margin-top:0.25rem; }
+
+  /* Tabs */
+  .dash-tabs { display:flex; gap:0.4rem; border-bottom:1px solid rgba(255,255,255,0.07); margin-bottom:1.75rem; }
+  .dtab {
+    font-family:'Syne',sans-serif; font-weight:700; font-size:0.8rem;
+    padding:0.65rem 1.15rem; border-radius:8px 8px 0 0; border:none;
+    background:transparent; color:rgba(245,244,240,0.3); cursor:pointer;
+    transition:all 0.2s; border-bottom: 2px solid transparent; position:relative; top:1px;
+  }
+  .dtab.active { color:var(--acid); border-bottom-color:var(--acid); background:rgba(184,255,87,0.04); }
+  .dtab:hover:not(.active) { color:rgba(245,244,240,0.6); }
+  .tpanel { display:none; }
+  .tpanel.active { display:block; }
+
+  /* Charts */
+  .cgrid { display:grid; grid-template-columns:1fr 1fr; gap:1.25rem; margin-bottom:1.5rem; }
+  .ccard {
+    background:rgba(255,255,255,0.025); border:1px solid rgba(255,255,255,0.07);
+    border-radius:14px; padding:1.5rem;
+  }
+  .ctitle { font-family:'Syne',sans-serif; font-weight:700; font-size:0.88rem; margin-bottom:1.25rem; color:rgba(245,244,240,0.65); }
+  .abar { margin-bottom:0.7rem; }
+  .abar-h { display:flex; justify-content:space-between; font-size:0.77rem; margin-bottom:0.3rem; color:rgba(245,244,240,0.5); }
+  .abar-h strong { color:var(--acid); font-family:'Syne',sans-serif; }
+  .abar-t { height:7px; background:rgba(255,255,255,0.05); border-radius:4px; overflow:hidden; }
+  .abar-f { height:100%; border-radius:4px; transition:width 0.8s cubic-bezier(0.23,1,0.32,1); }
+  .ca{ background:var(--acid); } .ce{ background:var(--electric); } .cv{ background:var(--violet); } .co{ background:var(--orange); }
+  .no-data { color:rgba(245,244,240,0.22); font-size:0.82rem; padding:1.5rem 0; text-align:center; }
+
+  /* Table */
+  .twrap { overflow-x:auto; border-radius:12px; border:1px solid rgba(255,255,255,0.07); }
+  table { width:100%; border-collapse:collapse; font-size:0.79rem; }
+  thead { background:rgba(255,255,255,0.03); }
+  th { padding:0.85rem 1rem; text-align:left; font-family:'Courier Prime',monospace; font-size:0.68rem; letter-spacing:0.1em; text-transform:uppercase; color:rgba(245,244,240,0.3); border-bottom:1px solid rgba(255,255,255,0.07); white-space:nowrap; font-weight:400; }
+  td { padding:0.8rem 1rem; border-bottom:1px solid rgba(255,255,255,0.04); color:rgba(245,244,240,0.65); max-width:170px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; vertical-align:top; }
+  tr:last-child td { border-bottom:none; }
+  tr:hover td { background:rgba(255,255,255,0.015); }
+  .tprice { color:var(--acid); font-family:'Syne',sans-serif; font-weight:700; }
+  .tdate { font-family:'Courier Prime',monospace; font-size:0.7rem; color:rgba(245,244,240,0.22); }
+  .empty { text-align:center; padding:4rem 2rem; color:rgba(245,244,240,0.22); }
+  .empty .ei { font-size:2.5rem; display:block; margin-bottom:1rem; opacity:0.4; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width:768px) {
+    nav { padding:1rem 1.5rem; }
+    .hero { grid-template-columns:1fr; }
+    .hero-right { display:none; }
+    .hero-left { padding:7rem 1.5rem 3rem; }
+    section { padding:4rem 1.5rem; }
+    .survey-grid { grid-template-columns:1fr; }
+    .survey-block.full { grid-column:1; }
+    .options-grid { grid-template-columns:1fr; }
+    .form-row { grid-template-columns:1fr; }
+    .features-strip { grid-template-columns:1fr 1fr; }
+    #survey { padding:1.5rem; }
+    footer { flex-direction:column; gap:1rem; text-align:center; }
+    h1 { font-size:2.5rem; }
+    .kpi-row { grid-template-columns:1fr 1fr; }
+    .cgrid { grid-template-columns:1fr; }
+    .dash-body { padding:1rem 1.25rem; }
+    .dash-nav { padding:0.9rem 1.25rem; flex-wrap:wrap; gap:0.75rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══ NAV ═══ -->
+<nav>
+  <div class="nav-logo">🐷 Hucha<span>Digital</span></div>
+  <div class="nav-right">
+    <div class="nav-badge">RESEARCH BETA ✦ 2025</div>
+    <!--
+      Admin entry point: icon-only button, visually minimal,
+      indistinguishable from a decoration for regular users.
+      No label, no tooltip, color nearly invisible.
+    -->
+    <button class="admin-trigger" onclick="openAdminLogin()" tabindex="-1" aria-hidden="true">⚙</button>
+  </div>
+</nav>
+
+<!-- ═══ HERO ═══ -->
+<div class="hero">
+  <div class="hero-left">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <p class="hero-tag">Construye tu hucha con nosotros</p>
+    <h1>Tus finanzas, <em>simples</em> y sin comisiones.</h1>
+    <p class="hero-sub">
+      Estamos creando la <strong>Hucha Digital</strong>: una app financiera para la Gen Z y autónomos que quieren tarjeta virtual, cero comisiones, cripto y cashback. <br>Tu opinión la construye.
+    </p>
+    <a href="#survey" class="hero-cta">
+      Dejar mi opinión
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    </a>
+    <div class="hero-stats">
+      <div><span class="stat-num" id="counter1">0</span><span class="stat-label">Opiniones recibidas</span></div>
+      <div><span class="stat-num">3 min</span><span class="stat-label">Para completar</span></div>
+      <div><span class="stat-num">100%</span><span class="stat-label">Anónimo</span></div>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="img-mosaic">
+      <img src="https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=600&q=80" alt="tarjeta" class="span2">
+      <img src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&q=80" alt="bolsa">
+      <img src="https://images.unsplash.com/photo-1642790551116-18e150f248e3?w=400&q=80" alt="cripto">
+      <img src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=400&q=80" alt="movil">
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MARQUEE ═══ -->
+<div class="marquee-section">
+  <div class="marquee-track">
+    <div class="marquee-item"><span class="dot"></span>Sin comisiones</div>
+    <div class="marquee-item"><span class="dot"></span>Tarjeta virtual</div>
+    <div class="marquee-item"><span class="dot"></span>Cripto integrado</div>
+    <div class="marquee-item"><span class="dot"></span>Cashback real</div>
+    <div class="marquee-item"><span class="dot"></span>Para autónomos</div>
+    <div class="marquee-item"><span class="dot"></span>Inversión automática</div>
+    <div class="marquee-item"><span class="dot"></span>SEPA instantáneo</div>
+    <div class="marquee-item"><span class="dot"></span>Multi-divisa</div>
+    <div class="marquee-item"><span class="dot"></span>Hucha inteligente</div>
+    <div class="marquee-item"><span class="dot"></span>Sin comisiones</div>
+    <div class="marquee-item"><span class="dot"></span>Tarjeta virtual</div>
+    <div class="marquee-item"><span class="dot"></span>Cripto integrado</div>
+    <div class="marquee-item"><span class="dot"></span>Cashback real</div>
+    <div class="marquee-item"><span class="dot"></span>Para autónomos</div>
+    <div class="marquee-item"><span class="dot"></span>Inversión automática</div>
+    <div class="marquee-item"><span class="dot"></span>SEPA instantáneo</div>
+    <div class="marquee-item"><span class="dot"></span>Multi-divisa</div>
+    <div class="marquee-item"><span class="dot"></span>Hucha inteligente</div>
+  </div>
+</div>
+
+<!-- ═══ FEATURES ═══ -->
+<section class="reveal">
+  <p class="section-label">Lo que imaginamos</p>
+  <h2>¿Qué podría ser la Hucha Digital?</h2>
+  <p class="section-desc">Antes de que te preguntemos, aquí va lo que tenemos en mente. Tú nos dices si vamos bien.</p>
+  <div class="features-strip">
+    <div class="feature-card">
+      <span class="feature-icon">💳</span>
+      <div class="feature-title">Tarjeta virtual & física</div>
+      <p class="feature-desc">Genera tarjetas al instante. Paga en cualquier divisa sin comisión oculta.</p>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">₿</span>
+      <div class="feature-title">Cripto & activos digitales</div>
+      <p class="feature-desc">Compra, vende y guarda Bitcoin, ETH y los principales activos desde la app.</p>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">💸</span>
+      <div class="feature-title">Cashback en compras</div>
+      <p class="feature-desc">Recupera hasta un 2% de tus compras automáticamente. Sin formularios.</p>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">🐷</span>
+      <div class="feature-title">Hucha inteligente</div>
+      <p class="feature-desc">Redondea cada pago y guarda el cambio. Tu ahorro crece solo, sin esfuerzo.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ VISUAL BREAK ═══ -->
+<div class="visual-break">
+  <img src="https://images.unsplash.com/photo-1518183214770-9cffbec72538?w=900&q=70" alt="finance">
+  <img src="https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=400&q=70" alt="trading">
+  <img src="https://images.unsplash.com/photo-1644143379190-08a5f055de1d?w=400&q=70" alt="crypto">
+</div>
+
+<!-- ═══ SURVEY HEADER ═══ -->
+<div style="padding: 0 3rem; max-width: 1200px; margin: 0 auto;">
+  <div style="padding: 5rem 0 2rem;">
+    <p class="section-label">La encuesta</p>
+    <h2>Cuéntanos qué necesitas</h2>
+    <p class="section-desc">3 minutos para construir algo que usarás de verdad.</p>
+  </div>
+</div>
+
+<!-- ═══ SURVEY FORM ═══ -->
+<div id="survey" class="reveal">
+  <div class="ticket">● HUCHA DIGITAL SURVEY v1.0 — 2025 Q1</div>
+  <div class="progress-steps">
+    <div class="step active"><div class="step-num">1</div><span>Servicios esenciales</span></div>
+    <div class="step-line"></div>
+    <div class="step"><div class="step-num">2</div><span>Extras valiosos</span></div>
+    <div class="step-line"></div>
+    <div class="step"><div class="step-num">3</div><span>Precio justo</span></div>
+    <div class="step-line"></div>
+    <div class="step"><div class="step-num">4</div><span>Tu perfil</span></div>
+  </div>
+
+  <form id="surveyForm">
+    <div class="survey-grid">
+
+      <div class="survey-block full">
+        <div class="block-title"><div class="block-num">1</div> Servicios mínimos — ¿Qué haría que esta app sea indispensable?</div>
+        <p class="block-sub">Selecciona todos los que consideras imprescindibles para abrirte una cuenta</p>
+        <div class="options-grid">
+          <div class="option-item"><input type="checkbox" id="s1" name="essential" value="cuenta_iban"><label for="s1">Cuenta corriente con IBAN</label></div>
+          <div class="option-item"><input type="checkbox" id="s2" name="essential" value="tarjeta_virtual"><label for="s2">Tarjeta virtual al instante</label></div>
+          <div class="option-item"><input type="checkbox" id="s3" name="essential" value="sepa_gratis"><label for="s3">Transferencias SEPA gratuitas</label></div>
+          <div class="option-item"><input type="checkbox" id="s4" name="essential" value="bizum"><label for="s4">Bizum / pagos inmediatos</label></div>
+          <div class="option-item"><input type="checkbox" id="s5" name="essential" value="sin_fx"><label for="s5">Sin comisiones en divisas</label></div>
+          <div class="option-item"><input type="checkbox" id="s6" name="essential" value="tarjeta_fisica"><label for="s6">Tarjeta física gratuita</label></div>
+          <div class="option-item"><input type="checkbox" id="s7" name="essential" value="wallet_digital"><label for="s7">Google Pay / Apple Pay</label></div>
+          <div class="option-item"><input type="checkbox" id="s8" name="essential" value="notif_rt"><label for="s8">Notificaciones en tiempo real</label></div>
+          <div class="option-item"><input type="checkbox" id="s9" name="essential" value="cajeros"><label for="s9">Reintegros en cajeros gratis</label></div>
+          <div class="option-item"><input type="checkbox" id="s10" name="essential" value="soporte_247"><label for="s10">Soporte por chat 24/7</label></div>
+        </div>
+      </div>
+
+      <div class="survey-block">
+        <div class="block-title"><div class="block-num">2</div> Servicios de valor añadido</div>
+        <p class="block-sub">¿Cuáles implementaríamos a medio plazo? Marca los que usarías en los próximos 12 meses</p>
+        <div class="options-grid" style="grid-template-columns:1fr;">
+          <div class="option-item"><input type="checkbox" id="p1" name="premium" value="cripto"><label for="p1">🪙 Compra/venta de criptomonedas</label></div>
+          <div class="option-item"><input type="checkbox" id="p2" name="premium" value="cashback"><label for="p2">💸 Programa de Cashback</label></div>
+          <div class="option-item"><input type="checkbox" id="p3" name="premium" value="fondos"><label for="p3">📈 Inversión en fondos indexados</label></div>
+          <div class="option-item"><input type="checkbox" id="p4" name="premium" value="seguros"><label for="p4">🛡️ Seguros (viaje, hogar, vida)</label></div>
+          <div class="option-item"><input type="checkbox" id="p5" name="premium" value="fiscal"><label for="p5">🧾 Asesoría fiscal para autónomos</label></div>
+          <div class="option-item"><input type="checkbox" id="p6" name="premium" value="facturacion"><label for="p6">📋 Facturación integrada</label></div>
+          <div class="option-item"><input type="checkbox" id="p7" name="premium" value="prestamos"><label for="p7">🏦 Préstamos y crédito rápido</label></div>
+          <div class="option-item"><input type="checkbox" id="p8" name="premium" value="hucha_auto"><label for="p8">🐷 Hucha de ahorro automático</label></div>
+        </div>
+      </div>
+
+      <div class="survey-block">
+        <div class="block-title"><div class="block-num">3</div> Tu perfil de uso</div>
+        <p class="block-sub">¿Cómo usas el dinero en tu día a día?</p>
+        <div class="options-grid" style="grid-template-columns:1fr;">
+          <div class="option-item"><input type="checkbox" id="u1" name="usage" value="compras_online"><label for="u1">🛍️ Compras online frecuentes</label></div>
+          <div class="option-item"><input type="checkbox" id="u2" name="usage" value="freelance"><label for="u2">💻 Cobros freelance / clientes</label></div>
+          <div class="option-item"><input type="checkbox" id="u3" name="usage" value="viajes"><label for="u3">✈️ Viajo al extranjero regularmente</label></div>
+          <div class="option-item"><input type="checkbox" id="u4" name="usage" value="inversion"><label for="u4">📊 Quiero invertir mis ahorros</label></div>
+          <div class="option-item"><input type="checkbox" id="u5" name="usage" value="autonomo"><label for="u5">🧾 Soy autónomo o tengo empresa</label></div>
+          <div class="option-item"><input type="checkbox" id="u6" name="usage" value="gaming"><label for="u6">🎮 Gaming / suscripciones digitales</label></div>
+          <div class="option-item"><input type="checkbox" id="u7" name="usage" value="compartir"><label for="u7">👥 Compartir gastos con amigos</label></div>
+          <div class="option-item"><input type="checkbox" id="u8" name="usage" value="ahorro_auto"><label for="u8">🏦 Ahorro automático mensual</label></div>
+        </div>
+      </div>
+
+      <div class="survey-block full">
+        <div class="block-title"><div class="block-num">4</div> Precio justo — ¿Cuánto pagarías al mes?</div>
+        <p class="block-sub">La Hucha Digital base es gratuita. ¿Cuánto pagarías por un plan premium que lo incluya todo?</p>
+        <div class="radio-group">
+          <div class="radio-item"><input type="radio" id="pr0" name="price" value="free"><label for="pr0">Solo versión gratuita — básico es suficiente<span class="price">0€/mes</span></label></div>
+          <div class="radio-item"><input type="radio" id="pr1" name="price" value="2.99"><label for="pr1">Tarjeta virtual ilimitada + cashback básico<span class="price">2,99€/mes</span></label></div>
+          <div class="radio-item"><input type="radio" id="pr2" name="price" value="5.99"><label for="pr2">Todo lo anterior + cripto + sin comisiones FX<span class="price">5,99€/mes</span></label></div>
+          <div class="radio-item"><input type="radio" id="pr3" name="price" value="9.99"><label for="pr3">Premium: facturación + asesoría fiscal + inversiones<span class="price">9,99€/mes</span></label></div>
+          <div class="radio-item"><input type="radio" id="pr4" name="price" value="14.99"><label for="pr4">Todo incluido — experiencia completa sin límites<span class="price">14,99€/mes</span></label></div>
+        </div>
+      </div>
+
+      <div class="survey-block">
+        <div class="block-title"><div class="block-num">5</div> Cuota de alta única</div>
+        <p class="block-sub">¿Pagarías una cuota única para obtener acceso prioritario y tarjeta física premium?</p>
+        <div class="slider-wrap">
+          <div class="slider-val" id="sliderVal">0€</div>
+          <input type="range" id="regFee" name="registration_fee" min="0" max="50" step="5" value="0">
+          <div class="slider-labels"><span>No, nada</span><span>25€</span><span>50€ o más</span></div>
+        </div>
+      </div>
+
+      <div class="survey-block">
+        <div class="block-title"><div class="block-num">6</div> Tu situación bancaria hoy</div>
+        <p class="block-sub">¿Qué usas actualmente?</p>
+        <div class="options-grid" style="grid-template-columns:1fr;">
+          <div class="option-item"><input type="checkbox" id="b1" name="current_bank" value="banco_tradicional"><label for="b1">🏛️ Banco tradicional (Santander, BBVA…)</label></div>
+          <div class="option-item"><input type="checkbox" id="b2" name="current_bank" value="neobank"><label for="b2">💜 Revolut / Wise / N26</label></div>
+          <div class="option-item"><input type="checkbox" id="b3" name="current_bank" value="broker"><label for="b3">📈 Trade Republic / Indexa Capital</label></div>
+          <div class="option-item"><input type="checkbox" id="b4" name="current_bank" value="efectivo"><label for="b4">💶 Prefiero efectivo</label></div>
+          <div class="option-item"><input type="checkbox" id="b5" name="current_bank" value="varios"><label for="b5">🔀 Uso varios a la vez</label></div>
+          <div class="option-item"><input type="checkbox" id="b6" name="current_bank" value="ninguno"><label for="b6">❌ Sin cuenta bancaria activa</label></div>
+        </div>
+      </div>
+
+      <div class="survey-block full">
+        <div class="block-title"><div class="block-num">7</div> Para avisarte cuando lancemos</div>
+        <p class="block-sub">Opcional. Solo para enviarte acceso anticipado si te interesa la beta.</p>
+        <div class="form-row">
+          <div class="form-field"><label>Nombre</label><input type="text" name="name" placeholder="Tu nombre"></div>
+          <div class="form-field"><label>Email</label><input type="email" name="email" placeholder="tu@email.com"></div>
+          <div class="form-field">
+            <label>Edad</label>
+            <select name="age">
+              <option value="">Selecciona rango</option>
+              <option value="16-22">16 – 22 años</option>
+              <option value="23-29">23 – 29 años</option>
+              <option value="30-39">30 – 39 años</option>
+              <option value="40-49">40 – 49 años</option>
+              <option value="50+">50 años o más</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label>Situación laboral</label>
+            <select name="employment">
+              <option value="">Selecciona</option>
+              <option value="empleado">Empleado por cuenta ajena</option>
+              <option value="autonomo">Autónomo / Freelance</option>
+              <option value="empresario">Empresario / Socio</option>
+              <option value="estudiante">Estudiante</option>
+              <option value="desempleado">En búsqueda de empleo</option>
+            </select>
+          </div>
+          <div class="form-field" style="grid-column:1/-1;">
+            <label>¿Qué no te ofrece ninguna app financiera y querrías tener?</label>
+            <textarea name="wishlist" placeholder="Cuéntanos tu lista de deseos…"></textarea>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="submit-row">
+      <p class="submit-note">Tus respuestas son 100% anónimas. No vendemos datos. Solo construimos algo mejor.</p>
+      <button type="submit" class="btn-submit">
+        Guardar en la hucha
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 9h12M11 5l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+  </form>
+
+  <div class="success-msg" id="successMsg">
+    <span class="success-icon">🐷</span>
+    <h2 style="margin-bottom:0.75rem;">¡Tu opinión ya está en la hucha!</h2>
+    <p style="color:rgba(245,244,240,0.5);max-width:420px;margin:0 auto 2rem;line-height:1.7;">Gracias por ayudarnos a construir la Hucha Digital. Serás de los primeros en saberlo cuando lancemos.</p>
+    <a href="#" onclick="resetForm();return false;" style="color:var(--acid);text-decoration:underline;font-size:0.85rem;">Añadir otra respuesta</a>
+  </div>
+</div>
+
+<!-- ═══ LIVE INSIGHTS ═══ -->
+<div style="padding: 0 3rem; max-width: 1200px; margin: 0 auto;">
+  <div class="results-preview reveal">
+    <p class="results-title">Tendencias en tiempo real</p>
+    <div class="bar-item"><div class="bar-label"><span>Tarjeta virtual gratuita</span><span>94%</span></div><div class="bar-track"><div class="bar-fill" style="--w:94%"></div></div></div>
+    <div class="bar-item"><div class="bar-label"><span>Sin comisiones en divisas</span><span>88%</span></div><div class="bar-track"><div class="bar-fill" style="--w:88%"></div></div></div>
+    <div class="bar-item"><div class="bar-label"><span>Compra/venta de cripto</span><span>76%</span></div><div class="bar-track"><div class="bar-fill" style="--w:76%"></div></div></div>
+    <div class="bar-item"><div class="bar-label"><span>Cashback en compras</span><span>71%</span></div><div class="bar-track"><div class="bar-fill" style="--w:71%"></div></div></div>
+    <div class="bar-item"><div class="bar-label"><span>Facturación para autónomos</span><span>58%</span></div><div class="bar-track"><div class="bar-fill" style="--w:58%"></div></div></div>
+    <p style="font-size:0.75rem;color:rgba(245,244,240,0.25);margin-top:1.5rem;font-family:'Courier Prime',monospace;">* Datos ilustrativos — se actualizan con cada respuesta completada</p>
+  </div>
+</div>
+
+<section style="height:3rem;"></section>
+
+<!-- ═══ FOOTER ═══ -->
+<footer>
+  <div class="footer-logo">🐷 Hucha<span>Digital</span></div>
+  <span>© 2025 Hucha Digital Research — Encuesta de investigación. No es una entidad bancaria regulada.</span>
+  <span style="font-family:'Courier Prime',monospace;font-size:0.7rem;">v1.1.0</span>
+</footer>
+
+
+<!-- ════════════════════════════════════════════════
+     ADMIN LOGIN MODAL — invisible to regular users
+════════════════════════════════════════════════ -->
+<div class="admin-overlay" id="adminOverlay">
+  <div class="admin-login">
+    <button class="admin-close-btn" onclick="closeLogin()">✕</button>
+    <div class="login-header">
+      <div class="lock-badge">🔐</div>
+      <h3>Panel Administrador</h3>
+    </div>
+    <p class="admin-sub">HUCHA DIGITAL — ACCESO RESTRINGIDO</p>
+    <div class="input-wrap">
+      <span class="ico">👤</span>
+      <input type="text" id="aUser" placeholder="Usuario" autocomplete="off">
+    </div>
+    <div class="input-wrap">
+      <span class="ico">🔑</span>
+      <input type="password" id="aPass" placeholder="Contraseña" autocomplete="off" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <div class="login-error" id="loginError">Credenciales incorrectas. Inténtalo de nuevo.</div>
+    <button class="btn-login" onclick="doLogin()">Acceder al panel →</button>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════
+     ADMIN DASHBOARD — full screen, password protected
+════════════════════════════════════════════════ -->
+<div class="admin-dashboard" id="adminDash">
+
+  <div class="dash-nav">
+    <div class="dash-logo">
+      <h4>🐷 Hucha Digital</h4>
+      <span class="dash-badge">ADMIN · RESULTADOS</span>
+    </div>
+    <div class="dash-actions">
+      <button class="btn-d ghost" onclick="showConfirm()">🗑 Limpiar datos</button>
+      <button class="btn-d primary" onclick="exportCSV()">⬇ Exportar CSV</button>
+      <button class="btn-d ghost" onclick="closeDash()">← Cerrar sesión</button>
+    </div>
+  </div>
+
+  <div class="dash-body">
+
+    <!-- Confirm delete -->
+    <div class="confirm-strip" id="confirmStrip">
+      <span>¿Eliminar <strong>todas</strong> las respuestas? Esta acción es irreversible.</span>
+      <div style="display:flex;gap:0.5rem;flex-shrink:0;">
+        <button class="btn-d danger" onclick="clearAll()">Sí, eliminar todo</button>
+        <button class="btn-d ghost" onclick="hideConfirm()">Cancelar</button>
+      </div>
+    </div>
+
+    <!-- KPIs -->
+    <div class="kpi-row">
+      <div class="kpi" data-c="1"><p class="kpi-l">Total respuestas</p><p class="kpi-v" id="kpiN">0</p><p class="kpi-s">Guardadas en este dispositivo</p></div>
+      <div class="kpi" data-c="2"><p class="kpi-l">Plan más elegido</p><p class="kpi-v" id="kpiP">—</p><p class="kpi-s">Preferencia de precio mensual</p></div>
+      <div class="kpi" data-c="3"><p class="kpi-l">Servicio top</p><p class="kpi-v" id="kpiS" style="font-size:1.05rem;line-height:1.3;margin-top:0.3rem;">—</p><p class="kpi-s">Esencial más seleccionado</p></div>
+      <div class="kpi" data-c="4"><p class="kpi-l">Cuota alta media</p><p class="kpi-v" id="kpiF">—</p><p class="kpi-s">Pago único promedio</p></div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="dash-tabs">
+      <button class="dtab active" onclick="tab('resumen',this)">Resumen</button>
+      <button class="dtab" onclick="tab('servicios',this)">Servicios</button>
+      <button class="dtab" onclick="tab('precios',this)">Precios</button>
+      <button class="dtab" onclick="tab('tabla',this)">Respuestas</button>
+    </div>
+
+    <!-- RESUMEN -->
+    <div class="tpanel active" id="tp-resumen">
+      <div class="cgrid">
+        <div class="ccard"><p class="ctitle">🔧 Servicios esenciales — top 5</p><div id="ch-es5"></div></div>
+        <div class="ccard"><p class="ctitle">⭐ Servicios premium — top 5</p><div id="ch-pr5"></div></div>
+        <div class="ccard"><p class="ctitle">👤 Perfil de uso</p><div id="ch-use"></div></div>
+        <div class="ccard"><p class="ctitle">🏛️ Banco/app actual</p><div id="ch-bank"></div></div>
+      </div>
+    </div>
+
+    <!-- SERVICIOS -->
+    <div class="tpanel" id="tp-servicios">
+      <div class="cgrid" style="grid-template-columns:1fr;">
+        <div class="ccard"><p class="ctitle">📊 Ranking completo — Servicios esenciales</p><div id="ch-esAll"></div></div>
+        <div class="ccard"><p class="ctitle">📊 Ranking completo — Servicios premium</p><div id="ch-prAll"></div></div>
+      </div>
+    </div>
+
+    <!-- PRECIOS -->
+    <div class="tpanel" id="tp-precios">
+      <div class="cgrid">
+        <div class="ccard"><p class="ctitle">💰 Distribución plan mensual</p><div id="ch-priceD"></div></div>
+        <div class="ccard"><p class="ctitle">🎯 Cuota de alta única</p><div id="ch-feeD"></div></div>
+      </div>
+    </div>
+
+    <!-- TABLA -->
+    <div class="tpanel" id="tp-tabla">
+      <div class="twrap" id="tableWrap">
+        <div class="empty"><span class="ei">📭</span>Sin respuestas todavía.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<script>
+/* ── CONFIG ── change these before deploying ── */
+const ADMIN_USER = 'admin';
+const ADMIN_PASS = 'hucha2025';
+const STORAGE_KEY = 'hucha_v1_responses';
+
+/* ── Label maps ── */
+const EL = { cuenta_iban:'IBAN', tarjeta_virtual:'T. virtual', sepa_gratis:'SEPA gratis', bizum:'Bizum', sin_fx:'Sin FX', tarjeta_fisica:'T. física', wallet_digital:'G/Apple Pay', notif_rt:'Notif. RT', cajeros:'Cajeros', soporte_247:'Soporte 24/7' };
+const PL = { cripto:'Cripto', cashback:'Cashback', fondos:'Fondos indexados', seguros:'Seguros', fiscal:'Asesoría fiscal', facturacion:'Facturación', prestamos:'Préstamos', hucha_auto:'Hucha auto' };
+const UL = { compras_online:'Compras online', freelance:'Freelance', viajes:'Viajes ext.', inversion:'Inversión', autonomo:'Autónomo', gaming:'Gaming', compartir:'Compartir gastos', ahorro_auto:'Ahorro auto' };
+const BL = { banco_tradicional:'Banco trad.', neobank:'Revolut/N26', broker:'Trade Rep.', efectivo:'Efectivo', varios:'Varios', ninguno:'Sin cuenta' };
+const PrL = { free:'Gratis', '2.99':'2,99€', '5.99':'5,99€', '9.99':'9,99€', '14.99':'14,99€' };
+
+/* ── Storage ── */
+const getR = () => JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');
+const setR = d => localStorage.setItem(STORAGE_KEY, JSON.stringify(d));
+
+/* ── Counter ── */
+(function(){ let s=0,t=2847,d=2000,st=t/(d/16); const el=document.getElementById('counter1'); const iv=setInterval(()=>{ s+=st; if(s>=t){el.textContent=t.toLocaleString();clearInterval(iv);return;} el.textContent=Math.floor(s).toLocaleString(); },16); })();
+
+/* ── Slider ── */
+const slider=document.getElementById('regFee'), slVal=document.getElementById('sliderVal');
+slider.addEventListener('input',()=>{ slVal.textContent=+slider.value===50?'+50€':slider.value+'€'; });
+
+/* ── Reveal ── */
+const ro=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');ro.unobserve(e.target);}}),{threshold:0.1});
+document.querySelectorAll('.reveal').forEach(r=>ro.observe(r));
+
+/* ── Bar animations ── */
+const bo=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting) e.target.querySelectorAll('.bar-fill').forEach(b=>b.style.animationPlayState='running');}),{threshold:0.3});
+document.querySelectorAll('.results-preview').forEach(e=>bo.observe(e));
+
+/* ── Form submit ── */
+document.getElementById('surveyForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  const fd=new FormData(e.target), entry={timestamp:new Date().toISOString()};
+  for(let [k,v] of fd.entries()){ if(!entry[k]) entry[k]=[]; if(Array.isArray(entry[k])) entry[k].push(v); else entry[k]=v; }
+  Object.keys(entry).forEach(k=>{ if(Array.isArray(entry[k])&&entry[k].length===1) entry[k]=entry[k][0]; });
+  entry.registration_fee=slider.value;
+  const r=getR(); r.push(entry); setR(r);
+  e.target.style.display='none';
+  document.getElementById('successMsg').classList.add('show');
+  document.querySelector('.progress-steps').style.display='none';
+  window.scrollTo({top:document.getElementById('survey').offsetTop-100,behavior:'smooth'});
+});
+
+function resetForm(){
+  const f=document.getElementById('surveyForm');
+  f.reset(); slVal.textContent='0€'; f.style.display='block';
+  document.getElementById('successMsg').classList.remove('show');
+  document.querySelector('.progress-steps').style.display='flex';
+}
+
+/* ════════════════════════════
+   ADMIN LOGIN
+════════════════════════════ */
+function openAdminLogin(){ document.getElementById('adminOverlay').classList.add('open'); setTimeout(()=>document.getElementById('aUser').focus(),200); }
+function closeLogin(){ document.getElementById('adminOverlay').classList.remove('open'); document.getElementById('loginError').classList.remove('show'); document.getElementById('aUser').value=''; document.getElementById('aPass').value=''; }
+
+function doLogin(){
+  const u=document.getElementById('aUser').value.trim(), p=document.getElementById('aPass').value;
+  if(u===ADMIN_USER && p===ADMIN_PASS){ closeLogin(); openDash(); }
+  else {
+    const err=document.getElementById('loginError'); err.classList.add('show');
+    const pw=document.getElementById('aPass'); pw.classList.add('shake'); pw.value='';
+    setTimeout(()=>pw.classList.remove('shake'),400);
+  }
+}
+
+document.getElementById('adminOverlay').addEventListener('click',function(e){ if(e.target===this) closeLogin(); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closeLogin(); closeDash(); } });
+
+/* ════════════════════════════
+   ADMIN DASHBOARD
+════════════════════════════ */
+function openDash(){ document.getElementById('adminDash').classList.add('open'); document.body.style.overflow='hidden'; refreshDash(); }
+function closeDash(){ document.getElementById('adminDash').classList.remove('open'); document.body.style.overflow=''; }
+
+function tab(id,btn){
+  document.querySelectorAll('.tpanel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.dtab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tp-'+id).classList.add('active'); btn.classList.add('active');
+  refreshDash();
+}
+
+function showConfirm(){ document.getElementById('confirmStrip').classList.add('show'); }
+function hideConfirm(){ document.getElementById('confirmStrip').classList.remove('show'); }
+function clearAll(){ setR([]); hideConfirm(); refreshDash(); }
+
+/* ── Count multi-value fields ── */
+function countField(rs,field){ const c={}; rs.forEach(r=>{ const v=r[field]; if(!v) return; (Array.isArray(v)?v:[v]).forEach(x=>{ c[x]=(c[x]||0)+1; }); }); return c; }
+
+/* ── Render bar chart ── */
+function renderBars(containerId, counts, labels, total, limit, colorClass){
+  const el=document.getElementById(containerId); if(!el) return;
+  const sorted=Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,limit||99);
+  if(!sorted.length){ el.innerHTML='<p class="no-data">Sin datos todavía</p>'; return; }
+  const mx=sorted[0][1];
+  el.innerHTML=sorted.map(([k,v])=>{
+    const pct=total>0?Math.round(v/total*100):0, w=mx>0?Math.round(v/mx*100):0;
+    return `<div class="abar"><div class="abar-h"><span>${labels[k]||k}</span><strong>${pct}% (${v})</strong></div><div class="abar-t"><div class="abar-f ${colorClass}" style="width:${w}%"></div></div></div>`;
+  }).join('');
+}
+
+function refreshDash(){
+  const rs=getR(), n=rs.length;
+  document.getElementById('kpiN').textContent=n;
+
+  const pc=countField(rs,'price');
+  const tp=Object.entries(pc).sort((a,b)=>b[1]-a[1])[0];
+  document.getElementById('kpiP').textContent=tp?(PrL[tp[0]]||tp[0]):'—';
+
+  const ec=countField(rs,'essential');
+  const te=Object.entries(ec).sort((a,b)=>b[1]-a[1])[0];
+  document.getElementById('kpiS').textContent=te?(EL[te[0]]||te[0]):'—';
+
+  const fees=rs.map(r=>+r.registration_fee||0).filter(v=>v>0);
+  const avg=fees.length?(fees.reduce((a,b)=>a+b,0)/fees.length).toFixed(0):0;
+  document.getElementById('kpiF').textContent=avg>0?avg+'€':'—';
+
+  renderBars('ch-es5',ec,EL,n,5,'ca');
+  renderBars('ch-pr5',countField(rs,'premium'),PL,n,5,'ce');
+  renderBars('ch-use',countField(rs,'usage'),UL,n,5,'cv');
+  renderBars('ch-bank',countField(rs,'current_bank'),BL,n,6,'co');
+  renderBars('ch-esAll',ec,EL,n,99,'ca');
+  renderBars('ch-prAll',countField(rs,'premium'),PL,n,99,'ce');
+  renderBars('ch-priceD',pc,PrL,n,99,'ca');
+
+  // Fee distribution
+  const fb={'0':'Sin cuota','5':'5€','10':'10€','15':'15€','20':'20€','25':'25€','30-50':'30-50€'};
+  const fc={}; rs.forEach(r=>{ const f=+r.registration_fee||0; let b=f>=30?'30-50':String(f); fc[b]=(fc[b]||0)+1; });
+  renderBars('ch-feeD',fc,fb,n,99,'co');
+
+  // Table
+  const tw=document.getElementById('tableWrap');
+  if(!rs.length){ tw.innerHTML='<div class="empty"><span class="ei">📭</span>Sin respuestas todavía.</div>'; return; }
+  const cols=['timestamp','name','email','age','employment','price','registration_fee','wishlist'];
+  const labels={timestamp:'Fecha',name:'Nombre',email:'Email',age:'Edad',employment:'Situación',price:'Plan',registration_fee:'Cuota €',wishlist:'Deseos'};
+  const rows=rs.map((r,i)=>{
+    const cells=cols.map(c=>{
+      let v=r[c]||'—';
+      if(c==='timestamp') v=new Date(v).toLocaleString('es-ES',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'});
+      const cls=c==='price'?'tprice':c==='timestamp'?'tdate':'';
+      return `<td class="${cls}" title="${v}">${v}</td>`;
+    }).join('');
+    return `<tr><td style="color:rgba(245,244,240,0.2);font-family:'Courier Prime',monospace;font-size:0.68rem;">#${i+1}</td>${cells}</tr>`;
+  }).join('');
+  tw.innerHTML=`<table><thead><tr><th>#</th>${cols.map(c=>`<th>${labels[c]}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+/* ── CSV Export ── */
+function exportCSV(){
+  const data=getR();
+  if(!data.length){ alert('No hay respuestas para exportar aún.'); return; }
+  const keys=[...new Set(data.flatMap(Object.keys))];
+  const rows=data.map(r=>keys.map(h=>{ const v=r[h]; if(!v) return '""'; return Array.isArray(v)?'"'+v.join('; ')+'"':'"'+String(v).replace(/"/g,'""')+'"'; }));
+  const csv=[keys.join(','),...rows.map(r=>r.join(','))].join('\n');
+  const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download='hucha_digital_survey_'+new Date().toISOString().split('T')[0]+'.csv'; a.click(); URL.revokeObjectURL(url);
+}
+</script>
+</body>
+</html>
