@@ -7,897 +7,2406 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
-  :root {
-    --cream: #faf8f4;
-    --white: #ffffff;
-    --sage: #7fa67a;
-    --sage-light: #c4ddc1;
-    --sage-pale: #edf5ec;
-    --amber: #d4892a;
-    --amber-light: #fdefd8;
-    --red-soft: #d95f52;
-    --red-pale: #fde8e6;
-    --blue: #4a7fa5;
-    --blue-pale: #e3eff8;
-    --stone: #8a8278;
-    --stone-light: #e8e4de;
-    --ink: #2c2a27;
-    --shadow: 0 2px 16px rgba(0,0,0,0.07);
-    --shadow-lg: 0 6px 32px rgba(0,0,0,0.10);
-    --radius: 14px;
-    --radius-sm: 8px;
-  }
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--cream);
-    color: var(--ink);
-    min-height: 100vh;
-    font-size: 15px;
-    line-height: 1.6;
-  }
+/* ══ DESIGN TOKENS ══════════════════════════════ */
+:root {
+  --cream:#faf8f4; --white:#ffffff;
+  --sage:#7fa67a; --sage-light:#c4ddc1; --sage-pale:#edf5ec;
+  --amber:#d4892a; --amber-light:#fdefd8;
+  --red-soft:#d95f52; --red-pale:#fde8e6;
+  --blue:#4a7fa5; --blue-pale:#e3eff8;
+  --teal:#3a9e8f; --teal-pale:#e0f3f0;
+  --purple:#8264b0; --purple-pale:#ede8f8;
+  --stone:#8a8278; --stone-light:#e8e4de; --ink:#2c2a27;
+  --gold:#c8972a; --gold-pale:#fdf5e0; --gold-mid:#f0d080;
+  --rose:#b5384f; --rose-pale:#fcedf0; --rose-mid:#e8a0ad;
+  --shadow:0 2px 16px rgba(0,0,0,0.07);
+  --shadow-lg:0 6px 32px rgba(0,0,0,0.10);
+  --radius:14px; --radius-sm:8px;
+}
 
-  /* HEADER */
-  header {
-    background: var(--white);
-    border-bottom: 1px solid var(--stone-light);
-    padding: 0 clamp(16px, 4vw, 48px);
-    position: sticky; top: 0; z-index: 100;
-    display: flex; align-items: center; justify-content: space-between;
-    gap: 16px; flex-wrap: wrap;
-    min-height: 64px;
-  }
-  .header-brand { display: flex; align-items: center; gap: 12px; }
-  .header-logo {
-    width: 38px; height: 38px; border-radius: 10px;
-    background: linear-gradient(135deg, var(--sage), var(--blue));
-    display: flex; align-items: center; justify-content: center;
-    color: white; font-size: 18px;
-  }
-  .header-title { font-family: 'DM Serif Display', serif; font-size: 1.2rem; color: var(--ink); }
-  .header-sub { font-size: 12px; color: var(--stone); }
-  .sepe-link {
-    display: flex; align-items: center; gap: 8px;
-    background: var(--blue-pale); color: var(--blue);
-    border: 1px solid #b8d4e8; border-radius: 20px;
-    padding: 8px 16px; text-decoration: none;
-    font-size: 13px; font-weight: 500; transition: all 0.2s;
-    white-space: nowrap;
-  }
-  .sepe-link:hover { background: var(--blue); color: white; }
-  .sepe-link svg { flex-shrink: 0; }
+/* ══ CRYPTO-SPECIFIC ═════════════════════════════ */
+.tab-badge.gold{background:var(--gold-pale);color:var(--gold)}
+.kpi-card.gold{border-color:var(--gold)}.kpi-card.gold .value{color:var(--gold)}
+.panel-icon.gold{background:var(--gold-pale)}
 
-  /* MAIN LAYOUT */
-  main {
-    max-width: 1320px;
-    margin: 0 auto;
-    padding: clamp(20px, 4vw, 40px) clamp(16px, 4vw, 40px);
-    display: grid;
-    gap: 24px;
-  }
+/* Market ticker strip */
+.ticker-strip{display:flex;gap:0;overflow-x:auto;-webkit-overflow-scrolling:touch;background:var(--ink);border-radius:var(--radius);padding:0}
+.ticker-strip::-webkit-scrollbar{height:3px}.ticker-strip::-webkit-scrollbar-thumb{background:rgba(255,255,255,.2);border-radius:2px}
+.ticker-item{display:flex;flex-direction:column;align-items:center;padding:12px 18px;border-right:1px solid rgba(255,255,255,.08);cursor:pointer;transition:background .15s;flex-shrink:0;min-width:100px}
+.ticker-item:last-child{border-right:none}
+.ticker-item:hover{background:rgba(255,255,255,.05)}
+.ticker-item.selected{background:rgba(200,151,42,.15)}
+.ticker-sym{font-size:11px;font-weight:700;letter-spacing:.08em;color:rgba(255,255,255,.5);margin-bottom:2px}
+.ticker-price{font-family:'DM Serif Display',serif;font-size:1rem;color:white;line-height:1}
+.ticker-chg{font-size:10px;margin-top:3px;font-weight:600}
+.ticker-chg.up{color:#6fcf97}.ticker-chg.dn{color:#eb5757}.ticker-chg.flat{color:rgba(255,255,255,.4)}
 
-  /* ALERT BANNER */
-  .alert-banner {
-    background: linear-gradient(135deg, #e8f4f0 0%, #e3eff8 100%);
-    border: 1px solid #b8d4e8;
-    border-radius: var(--radius);
-    padding: 16px 24px;
-    display: flex; align-items: flex-start; gap: 12px;
-    font-size: 14px;
-  }
-  .alert-banner strong { color: var(--blue); }
+/* Coin market table */
+.coin-table{width:100%;border-collapse:collapse;font-size:13px}
+.coin-table thead th{padding:10px 14px;text-align:right;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--stone);border-bottom:2px solid var(--stone-light);background:var(--cream)}
+.coin-table thead th:first-child{text-align:left}
+.coin-table tbody tr{border-bottom:1px solid var(--stone-light);transition:background .12s;cursor:pointer}
+.coin-table tbody tr:hover{background:#fdf9f3}
+.coin-table tbody td{padding:11px 14px;text-align:right;white-space:nowrap}
+.coin-table tbody td:first-child{text-align:left}
+.coin-rank{width:22px;height:22px;border-radius:50%;background:var(--stone-light);display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--stone)}
+.coin-name-cell{display:flex;align-items:center;gap:10px}
+.coin-logo{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.coin-name{font-weight:600;font-size:13px}.coin-sym{font-size:11px;color:var(--stone)}
+.chg-badge{display:inline-flex;align-items:center;gap:3px;border-radius:5px;padding:3px 8px;font-size:11px;font-weight:700}
+.chg-badge.up{background:#eafaf0;color:#27ae60}.chg-badge.dn{background:#fde8e6;color:#d95f52}.chg-badge.flat{background:var(--stone-light);color:var(--stone)}
+.signal-badge{display:inline-block;border-radius:5px;padding:3px 9px;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+.signal-badge.buy{background:#eafaf0;color:#27ae60}
+.signal-badge.sell{background:#fde8e6;color:#d95f52}
+.signal-badge.hold{background:var(--stone-light);color:var(--stone)}
+.signal-badge.watch{background:var(--amber-light);color:var(--amber)}
+.sparkline-cell canvas{display:block}
 
-  /* CARDS ROW */
-  .cards-row {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 16px;
-  }
-  .kpi-card {
-    background: var(--white);
-    border-radius: var(--radius);
-    padding: 20px 22px;
-    box-shadow: var(--shadow);
-    border-top: 3px solid transparent;
-    position: relative; overflow: hidden;
-  }
-  .kpi-card.green { border-color: var(--sage); }
-  .kpi-card.amber { border-color: var(--amber); }
-  .kpi-card.red   { border-color: var(--red-soft); }
-  .kpi-card.blue  { border-color: var(--blue); }
-  .kpi-card .label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--stone); margin-bottom: 6px; }
-  .kpi-card .value { font-family: 'DM Serif Display', serif; font-size: 1.8rem; line-height: 1; }
-  .kpi-card.green .value { color: var(--sage); }
-  .kpi-card.amber .value { color: var(--amber); }
-  .kpi-card.red .value   { color: var(--red-soft); }
-  .kpi-card.blue .value  { color: var(--blue); }
-  .kpi-card .sub { font-size: 12px; color: var(--stone); margin-top: 4px; }
-  .kpi-badge {
-    position: absolute; top: 16px; right: 16px;
-    font-size: 20px; opacity: 0.15;
-  }
+/* Portfolio position cards */
+.crypto-pos-list{display:grid;gap:14px}
+.crypto-pos-card{background:var(--white);border:1.5px solid var(--stone-light);border-radius:var(--radius);overflow:hidden;transition:box-shadow .2s}
+.crypto-pos-card:hover{box-shadow:var(--shadow-lg)}
+.crypto-pos-header{padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.crypto-pos-left{display:flex;align-items:center;gap:12px}
+.crypto-pos-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.pos-kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;padding:14px 18px 18px;border-top:1px solid var(--stone-light);background:var(--cream)}
+.pos-kpi{background:var(--white);border-radius:var(--radius-sm);padding:10px 12px}
+.pos-kpi .pk-label{font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--stone);margin-bottom:3px}
+.pos-kpi .pk-value{font-family:'DM Serif Display',serif;font-size:1.15rem}
+.pos-kpi .pk-value.pos{color:var(--sage)}.pos-kpi .pk-value.neg{color:var(--red-soft)}.pos-kpi .pk-value.gold{color:var(--gold)}.pos-kpi .pk-value.blue{color:var(--blue)}
+.pos-kpi .pk-sub{font-size:9px;color:var(--stone);margin-top:2px}
 
-  /* TWO COLUMNS */
-  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-  @media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } }
+/* Buy history modal-like inline */
+.buy-history{margin-top:12px;border-top:1px solid var(--stone-light);padding-top:12px}
+.buy-history-title{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--stone);margin-bottom:8px}
+.buy-row{display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:8px;align-items:center;padding:6px 10px;background:var(--cream);border-radius:6px;margin-bottom:4px;font-size:12px}
+.buy-row-head{display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:8px;padding:4px 10px;font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--stone)}
+.buy-row .pnl-cell{font-weight:700}
 
-  /* PANELS */
-  .panel {
-    background: var(--white);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    overflow: hidden;
-  }
-  .panel-header {
-    padding: 18px 24px;
-    border-bottom: 1px solid var(--stone-light);
-    display: flex; align-items: center; gap: 10px;
-  }
-  .panel-header h2 { font-family: 'DM Serif Display', serif; font-size: 1.05rem; }
-  .panel-icon {
-    width: 30px; height: 30px; border-radius: 8px;
-    display: flex; align-items: center; justify-content: center; font-size: 14px;
-  }
-  .panel-icon.green { background: var(--sage-pale); }
-  .panel-icon.amber { background: var(--amber-light); }
-  .panel-icon.red   { background: var(--red-pale); }
-  .panel-icon.blue  { background: var(--blue-pale); }
-  .panel-body { padding: 20px 24px; }
+/* Add buy form */
+.add-buy-form{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;padding:12px 18px;background:var(--teal-pale);border-top:1px solid #8dd4c8}
+.add-buy-form .form-group label{font-size:11px}
 
-  /* FORM INPUTS */
-  .form-section { margin-bottom: 20px; }
-  .form-section-title {
-    font-size: 11px; font-weight: 600; letter-spacing: 0.08em;
-    text-transform: uppercase; color: var(--stone);
-    margin-bottom: 10px; padding-bottom: 6px;
-    border-bottom: 1px solid var(--stone-light);
-    display: flex; align-items: center; gap: 6px;
-  }
-  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
-  .form-group { display: flex; flex-direction: column; gap: 4px; }
-  .form-group label { font-size: 12px; font-weight: 500; color: var(--ink); }
-  .form-group small { font-size: 11px; color: var(--stone); }
-  .form-group input, .form-group select {
-    border: 1.5px solid var(--stone-light);
-    border-radius: var(--radius-sm);
-    padding: 8px 12px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    color: var(--ink);
-    background: var(--cream);
-    transition: border-color 0.2s;
-    width: 100%;
-  }
-  .form-group input:focus, .form-group select:focus {
-    outline: none;
-    border-color: var(--sage);
-    background: white;
-  }
-  .input-prefix {
-    display: flex; align-items: center;
-    border: 1.5px solid var(--stone-light);
-    border-radius: var(--radius-sm);
-    background: var(--cream); overflow: hidden;
-    transition: border-color 0.2s;
-  }
-  .input-prefix:focus-within { border-color: var(--sage); background: white; }
-  .input-prefix span {
-    padding: 8px 10px 8px 12px;
-    font-size: 13px; color: var(--stone);
-    background: var(--stone-light);
-    font-weight: 600;
-    border-right: 1px solid var(--stone-light);
-    white-space: nowrap;
-  }
-  .input-prefix input {
-    border: none; background: transparent;
-    padding: 8px 12px; flex: 1;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px; color: var(--ink);
-  }
-  .input-prefix input:focus { outline: none; }
+/* Refresh btn */
+.refresh-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--stone);background:var(--cream);border:1px solid var(--stone-light);border-radius:20px;padding:4px 10px}
+.spinning{animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 
-  .toggle-row {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 8px 12px;
-    background: var(--cream);
-    border-radius: var(--radius-sm);
-    margin-bottom: 4px;
-  }
-  .toggle-label { font-size: 13px; font-weight: 500; }
-  .toggle { position: relative; display: inline-block; width: 40px; height: 22px; }
-  .toggle input { opacity: 0; width: 0; height: 0; }
-  .toggle-slider {
-    position: absolute; inset: 0;
-    background: var(--stone-light); border-radius: 22px;
-    cursor: pointer; transition: 0.3s;
-  }
-  .toggle-slider:before {
-    content: ''; position: absolute;
-    width: 16px; height: 16px; border-radius: 50%;
-    background: white; top: 3px; left: 3px;
-    transition: 0.3s; box-shadow: 0 1px 4px rgba(0,0,0,0.2);
-  }
-  .toggle input:checked + .toggle-slider { background: var(--sage); }
-  .toggle input:checked + .toggle-slider:before { transform: translateX(18px); }
+/* ══ JUBILACIÓN-SPECIFIC ═════════════════════════════ */
+.tab-badge.rose{background:var(--rose-pale);color:var(--rose)}
+.kpi-card.rose{border-color:var(--rose-mid)}.kpi-card.rose .value{color:var(--rose)}
+.panel-icon.rose{background:var(--rose-pale)}
 
-  /* RECALC BUTTON */
-  .btn-recalc {
-    width: 100%; padding: 12px;
-    background: linear-gradient(135deg, var(--sage), #5c9b57);
-    color: white; border: none; border-radius: var(--radius-sm);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px; font-weight: 600;
-    cursor: pointer; transition: all 0.2s;
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-    margin-top: 16px;
-  }
-  .btn-recalc:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(127,166,122,0.4); }
-  .btn-recalc:active { transform: none; }
+/* Scenario cards */
+.scenario-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+.scenario-card{background:var(--white);border:2px solid var(--stone-light);border-radius:var(--radius);overflow:hidden;transition:box-shadow .2s}
+.scenario-card:hover{box-shadow:var(--shadow-lg)}
+.scenario-card.recommended{border-color:var(--sage);}
+.scenario-card.early{border-color:var(--amber);}
+.scenario-card.penalized{border-color:var(--red-soft);}
+.scenario-header{padding:14px 16px;display:flex;align-items:center;gap:10px}
+.scenario-header.ordinary{background:linear-gradient(135deg,var(--blue-pale),#edf5ec)}
+.scenario-header.voluntary{background:linear-gradient(135deg,var(--amber-light),#fff8ec)}
+.scenario-header.involuntary{background:linear-gradient(135deg,var(--rose-pale),#fff5f7)}
+.scenario-header.active{background:linear-gradient(135deg,var(--teal-pale),#e8f8f5)}
+.scenario-icon{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.scenario-title{font-family:'DM Serif Display',serif;font-size:1rem;line-height:1.2}
+.scenario-subtitle{font-size:11px;color:var(--stone)}
+.scenario-body{padding:14px 16px;display:grid;gap:8px}
+.scenario-kpi{display:flex;justify-content:space-between;align-items:baseline;padding-bottom:7px;border-bottom:1px solid var(--stone-light)}
+.scenario-kpi:last-child{border-bottom:none;padding-bottom:0}
+.scenario-kpi .sk-label{font-size:12px;color:var(--stone)}
+.scenario-kpi .sk-value{font-weight:700;font-size:13px}
+.scenario-kpi .sk-value.big{font-family:'DM Serif Display',serif;font-size:1.25rem}
+.scenario-kpi .sk-value.green{color:var(--sage)}
+.scenario-kpi .sk-value.amber{color:var(--amber)}
+.scenario-kpi .sk-value.red{color:var(--red-soft)}
+.scenario-kpi .sk-value.blue{color:var(--blue)}
+.scenario-badge{display:inline-block;border-radius:5px;padding:3px 9px;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;margin-top:8px}
+.scenario-badge.ok{background:var(--sage-pale);color:var(--sage)}
+.scenario-badge.warn{background:var(--amber-light);color:var(--amber)}
+.scenario-badge.bad{background:var(--red-pale);color:var(--red-soft)}
+.scenario-badge.info{background:var(--blue-pale);color:var(--blue)}
 
-  /* CHARTS */
-  .chart-container { position: relative; padding: 4px; }
+/* Timeline */
+.jub-timeline{position:relative;padding:24px 0;overflow-x:auto}
+.jub-timeline-track{display:flex;align-items:center;min-width:600px;position:relative}
+.jub-timeline-line{position:absolute;top:50%;left:0;right:0;height:3px;background:var(--stone-light);z-index:0;transform:translateY(-50%)}
+.jub-timeline-nodes{display:flex;align-items:center;justify-content:space-between;width:100%;position:relative;z-index:1;gap:0}
+.jub-node{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1}
+.jub-node-dot{width:18px;height:18px;border-radius:50%;border:3px solid var(--white);box-shadow:0 0 0 2px var(--stone-light)}
+.jub-node-dot.current{background:var(--blue);box-shadow:0 0 0 2px var(--blue)}
+.jub-node-dot.study-end{background:var(--purple);box-shadow:0 0 0 2px var(--purple)}
+.jub-node-dot.early-vol{background:var(--amber);box-shadow:0 0 0 2px var(--amber)}
+.jub-node-dot.early-inv{background:var(--red-soft);box-shadow:0 0 0 2px var(--red-soft)}
+.jub-node-dot.ordinary{background:var(--sage);box-shadow:0 0 0 3px var(--sage)}
+.jub-node-label{font-size:10px;font-weight:700;text-align:center;white-space:nowrap}
+.jub-node-sub{font-size:9px;color:var(--stone);text-align:center;white-space:nowrap}
 
-  /* TABLE */
-  .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-  table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 700px; }
-  thead tr { background: var(--ink); color: white; }
-  thead th { padding: 12px 14px; text-align: right; font-weight: 500; font-size: 12px; white-space: nowrap; }
-  thead th:first-child { text-align: left; }
-  tbody tr { border-bottom: 1px solid var(--stone-light); transition: background 0.15s; }
-  tbody tr:hover { background: var(--cream); }
-  tbody td { padding: 11px 14px; text-align: right; white-space: nowrap; }
-  tbody td:first-child { text-align: left; font-weight: 500; color: var(--stone); font-size: 12px; letter-spacing: 0.04em; }
-  .row-highlight td { background: var(--sage-pale); }
-  .row-total { border-top: 2px solid var(--ink) !important; }
-  .row-total td { font-weight: 600; }
-  .row-saldo td { background: linear-gradient(90deg, #e8f5e4, #d8efd4); font-weight: 700; font-size: 14px; }
-  .row-saldo td:first-child { color: var(--ink); }
-  td.positive { color: var(--sage); font-weight: 600; }
-  td.negative { color: var(--red-soft); font-weight: 600; }
-  .age-row th { background: var(--stone-light); color: var(--ink); font-size: 11px; }
-  .year-row th { background: #3a3831; font-size: 11px; }
+/* Coverage gap */
+.coverage-bar{background:var(--stone-light);border-radius:6px;height:18px;margin-top:8px;overflow:hidden;display:flex}
+.coverage-seg{display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:white;min-width:2px}
 
-  /* LEGEND PILLS */
-  .legend-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
-  .pill {
-    display: flex; align-items: center; gap: 6px;
-    font-size: 12px; padding: 4px 12px;
-    border-radius: 20px; font-weight: 500;
-  }
-  .pill .dot { width: 8px; height: 8px; border-radius: 50%; }
-  .pill-green { background: var(--sage-pale); color: var(--sage); }
-  .pill-red { background: var(--red-pale); color: var(--red-soft); }
-  .pill-blue { background: var(--blue-pale); color: var(--blue); }
-  .pill-amber { background: var(--amber-light); color: var(--amber); }
+/* Sensitivity table */
+.sens-table{width:100%;border-collapse:collapse;font-size:12px}
+.sens-table th{padding:8px 12px;background:var(--cream);font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--stone);border-bottom:2px solid var(--stone-light);text-align:right}
+.sens-table th:first-child{text-align:left}
+.sens-table td{padding:9px 12px;border-bottom:1px solid var(--stone-light);text-align:right}
+.sens-table td:first-child{text-align:left;font-weight:600}
+.sens-table tr.highlighted td{background:var(--sage-pale);font-weight:700}
+.sens-table .pension-val{font-family:'DM Serif Display',serif;font-size:1.05rem}
 
-  /* FOOTER */
-  footer {
-    text-align: center; padding: 24px;
-    font-size: 12px; color: var(--stone);
-    border-top: 1px solid var(--stone-light);
-    background: var(--white);
-  }
-  footer a { color: var(--blue); text-decoration: none; }
+/* SS references */
+.ss-ref-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.ss-ref-card{padding:14px;border-radius:var(--radius-sm);border:1px solid}
+.ss-ref-card a{display:inline-flex;align-items:center;gap:4px;margin-top:8px;font-size:11px;font-weight:600;text-decoration:none}
+.ss-ref-card a:hover{text-decoration:underline}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--ink);min-height:100vh;font-size:15px;line-height:1.6}
 
-  /* TABS */
-  .tab-row { display: flex; gap: 4px; padding: 4px; background: var(--cream); border-radius: var(--radius-sm); margin-bottom: 16px; }
-  .tab-btn {
-    flex: 1; padding: 8px 12px; border: none; border-radius: 6px;
-    font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500;
-    cursor: pointer; background: transparent; color: var(--stone); transition: all 0.2s;
-  }
-  .tab-btn.active { background: white; color: var(--ink); box-shadow: var(--shadow); }
+/* ══ HEADER ══════════════════════════════════════ */
+header{background:var(--white);border-bottom:1px solid var(--stone-light);padding:0 clamp(16px,4vw,48px);position:sticky;top:0;z-index:200;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;min-height:64px}
+.header-brand{display:flex;align-items:center;gap:12px}
+.header-logo{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--sage),var(--blue));display:flex;align-items:center;justify-content:center;color:white;font-size:18px;flex-shrink:0}
+.header-title{font-family:'DM Serif Display',serif;font-size:1.15rem;color:var(--ink)}
+.header-sub{font-size:11px;color:var(--stone)}
+.sepe-link{display:flex;align-items:center;gap:8px;background:var(--blue-pale);color:var(--blue);border:1px solid #b8d4e8;border-radius:20px;padding:7px 14px;text-decoration:none;font-size:12px;font-weight:500;transition:all .2s;white-space:nowrap}
+.sepe-link:hover{background:var(--blue);color:white}
 
-  /* INFO BOX */
-  .info-box {
-    background: var(--amber-light);
-    border: 1px solid #f0c97a;
-    border-radius: var(--radius-sm);
-    padding: 14px 16px;
-    font-size: 13px;
-    color: #7a5010;
-    display: flex; gap: 10px;
-    margin-bottom: 16px;
-  }
+/* ══ TAB NAV ══════════════════════════════════════ */
+.tab-nav{background:var(--white);border-bottom:2px solid var(--stone-light);padding:0 clamp(16px,4vw,48px);position:sticky;top:64px;z-index:150;display:flex;gap:0;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tab-nav::-webkit-scrollbar{display:none}
+.tab-nav-btn{display:flex;align-items:center;gap:8px;padding:14px 20px;border:none;background:transparent;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:var(--stone);cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s}
+.tab-nav-btn:hover{color:var(--ink)}
+.tab-nav-btn.active{color:var(--ink);border-bottom-color:var(--ink);font-weight:600}
+.tab-badge{background:var(--sage-pale);color:var(--sage);border-radius:20px;font-size:10px;font-weight:700;padding:1px 7px}
+.tab-badge.teal{background:var(--teal-pale);color:var(--teal)}
 
-  .chart-full { grid-column: 1 / -1; }
-  @media (max-width: 900px) { .chart-full { grid-column: 1; } }
+/* ══ TAB PANES ══════════════════════════════════== */
+.tab-pane{display:none}
+.tab-pane.active{display:block}
 
-  /* PROGRESS BAR */
-  .progress-bar-wrap { margin-top: 8px; }
-  .progress-bar-track { height: 6px; background: var(--stone-light); border-radius: 3px; overflow: hidden; }
-  .progress-bar-fill { height: 100%; border-radius: 3px; transition: width 0.6s ease; }
-  .progress-label { display: flex; justify-content: space-between; font-size: 11px; color: var(--stone); margin-top: 4px; }
+/* ══ LAYOUT ══════════════════════════════════════ */
+.main-content{max-width:1320px;margin:0 auto;padding:clamp(20px,4vw,40px) clamp(16px,4vw,40px);display:grid;gap:24px}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px}
+@media(max-width:1100px){.three-col{grid-template-columns:1fr 1fr}}
+@media(max-width:900px){.two-col,.three-col{grid-template-columns:1fr}}
 
-  /* STICKY CTA */
-  @media (max-width: 600px) {
-    .sepe-link .sepe-text { display: none; }
-  }
+/* ══ ALERT BANNER ════════════════════════════════ */
+.alert-banner{background:linear-gradient(135deg,#e8f4f0 0%,#e3eff8 100%);border:1px solid #b8d4e8;border-radius:var(--radius);padding:16px 24px;display:flex;align-items:flex-start;gap:12px;font-size:14px}
+.alert-banner strong{color:var(--blue)}
+
+/* ══ KPI CARDS ═══════════════════════════════════ */
+.cards-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:16px}
+.kpi-card{background:var(--white);border-radius:var(--radius);padding:20px 22px;box-shadow:var(--shadow);border-top:3px solid transparent;position:relative;overflow:hidden;transition:transform .15s,box-shadow .15s}
+.kpi-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
+.kpi-card.green{border-color:var(--sage)}.kpi-card.amber{border-color:var(--amber)}.kpi-card.red{border-color:var(--red-soft)}.kpi-card.blue{border-color:var(--blue)}.kpi-card.teal{border-color:var(--teal)}.kpi-card.purple{border-color:var(--purple)}
+.kpi-card .label{font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--stone);margin-bottom:6px}
+.kpi-card .value{font-family:'DM Serif Display',serif;font-size:1.75rem;line-height:1}
+.kpi-card.green .value{color:var(--sage)}.kpi-card.amber .value{color:var(--amber)}.kpi-card.red .value{color:var(--red-soft)}.kpi-card.blue .value{color:var(--blue)}.kpi-card.teal .value{color:var(--teal)}.kpi-card.purple .value{color:var(--purple)}
+.kpi-card .sub{font-size:11px;color:var(--stone);margin-top:5px}
+.kpi-badge{position:absolute;top:14px;right:14px;font-size:20px;opacity:.13}
+
+/* ══ PANELS ══════════════════════════════════════ */
+.panel{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+.panel-header{padding:18px 24px;border-bottom:1px solid var(--stone-light);display:flex;align-items:center;justify-content:space-between;gap:10px}
+.panel-header-left{display:flex;align-items:center;gap:10px}
+.panel-header h2{font-family:'DM Serif Display',serif;font-size:1.05rem}
+.panel-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.panel-icon.green{background:var(--sage-pale)}.panel-icon.amber{background:var(--amber-light)}.panel-icon.red{background:var(--red-pale)}.panel-icon.blue{background:var(--blue-pale)}.panel-icon.teal{background:var(--teal-pale)}.panel-icon.purple{background:var(--purple-pale)}
+.panel-body{padding:20px 24px}
+
+/* ══ FORMS ═══════════════════════════════════════ */
+.form-section{margin-bottom:20px}
+.form-section-title{font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--stone);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--stone-light);display:flex;align-items:center;gap:6px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:600px){.form-grid{grid-template-columns:1fr}}
+.form-group{display:flex;flex-direction:column;gap:4px}
+.form-group label{font-size:12px;font-weight:500;color:var(--ink)}
+.form-group small{font-size:10px;color:var(--stone)}
+.form-group input,.form-group select{border:1.5px solid var(--stone-light);border-radius:var(--radius-sm);padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--ink);background:var(--cream);transition:border-color .2s;width:100%}
+.form-group input:focus,.form-group select:focus{outline:none;border-color:var(--sage);background:white}
+.input-prefix{display:flex;align-items:center;border:1.5px solid var(--stone-light);border-radius:var(--radius-sm);background:var(--cream);overflow:hidden;transition:border-color .2s}
+.input-prefix:focus-within{border-color:var(--sage);background:white}
+.input-prefix>span{padding:8px 10px 8px 12px;font-size:12px;color:var(--stone);background:var(--stone-light);font-weight:600;border-right:1px solid var(--stone-light);white-space:nowrap}
+.input-prefix input{border:none;background:transparent;padding:8px 12px;flex:1;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--ink)}
+.input-prefix input:focus{outline:none}
+
+/* ══ BUTTONS ══════════════════════════════════════ */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:9px 18px;border:none;border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap}
+.btn-primary{background:linear-gradient(135deg,var(--sage),#5c9b57);color:white}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(127,166,122,.4)}
+.btn-full{width:100%;justify-content:center;padding:12px;font-size:14px;margin-top:16px}
+.btn-secondary{background:var(--cream);color:var(--ink);border:1.5px solid var(--stone-light)}
+.btn-secondary:hover{background:var(--stone-light)}
+.btn-danger{background:var(--red-pale);color:var(--red-soft);border:1.5px solid #f0b8b3}
+.btn-danger:hover{background:var(--red-soft);color:white}
+.btn-teal{background:var(--teal-pale);color:var(--teal);border:1.5px solid #8dd4c8}
+.btn-teal:hover{background:var(--teal);color:white}
+
+/* ══ TABLES ══════════════════════════════════════ */
+.table-wrapper{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:680px}
+thead tr{background:var(--ink);color:white}
+thead th{padding:11px 14px;text-align:right;font-weight:500;font-size:11px;white-space:nowrap}
+thead th:first-child{text-align:left}
+tbody tr{border-bottom:1px solid var(--stone-light);transition:background .15s}
+tbody tr:hover{background:var(--cream)}
+tbody td{padding:10px 14px;text-align:right;white-space:nowrap}
+tbody td:first-child{text-align:left;font-weight:500;color:var(--stone);font-size:11px;letter-spacing:.04em}
+.row-section td{font-weight:700!important;font-size:10px!important;letter-spacing:.09em!important;text-transform:uppercase;padding:7px 14px}
+.row-section.ing td{background:#e8f5e4;color:var(--sage)!important}
+.row-section.gas td{background:#fde8e6;color:var(--red-soft)!important}
+.row-section.res td{background:#e3eff8;color:var(--blue)!important}
+.row-total{border-top:2px solid var(--stone-light)!important}
+.row-total td{font-weight:700}
+.row-saldo td{background:linear-gradient(90deg,#e8f5e4,#d8efd4);font-weight:700;font-size:13px}
+td.positive{color:var(--sage);font-weight:600}
+td.negative{color:var(--red-soft);font-weight:600}
+.age-row th{background:#3d3a36;font-size:11px}
+.year-row th{background:var(--ink);font-size:11px}
+
+/* ══ LEGEND PILLS ════════════════════════════════ */
+.legend-pills{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.pill{display:flex;align-items:center;gap:6px;font-size:11px;padding:4px 11px;border-radius:20px;font-weight:500}
+.pill .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.pill-green{background:var(--sage-pale);color:var(--sage)}.pill-red{background:var(--red-pale);color:var(--red-soft)}.pill-blue{background:var(--blue-pale);color:var(--blue)}.pill-teal{background:var(--teal-pale);color:var(--teal)}.pill-purple{background:var(--purple-pale);color:var(--purple)}.pill-amber{background:var(--amber-light);color:var(--amber)}
+
+/* ══ INFO BOXES ══════════════════════════════════ */
+.info-box{border-radius:var(--radius-sm);padding:14px 16px;font-size:13px;display:flex;gap:10px;margin-bottom:16px}
+.info-box.amber{background:var(--amber-light);border:1px solid #f0c97a;color:#7a5010}
+.info-box.blue{background:var(--blue-pale);border:1px solid #b8d4e8;color:#2a5070}
+.info-box.teal{background:var(--teal-pale);border:1px solid #8dd4c8;color:#1a6055}
+
+/* ══ PROPERTY CARDS ══════════════════════════════ */
+.prop-list{display:grid;gap:20px}
+.prop-card{background:var(--white);border:1.5px solid var(--stone-light);border-radius:var(--radius);overflow:hidden;transition:box-shadow .2s}
+.prop-card:hover{box-shadow:var(--shadow-lg)}
+.prop-card-header{padding:14px 20px;background:linear-gradient(135deg,#f5f2ec,var(--teal-pale));border-bottom:1px solid var(--stone-light);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.prop-card-title-row{display:flex;align-items:center;gap:10px}
+.prop-card-icon{width:36px;height:36px;border-radius:10px;background:var(--teal);color:white;display:flex;align-items:center;justify-content:center;font-size:17px}
+.prop-card-name{font-family:'DM Serif Display',serif;font-size:1rem}
+.prop-card-addr{font-size:11px;color:var(--stone)}
+.prop-card-actions{display:flex;gap:8px}
+.prop-card-body{padding:20px}
+.prop-form-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px}
+.prop-kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:12px;margin-top:16px;padding-top:16px;border-top:1px solid var(--stone-light)}
+.prop-kpi{background:var(--cream);border-radius:var(--radius-sm);padding:12px 14px}
+.pk-label{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--stone);margin-bottom:4px}
+.pk-value{font-family:'DM Serif Display',serif;font-size:1.3rem}
+.pk-value.pos{color:var(--sage)}.pk-value.neg{color:var(--red-soft)}.pk-value.teal{color:var(--teal)}.pk-value.amber{color:var(--amber)}
+.pk-sub{font-size:10px;color:var(--stone);margin-top:2px}
+
+/* ══ OVERVIEW ════════════════════════════════════ */
+.wealth-bar-track{height:12px;background:var(--stone-light);border-radius:6px;overflow:hidden;display:flex}
+.wealth-bar-fill{height:100%;transition:width .6s ease}
+.wealth-legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:10px;font-size:12px}
+.wealth-legend-item{display:flex;align-items:center;gap:6px}
+.wealth-legend-dot{width:10px;height:10px;border-radius:3px}
+.ov-title{font-family:'DM Serif Display',serif;font-size:1.3rem;color:var(--ink);margin-bottom:4px}
+.ov-sub{font-size:13px;color:var(--stone);margin-bottom:0}
+
+/* ══ RESPONSIVE ══════════════════════════════════ */
+@media(max-width:600px){
+  .sepe-link .sepe-text{display:none}
+  .tab-nav-btn .tab-text{display:none}
+  .tab-nav-btn{padding:14px 16px}
+}
+
+/* ══ FOOTER ══════════════════════════════════════ */
+footer{text-align:center;padding:24px;font-size:12px;color:var(--stone);border-top:1px solid var(--stone-light);background:var(--white)}
+footer a{color:var(--blue);text-decoration:none}
 </style>
 </head>
 <body>
 
+<!-- ══ HEADER ══════════════════════════════════════════════════════ -->
 <header>
   <div class="header-brand">
     <div class="header-logo">💼</div>
     <div>
-      <div class="header-title">Panel Financiero · José</div>
-      <div class="header-sub">Previsión hasta jubilación · 54 años · Actualizado Feb 2026</div>
+      <div class="header-title">Panel Financiero Personal · José</div>
+      <div class="header-sub">Planificación hasta jubilación · 54 años · Feb 2026</div>
     </div>
   </div>
-  <a href="https://www.sepe.es/HomeSepe/Personas/distributiva-prestaciones/prestacion-contributiva/prestacion-contributiva-para-mayores-de-52.html" 
+  <a href="https://www.sepe.es/HomeSepe/Personas/distributiva-prestaciones/prestacion-contributiva/prestacion-contributiva-para-mayores-de-52.html"
      target="_blank" rel="noopener" class="sepe-link">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
     <span class="sepe-text">Subsidio +52 años · SEPE</span>
   </a>
 </header>
 
-<main>
+<!-- ══ TAB NAVIGATION ══════════════════════════════════════════════ -->
+<nav class="tab-nav">
+  <button class="tab-nav-btn active" onclick="switchTab('overview',this)">
+    <span>🏠</span><span class="tab-text">Overview global</span>
+    <span class="tab-badge">Total</span>
+  </button>
+  <button class="tab-nav-btn" onclick="switchTab('financiero',this)">
+    <span>📊</span><span class="tab-text">Planificación financiera</span>
+  </button>
+  <button class="tab-nav-btn" onclick="switchTab('inmobiliario',this)">
+    <span>🏘️</span><span class="tab-text">Patrimonio inmobiliario</span>
+    <span class="tab-badge teal" id="propBadge">0 viviendas</span>
+  </button>
+  <button class="tab-nav-btn" onclick="switchTab('crypto',this)">
+    <span>₿</span><span class="tab-text">Inversiones / Crypto</span>
+    <span class="tab-badge gold" id="cryptoBadge">0 activos</span>
+  </button>
+  <button class="tab-nav-btn" onclick="switchTab('jubilacion',this)">
+    <span>🏖️</span><span class="tab-text">Simulación jubilación</span>
+    <span class="tab-badge rose" id="jubBadge">—</span>
+  </button>
+</nav>
 
-  <!-- BANNER -->
-  <div class="alert-banner">
-    <span style="font-size:20px">ℹ️</span>
+<!-- ══════════════════════════════════════════════════════════════════
+     TAB 1 · OVERVIEW GLOBAL
+══════════════════════════════════════════════════════════════════════ -->
+<div class="tab-pane active" id="pane-overview">
+  <div class="main-content">
+
     <div>
-      <strong>Subsidio para mayores de 52 años:</strong> Tienes derecho a esta prestación si has agotado la prestación contributiva, tienes más de 52 años y acreditas al menos 6 años cotizados. La cuantía es el 80% del IPREM mensual (≈ <strong>500 €/mes</strong>). 
-      <a href="https://www.sepe.es/HomeSepe/Personas/distributiva-prestaciones/prestacion-contributiva/prestacion-contributiva-para-mayores-de-52.html" target="_blank" style="color:var(--blue);font-weight:600;">Ver condiciones completas en SEPE →</a>
+      <div class="ov-title">Situación patrimonial global</div>
+      <div class="ov-sub">Visión consolidada de planificación financiera, patrimonio inmobiliario, inversiones crypto/alternativas y simulación de jubilación.</div>
     </div>
-  </div>
 
-  <!-- KPI CARDS -->
-  <div class="cards-row" id="kpiRow">
-    <!-- Rendered by JS -->
-  </div>
+    <div class="cards-row" id="ovKpiRow">
+      <div style="grid-column:1/-1;color:var(--stone);font-size:13px;padding:12px 0">Cargando datos...</div>
+    </div>
 
-  <!-- CONFIGURACIÓN + CHARTS -->
-  <div class="two-col">
-
-    <!-- PANEL CONFIGURACIÓN -->
     <div class="panel">
       <div class="panel-header">
-        <div class="panel-icon green">⚙️</div>
-        <h2>Configuración de datos</h2>
+        <div class="panel-header-left"><div class="panel-icon teal">🏗️</div><h2>Composición del patrimonio neto</h2></div>
       </div>
+      <div class="panel-body" id="ovWealthBar">
+        <p style="color:var(--stone);font-size:13px">Configura los módulos para ver la composición patrimonial.</p>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="panel">
+        <div class="panel-header"><div class="panel-header-left"><div class="panel-icon purple">📈</div><h2>Evolución patrimonial proyectada</h2></div></div>
+        <div class="panel-body">
+          <div class="legend-pills">
+            <div class="pill pill-blue"><div class="dot" style="background:var(--blue)"></div>Saldo cuenta</div>
+            <div class="pill pill-teal"><div class="dot" style="background:var(--teal)"></div>Valor inmuebles</div>
+            <div class="pill pill-purple"><div class="dot" style="background:var(--purple)"></div>Patrimonio total</div>
+          </div>
+          <div style="height:280px"><canvas id="ovChartPatrimonio"></canvas></div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><div class="panel-header-left"><div class="panel-icon green">💰</div><h2>Flujo neto mensual total</h2></div></div>
+        <div class="panel-body">
+          <div class="legend-pills">
+            <div class="pill pill-green"><div class="dot" style="background:var(--sage)"></div>Ingresos totales</div>
+            <div class="pill pill-red"><div class="dot" style="background:var(--red-soft)"></div>Gastos totales</div>
+            <div class="pill pill-blue"><div class="dot" style="background:var(--blue)"></div>Resultado neto</div>
+          </div>
+          <div style="height:280px"><canvas id="ovChartFlujo"></canvas></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-header-left"><div class="panel-icon blue">📊</div><h2>Resumen planificación financiera</h2></div>
+          <button class="btn btn-secondary" style="font-size:12px;padding:6px 14px" onclick="switchTab('financiero',document.querySelectorAll('.tab-nav-btn')[1])">Ver detalle →</button>
+        </div>
+        <div class="panel-body" id="ovResumenFin"><p style="color:var(--stone);font-size:13px">Configura la planificación financiera.</p></div>
+      </div>
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-header-left"><div class="panel-icon teal">🏘️</div><h2>Resumen patrimonio inmobiliario</h2></div>
+          <button class="btn btn-secondary" style="font-size:12px;padding:6px 14px" onclick="switchTab('inmobiliario',document.querySelectorAll('.tab-nav-btn')[2])">Ver detalle →</button>
+        </div>
+        <div class="panel-body" id="ovResumenInm"><p style="color:var(--stone);font-size:13px">Añade viviendas en el módulo de patrimonio.</p></div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-header-left"><div class="panel-icon gold">&#x20BF;</div><h2>Resumen inversiones crypto</h2></div>
+          <button class="btn btn-secondary" style="font-size:12px;padding:6px 14px" onclick="switchTab('crypto',document.querySelectorAll('.tab-nav-btn')[3])">Ver detalle →</button>
+        </div>
+        <div class="panel-body" id="ovResumenCrypto"><p style="color:var(--stone);font-size:13px">Añade activos en el módulo de inversiones.</p></div>
+      </div>
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-header-left"><div class="panel-icon rose">🏖️</div><h2>Simulación jubilación</h2></div>
+          <button class="btn btn-secondary" style="font-size:12px;padding:6px 14px" onclick="switchTab('jubilacion',document.querySelectorAll('.tab-nav-btn')[4])">Ver detalle →</button>
+        </div>
+        <div class="panel-body" id="ovResumenJub"><p style="color:var(--stone);font-size:13px">Configura los datos en el módulo de jubilación.</p></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header"><div class="panel-header-left"><div class="panel-icon purple">📊</div><h2>Distribución patrimonial actual</h2></div></div>
+      <div class="panel-body"><div style="height:240px"><canvas id="ovChartDonutTotal"></canvas></div></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     TAB 2 · PLANIFICACIÓN FINANCIERA
+══════════════════════════════════════════════════════════════════════ -->
+<div class="tab-pane" id="pane-financiero">
+  <div class="main-content">
+
+    <div class="alert-banner">
+      <span style="font-size:20px">ℹ️</span>
+      <div><strong>Subsidio para mayores de 52 años:</strong> Derecho si agotaste prestación contributiva, tienes +52 años y acreditas ≥ 6 años cotizados. Cuantía: 80% IPREM ≈ <strong>500 €/mes</strong>.
+      <a href="https://www.sepe.es/HomeSepe/Personas/distributiva-prestaciones/prestacion-contributiva/prestacion-contributiva-para-mayores-de-52.html" target="_blank" style="color:var(--blue);font-weight:600"> Ver condiciones SEPE →</a></div>
+    </div>
+
+    <div class="cards-row" id="kpiRow"></div>
+
+    <div class="two-col">
+
+      <!-- CONFIGURACIÓN -->
+      <div class="panel">
+        <div class="panel-header"><div class="panel-header-left"><div class="panel-icon green">⚙️</div><h2>Configuración de datos</h2></div></div>
+        <div class="panel-body">
+          <div class="form-section">
+            <div class="form-section-title">💰 Ingresos</div>
+            <div class="form-grid">
+              <div class="form-group"><label>Nómina mensual</label><div class="input-prefix"><span>€</span><input type="number" id="nomina" value="800" step="50"></div></div>
+              <div class="form-group"><label>Meses trabajados/año</label><input type="number" id="mesesNomina" value="9" min="0" max="12"></div>
+              <div class="form-group"><label>Devolución IRPF anual</label><div class="input-prefix"><span>€</span><input type="number" id="irpf" value="1400" step="100"></div></div>
+              <div class="form-group"><label>Año nómina completa</label>
+                <select id="anoNominaFull"><option value="2030">2030</option><option value="2029">2029</option><option value="2028">2028</option><option value="2027">2027</option><option value="2026">2026</option></select></div>
+              <div class="form-group"><label>Subsidio +52 años (mensual)</label><div class="input-prefix"><span>€</span><input type="number" id="subsidio" value="500" step="10"></div></div>
+              <div class="form-group"><label>Año inicio subsidio</label>
+                <select id="anoSubsidio"><option value="9999">No activado</option><option value="2026">2026</option><option value="2027">2027</option><option value="2028">2028</option><option value="2029">2029</option><option value="2030" selected>2030</option><option value="2031">2031</option><option value="2032">2032</option></select></div>
+              <div class="form-group"><label>Otros ingresos anuales</label><div class="input-prefix"><span>€</span><input type="number" id="otrosIngresos" value="0" step="100"></div><small>Alquileres, inversiones…</small></div>
+            </div>
+          </div>
+          <div class="form-section">
+            <div class="form-section-title">🏠 Gastos fijos</div>
+            <div class="form-grid">
+              <div class="form-group"><label>Hipoteca mensual</label><div class="input-prefix"><span>€</span><input type="number" id="hipoteca" value="300" step="10"></div></div>
+              <div class="form-group"><label>Año fin hipoteca</label>
+                <select id="anoFinHipoteca"><option value="9999">Indefinida</option><option value="2030">2030</option><option value="2031" selected>2031</option><option value="2032">2032</option><option value="2033">2033</option><option value="2034">2034</option><option value="2035">2035</option></select></div>
+              <div class="form-group"><label>Cuota autónomo mensual</label><div class="input-prefix"><span>€</span><input type="number" id="autonomos" value="400" step="10"></div></div>
+              <div class="form-group"><label>Año fin cuota autónomo</label>
+                <select id="anoFinAutonomos"><option value="9999">Indefinida</option><option value="2026">2026</option><option value="2027">2027</option><option value="2028">2028</option><option value="2029" selected>2029</option><option value="2030">2030</option><option value="2031">2031</option></select></div>
+              <div class="form-group"><label>Gastos casa mensuales</label><div class="input-prefix"><span>€</span><input type="number" id="gastosCasa" value="1000" step="50"></div></div>
+              <div class="form-group"><label>Otros gastos anuales</label><div class="input-prefix"><span>€</span><input type="number" id="otrosGastos" value="0" step="100"></div></div>
+            </div>
+          </div>
+          <div class="form-section">
+            <div class="form-section-title">📈 Parámetros generales</div>
+            <div class="form-grid">
+              <div class="form-group"><label>Saldo inicial en cuenta</label><div class="input-prefix"><span>€</span><input type="number" id="saldoInicial" value="50000" step="1000"></div></div>
+              <div class="form-group"><label>IPC anual previsto (%)</label><div class="input-prefix"><span>%</span><input type="number" id="ipc" value="2" step="0.1" min="0" max="10"></div></div>
+              <div class="form-group"><label>Año inicio</label><select id="anoInicio"><option value="2026" selected>2026</option><option value="2025">2025</option></select></div>
+              <div class="form-group"><label>Horizonte</label>
+                <select id="horizonte"><option value="10">10 años (2035)</option><option value="12">12 años (2037)</option><option value="15">15 años (2040)</option></select></div>
+            </div>
+          </div>
+          <button class="btn btn-primary btn-full" onclick="recalculate()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+            Recalcular proyección
+          </button>
+        </div>
+      </div>
+
+      <!-- CHART SALDO -->
+      <div class="panel">
+        <div class="panel-header"><div class="panel-header-left"><div class="panel-icon blue">📊</div><h2>Evolución del saldo</h2></div></div>
+        <div class="panel-body">
+          <div class="legend-pills">
+            <div class="pill pill-blue"><div class="dot" style="background:var(--blue)"></div>Saldo acumulado</div>
+            <div class="pill pill-green"><div class="dot" style="background:var(--sage)"></div>Ingresos anuales</div>
+            <div class="pill pill-red"><div class="dot" style="background:var(--red-soft)"></div>Gastos anuales</div>
+          </div>
+          <div style="height:320px"><canvas id="chartSaldo"></canvas></div>
+          <div id="retirementNote" style="margin-top:12px;font-size:12px;color:var(--stone);text-align:center"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHART BARRAS -->
+    <div class="panel">
+      <div class="panel-header"><div class="panel-header-left"><div class="panel-icon amber">📉</div><h2>Ingresos vs. Gastos anuales</h2></div></div>
+      <div class="panel-body"><div style="height:240px"><canvas id="chartBarras"></canvas></div></div>
+    </div>
+
+    <!-- TABLA DETALLADA -->
+    <div class="panel">
+      <div class="panel-header"><div class="panel-header-left"><div class="panel-icon green">📋</div><h2>Tabla de previsiones detallada</h2></div></div>
+      <div class="panel-body" style="padding:0"><div class="table-wrapper"><table id="tablaPrevisiones"></table></div></div>
+    </div>
+
+    <!-- NOTAS -->
+    <div class="panel">
+      <div class="panel-header"><div class="panel-header-left"><div class="panel-icon amber">📌</div><h2>Notas y supuestos</h2></div></div>
       <div class="panel-body">
-
-        <div class="form-section">
-          <div class="form-section-title">💰 Ingresos</div>
-          <div class="form-grid">
-            <div class="form-group">
-              <label>Nómina mensual</label>
-              <div class="input-prefix"><span>€</span><input type="number" id="nomina" value="800" step="50"></div>
-            </div>
-            <div class="form-group">
-              <label>Meses trabajados/año</label>
-              <input type="number" id="mesesNomina" value="9" min="0" max="12">
-            </div>
-            <div class="form-group">
-              <label>Devolución IRPF anual</label>
-              <div class="input-prefix"><span>€</span><input type="number" id="irpf" value="1400" step="100"></div>
-            </div>
-            <div class="form-group">
-              <label>Año inicio nómina completa</label>
-              <select id="anoNominaFull">
-                <option value="2030">2030</option><option value="2029">2029</option>
-                <option value="2028">2028</option><option value="2027">2027</option>
-                <option value="2026">2026</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Subsidio +52 años (mensual)</label>
-              <div class="input-prefix"><span>€</span><input type="number" id="subsidio" value="500" step="10"></div>
-            </div>
-            <div class="form-group">
-              <label>Año inicio subsidio</label>
-              <select id="anoSubsidio">
-                <option value="9999">No activado</option>
-                <option value="2026">2026</option><option value="2027">2027</option>
-                <option value="2028">2028</option><option value="2029">2029</option>
-                <option value="2030" selected>2030</option><option value="2031">2031</option>
-                <option value="2032">2032</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Otros ingresos anuales</label>
-              <div class="input-prefix"><span>€</span><input type="number" id="otrosIngresos" value="0" step="100"></div>
-              <small>Alquileres, inversiones, etc.</small>
-            </div>
-          </div>
+        <div class="info-box amber"><span>⚠️</span><div>Proyección orientativa. Las cifras reales dependerán del IPC, cambios legislativos y situación laboral. Revisar anualmente.</div></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;font-size:13px">
+          <div style="background:var(--sage-pale);border-radius:var(--radius-sm);padding:14px"><div style="font-weight:700;margin-bottom:6px;color:var(--sage)">🌱 Ingresos</div>Nómina por meses trabajados. Subsidio +52 activa en el año seleccionado. IRPF fijo anual.</div>
+          <div style="background:var(--red-pale);border-radius:var(--radius-sm);padding:14px"><div style="font-weight:700;margin-bottom:6px;color:var(--red-soft)">🏠 Gastos</div>Gastos de casa actualizados con IPC. Hipoteca y autónomos se eliminan al llegar al año fin.</div>
+          <div style="background:var(--blue-pale);border-radius:var(--radius-sm);padding:14px"><div style="font-weight:700;margin-bottom:6px;color:var(--blue)">📐 Metodología</div>Saldo = Saldo anterior + Ingresos − Gastos. Acumulado año a año en euros corrientes.</div>
+          <div style="background:var(--amber-light);border-radius:var(--radius-sm);padding:14px"><div style="font-weight:700;margin-bottom:6px;color:var(--amber)">📅 Jubilación</div>Edad legal: 66 años y 8 meses con &lt;37a 9m cotizados. 65 años con período mínimo completo.<br><a href="https://www.seg-social.es" target="_blank" style="color:var(--blue);font-size:11px">Ver Seg. Social →</a></div>
         </div>
+      </div>
+    </div>
 
-        <div class="form-section">
-          <div class="form-section-title">🏠 Gastos fijos</div>
-          <div class="form-grid">
-            <div class="form-group">
-              <label>Hipoteca mensual</label>
-              <div class="input-prefix"><span>€</span><input type="number" id="hipoteca" value="300" step="10"></div>
-            </div>
-            <div class="form-group">
-              <label>Año fin hipoteca</label>
-              <select id="anoFinHipoteca">
-                <option value="9999">Indefinida</option>
-                <option value="2030">2030</option><option value="2031" selected>2031</option>
-                <option value="2032">2032</option><option value="2033">2033</option>
-                <option value="2034">2034</option><option value="2035">2035</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Cuota autónomo mensual</label>
-              <div class="input-prefix"><span>€</span><input type="number" id="autonomos" value="400" step="10"></div>
-            </div>
-            <div class="form-group">
-              <label>Año fin cuota autónomo</label>
-              <select id="anoFinAutonomos">
-                <option value="9999">Indefinida</option>
-                <option value="2026">2026</option><option value="2027">2027</option>
-                <option value="2028">2028</option><option value="2029" selected>2029</option>
-                <option value="2030">2030</option><option value="2031">2031</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Gastos casa mensuales</label>
-              <div class="input-prefix"><span>€</span><input type="number" id="gastosCasa" value="1000" step="50"></div>
-            </div>
-            <div class="form-group">
-              <label>Otros gastos anuales</label>
-              <div class="input-prefix"><span>€</span><input type="number" id="otrosGastos" value="0" step="100"></div>
-              <small>Seguros, suscripciones, etc.</small>
-            </div>
-          </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     TAB 3 · PATRIMONIO INMOBILIARIO
+══════════════════════════════════════════════════════════════════════ -->
+<div class="tab-pane" id="pane-inmobiliario">
+  <div class="main-content">
+
+    <div class="cards-row" id="propKpiRow">
+      <div style="grid-column:1/-1;color:var(--stone);font-size:13px;padding:12px 0">Añade tu primera vivienda para ver los indicadores.</div>
+    </div>
+
+    <!-- CHARTS INMOBILIARIOS -->
+    <div class="two-col">
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-header-left"><div class="panel-icon teal">🍩</div><h2>Desglose de gastos</h2></div>
+          <select id="propChartSelect" style="font-size:12px;padding:5px 10px;border:1.5px solid var(--stone-light);border-radius:var(--radius-sm);background:var(--cream);font-family:'DM Sans',sans-serif" onchange="renderPropDonut()">
+            <option value="all">Todas las viviendas</option>
+          </select>
         </div>
+        <div class="panel-body"><div style="height:270px"><canvas id="propChartDonut"></canvas></div></div>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><div class="panel-header-left"><div class="panel-icon teal">📊</div><h2>Rentabilidad por vivienda</h2></div></div>
+        <div class="panel-body"><div style="height:270px"><canvas id="propChartRent"></canvas></div></div>
+      </div>
+    </div>
 
-        <div class="form-section">
-          <div class="form-section-title">📈 Parámetros generales</div>
-          <div class="form-grid">
-            <div class="form-group">
-              <label>Saldo inicial en cuenta</label>
-              <div class="input-prefix"><span>€</span><input type="number" id="saldoInicial" value="50000" step="1000"></div>
-            </div>
-            <div class="form-group">
-              <label>IPC anual previsto (%)</label>
-              <div class="input-prefix"><span>%</span><input type="number" id="ipc" value="2" step="0.1" min="0" max="10"></div>
-            </div>
-            <div class="form-group">
-              <label>Año inicio previsión</label>
-              <select id="anoInicio">
-                <option value="2026" selected>2026</option>
-                <option value="2025">2025</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Horizonte de previsión</label>
-              <select id="horizonte">
-                <option value="10">10 años (hasta 2035)</option>
-                <option value="12">12 años (hasta 2037)</option>
-                <option value="15">15 años (hasta 2040)</option>
-              </select>
-            </div>
-          </div>
+    <!-- TABLA COMPARATIVA -->
+    <div class="panel" id="propTablePanel" style="display:none">
+      <div class="panel-header"><div class="panel-header-left"><div class="panel-icon teal">📋</div><h2>Tabla comparativa de viviendas</h2></div></div>
+      <div class="panel-body" style="padding:0"><div class="table-wrapper"><table id="propTabla"></table></div></div>
+    </div>
+
+    <!-- CABECERA LISTADO -->
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+      <div>
+        <div class="ov-title">Mis viviendas</div>
+        <div class="ov-sub">Gestiona cada propiedad con sus ingresos y gastos asociados.</div>
+      </div>
+      <button class="btn btn-teal" onclick="addProperty()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Añadir vivienda
+      </button>
+    </div>
+
+    <div class="prop-list" id="propList"></div>
+
+    <div id="propEmpty" style="text-align:center;padding:48px 24px;color:var(--stone)">
+      <div style="font-size:48px;margin-bottom:12px">🏘️</div>
+      <div style="font-family:'DM Serif Display',serif;font-size:1.2rem;margin-bottom:8px;color:var(--ink)">Sin viviendas registradas</div>
+      <div style="font-size:13px;margin-bottom:20px">Añade tu primera propiedad para ver el análisis de rentabilidad.</div>
+      <button class="btn btn-teal" onclick="addProperty()">+ Añadir primera vivienda</button>
+    </div>
+
+    <!-- GUÍA RENTABILIDAD -->
+    <div class="panel">
+      <div class="panel-header"><div class="panel-header-left"><div class="panel-icon amber">📌</div><h2>Guía de rentabilidad inmobiliaria</h2></div></div>
+      <div class="panel-body">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;font-size:13px">
+          <div style="background:var(--teal-pale);border-radius:var(--radius-sm);padding:14px"><div style="font-weight:700;margin-bottom:6px;color:var(--teal)">📐 Rentabilidad bruta</div>(Ingresos alquiler anuales / Valor inmueble) × 100. Sin descontar gastos. Referencia de mercado.</div>
+          <div style="background:var(--sage-pale);border-radius:var(--radius-sm);padding:14px"><div style="font-weight:700;margin-bottom:6px;color:var(--sage)">✅ Rentabilidad neta</div>((Ingresos − Gastos) / Valor inmueble) × 100. La cifra real. Por encima del 4% es aceptable.</div>
+          <div style="background:var(--red-pale);border-radius:var(--radius-sm);padding:14px"><div style="font-weight:700;margin-bottom:6px;color:var(--red-soft)">💸 Gastos deducibles</div>Inmobiliaria, comunidad, IBI, seguros y mantenimiento son deducibles en IRPF (reducción 60% arrendamiento vivienda habitual).</div>
+          <div style="background:var(--amber-light);border-radius:var(--radius-sm);padding:14px"><div style="font-weight:700;margin-bottom:6px;color:var(--amber)">📊 Benchmark mercado</div>Rentabilidad bruta media España 2024: 7,1%. Prime Madrid/BCN: 3-4%. Ciudades medianas: 6-9%. Fuente: Fotocasa.</div>
         </div>
+      </div>
+    </div>
 
-        <button class="btn-recalc" onclick="recalculate()">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
-          Recalcular proyección
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     TAB 4 · INVERSIONES / CRYPTO
+══════════════════════════════════════════════════════════════════════ -->
+<div class="tab-pane" id="pane-crypto">
+  <div class="main-content">
+
+    <!-- KPIs PORTFOLIO -->
+    <div class="cards-row" id="cryptoKpiRow">
+      <div style="grid-column:1/-1;color:var(--stone);font-size:13px;padding:12px 0">Cargando precios de mercado…</div>
+    </div>
+
+    <!-- TICKER STRIP -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-header-left">
+          <div class="panel-icon gold">📡</div>
+          <h2>Precios de mercado en tiempo real</h2>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span class="refresh-badge" id="lastUpdated">⏱ Sin actualizar</span>
+          <button class="btn btn-secondary" style="font-size:12px;padding:6px 14px" onclick="fetchCryptoPrices()">
+            <svg id="refreshIcon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+            Actualizar
+          </button>
+        </div>
+      </div>
+      <div class="panel-body" style="padding:0">
+        <div class="ticker-strip" id="tickerStrip">
+          <div style="padding:16px 20px;color:var(--stone);font-size:13px">Cargando…</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MARKET TABLE -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-header-left"><div class="panel-icon gold">📊</div><h2>Top 10 cryptomonedas · EUR</h2></div>
+        <div style="font-size:12px;color:var(--stone)">Señal basada en variación 24h y momentum</div>
+      </div>
+      <div class="panel-body" style="padding:0">
+        <div class="table-wrapper">
+          <table class="coin-table" id="coinTable">
+            <thead><tr>
+              <th style="text-align:left">#  Activo</th>
+              <th>Precio (€)</th>
+              <th>24h %</th>
+              <th>7d %</th>
+              <th>Cap. mercado</th>
+              <th>Vol. 24h</th>
+              <th>Señal</th>
+              <th>En cartera</th>
+            </tr></thead>
+            <tbody id="coinTableBody"><tr><td colspan="8" style="text-align:center;padding:24px;color:var(--stone)">Cargando datos de mercado…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHARTS ROW -->
+    <div class="two-col">
+      <div class="panel">
+        <div class="panel-header"><div class="panel-header-left"><div class="panel-icon gold">🍩</div><h2>Composición de cartera</h2></div></div>
+        <div class="panel-body"><div style="height:270px"><canvas id="crChartDonut"></canvas></div></div>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><div class="panel-header-left"><div class="panel-icon gold">📉</div><h2>P&L por activo</h2></div></div>
+        <div class="panel-body"><div style="height:270px"><canvas id="crChartPnl"></canvas></div></div>
+      </div>
+    </div>
+
+    <!-- PORTFOLIO SECTION -->
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+      <div>
+        <div class="ov-title">Mi cartera de inversiones</div>
+        <div class="ov-sub">Añade tus posiciones para calcular precio medio, P&L y valor actual al precio de mercado.</div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <select id="addCoinSelect" style="font-size:13px;padding:8px 12px;border:1.5px solid var(--stone-light);border-radius:var(--radius-sm);background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--ink)">
+          <option value="">— Selecciona activo —</option>
+        </select>
+        <button class="btn btn-teal" onclick="addCryptoPosition()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Añadir activo
         </button>
       </div>
     </div>
 
-    <!-- PANEL GRÁFICO SALDO -->
+    <div class="crypto-pos-list" id="cryptoPosList"></div>
+
+    <div id="cryptoPosEmpty" style="text-align:center;padding:48px 24px;color:var(--stone)">
+      <div style="font-size:48px;margin-bottom:12px">₿</div>
+      <div style="font-family:'DM Serif Display',serif;font-size:1.2rem;margin-bottom:8px;color:var(--ink)">Sin inversiones registradas</div>
+      <div style="font-size:13px;margin-bottom:20px">Selecciona un activo arriba y añádelo a tu cartera para seguir su evolución.</div>
+    </div>
+
+    <!-- SEÑALES Y CONSEJOS -->
     <div class="panel">
-      <div class="panel-header">
-        <div class="panel-icon blue">📊</div>
-        <h2>Evolución del saldo</h2>
-      </div>
+      <div class="panel-header"><div class="panel-header-left"><div class="panel-icon amber">💡</div><h2>Señales del mercado y consejos</h2></div></div>
       <div class="panel-body">
-        <div class="legend-pills">
-          <div class="pill pill-blue"><div class="dot" style="background:var(--blue)"></div>Saldo proyectado</div>
-          <div class="pill pill-green"><div class="dot" style="background:var(--sage)"></div>Ingresos anuales</div>
-          <div class="pill pill-red"><div class="dot" style="background:var(--red-soft)"></div>Gastos anuales</div>
+        <div class="info-box amber"><span>⚠️</span><div>Las señales son <strong>orientativas</strong> y se basan en variación de precio 24h, volatilidad histórica y momentum. No constituyen asesoramiento financiero. Consulta siempre con un profesional antes de invertir en activos de alta volatilidad.</div></div>
+        <div id="cryptoSignalsPanel" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px"></div>
+      </div>
+    </div>
+
+    <!-- GUÍA CRYPTO -->
+    <div class="panel">
+      <div class="panel-header"><div class="panel-header-left"><div class="panel-icon amber">📌</div><h2>Guía de inversión en cripto · Perfil conservador 54 años</h2></div></div>
+      <div class="panel-body">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;font-size:13px">
+          <div style="background:var(--gold-pale);border-radius:var(--radius-sm);padding:14px"><div style="font-weight:700;margin-bottom:6px;color:var(--gold)">⚖️ Peso recomendado</div>Para un perfil conservador de 54 años, se recomienda destinar <strong>máximo un 5-10% del patrimonio total</strong> a activos digitales. Priorizar BTC y ETH como "oro digital".</div>
+          <div style="background:var(--blue-pale);border-radius:var(--radius-sm);padding:14px"><div style="font-weight:700;margin-bottom:6px;color:var(--blue)">📅 DCA - Compra periódica</div>Aplicar Dollar Cost Averaging (compras periódicas) para suavizar la volatilidad. Mejor comprar cantidades fijas mensualmente que intentar sincronizar el mercado.</div>
+          <div style="background:var(--red-pale);border-radius:var(--radius-sm);padding:14px"><div style="font-weight:700;margin-bottom:6px;color:var(--red-soft)">🔐 Seguridad</div>Nunca guardes más del 20% en exchanges. Usa hardware wallets (Ledger, Trezor) para cantidades importantes. Haz copias de seguridad de tus seed phrases.</div>
+          <div style="background:var(--sage-pale);border-radius:var(--radius-sm);padding:14px"><div style="font-weight:700;margin-bottom:6px;color:var(--sage)">🏛️ Fiscalidad España</div>Las ganancias crypto tributan en el IRPF como rendimientos del capital. 2024: 19% hasta 6.000€, 21% hasta 50.000€, 23% hasta 200.000€, 27% superior. Declara cada operación.<a href="https://www.aeat.es" target="_blank" style="display:block;margin-top:6px;color:var(--blue);font-size:11px">Ver AEAT →</a></div>
         </div>
-        <div class="chart-container" style="height:320px">
-          <canvas id="chartSaldo"></canvas>
-        </div>
-        <div id="retirementNote" style="margin-top:12px;font-size:12px;color:var(--stone);text-align:center"></div>
       </div>
     </div>
 
   </div>
+</div>
 
-  <!-- PANEL GRÁFICO INGRESOS VS GASTOS -->
-  <div class="panel">
-    <div class="panel-header">
-      <div class="panel-icon amber">📉</div>
-      <h2>Ingresos vs. Gastos anuales</h2>
+<!-- ══════════════════════════════════════════════════════════════════
+     TAB 5 · SIMULACIÓN JUBILACIÓN
+══════════════════════════════════════════════════════════════════════ -->
+<div class="tab-pane" id="pane-jubilacion">
+  <div class="main-content">
+
+    <div class="alert-banner" style="background:linear-gradient(135deg,var(--rose-pale),#fff5f7);border-color:var(--rose-mid)">
+      <span style="font-size:20px">🏛️</span>
+      <div><strong>Normativa vigente:</strong> Simulación basada en la Ley General de la Seguridad Social (RDL 8/2015) y reformas de pensiones de 2021–2024. Los resultados son <strong>estimaciones orientativas</strong>; la pensión real la calcula la Tesorería General de la Seguridad Social.
+      <a href="https://www.seg-social.es/wps/portal/wss/internet/Trabajadores/PrestacionesPensionesContributivas/10952" target="_blank" style="color:var(--rose);font-weight:600"> Tu pensión en Seg. Social →</a></div>
     </div>
-    <div class="panel-body">
-      <div style="height:260px">
-        <canvas id="chartBarras"></canvas>
+
+    <!-- KPI CARDS -->
+    <div class="cards-row" id="jubKpiRow">
+      <div style="grid-column:1/-1;color:var(--stone);font-size:13px;padding:12px 0">Configura los datos para calcular la simulación de jubilación.</div>
+    </div>
+
+    <!-- CONFIG + TIMELINE -->
+    <div class="two-col">
+
+      <!-- CONFIGURACIÓN -->
+      <div class="panel">
+        <div class="panel-header"><div class="panel-header-left"><div class="panel-icon rose">⚙️</div><h2>Datos para la simulación</h2></div></div>
+        <div class="panel-body">
+
+          <div class="form-section">
+            <div class="form-section-title">👤 Datos personales y laborales</div>
+            <div class="form-grid">
+              <div class="form-group"><label>Edad actual</label><input type="number" id="jub_edadActual" value="54" min="30" max="65" step="1"></div>
+              <div class="form-group"><label>Años cotizados actualmente</label><input type="number" id="jub_anosCotizados" value="28" min="0" max="50" step="1"></div>
+              <div class="form-group"><label>Base cotización actual (€/mes)</label><div class="input-prefix"><span>€</span><input type="number" id="jub_baseCotizacion" value="1200" min="800" max="4750" step="50"></div></div>
+              <div class="form-group"><label>Evolución anual base cotiz. (%)</label><div class="input-prefix"><span>%</span><input type="number" id="jub_evolucionBase" value="2.0" min="0" max="10" step="0.5"></div></div>
+              <div class="form-group"><label>Año fin actividad laboral</label>
+                <select id="jub_anoFinActividad">
+                  <option value="2030">2030 (56 años)</option>
+                  <option value="2031">2031 (57 años)</option>
+                  <option value="2032">2032 (58 años)</option>
+                  <option value="2033">2033 (59 años)</option>
+                  <option value="2034">2034 (60 años)</option>
+                  <option value="2035" selected>2035 (61 años)</option>
+                  <option value="2036">2036 (62 años)</option>
+                  <option value="2037">2037 (63 años)</option>
+                  <option value="2038">2038 (64 años)</option>
+                  <option value="2039">2039 (65 años)</option>
+                  <option value="2040">2040 (66 años)</option>
+                  <option value="2041">2041 (67 años)</option>
+                </select>
+              </div>
+              <div class="form-group"><label>Meses/año trabajados (periodo activo)</label><input type="number" id="jub_mesesAnio" value="9" min="1" max="12" step="1"></div>
+              <div class="form-group"><label>% jornada laboral</label><div class="input-prefix"><span>%</span><input type="number" id="jub_porcentajeJornada" value="100" min="25" max="100" step="5"></div></div>
+              <div class="form-group"><label>IPC previsto (%)</label><div class="input-prefix"><span>%</span><input type="number" id="jub_ipc" value="2.0" min="0" max="8" step="0.5"></div></div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <div class="form-section-title">⚙️ Parámetros del cálculo</div>
+            <div class="form-grid">
+              <div class="form-group"><label>Tipo IRPF sobre pensión (%)</label><div class="input-prefix"><span>%</span><input type="number" id="jub_irpfPension" value="12" min="0" max="45" step="1"></div></div>
+              <div class="form-group"><label>Revalorización anual pensión (%)</label><div class="input-prefix"><span>%</span><input type="number" id="jub_revaPension" value="2.0" min="0" max="6" step="0.5"></div></div>
+              <div class="form-group"><label>Esperanza de vida proyectada</label>
+                <select id="jub_esperanzaVida">
+                  <option value="80">80 años</option>
+                  <option value="83">83 años</option>
+                  <option value="85" selected>85 años</option>
+                  <option value="88">88 años</option>
+                  <option value="90">90 años</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <button class="btn btn-primary" style="width:100%;padding:10px" onclick="calcularJubilacion()">
+            🔄 Recalcular simulación
+          </button>
+
+        </div>
+      </div>
+
+      <!-- NORMATIVA BASE -->
+      <div class="panel">
+        <div class="panel-header"><div class="panel-header-left"><div class="panel-icon rose">📋</div><h2>Normativa de referencia 2024–2025</h2></div></div>
+        <div class="panel-body" style="font-size:13px">
+          <div style="display:grid;gap:10px">
+
+            <div style="background:var(--blue-pale);border-radius:var(--radius-sm);padding:12px">
+              <div style="font-weight:700;color:var(--blue);margin-bottom:6px">🕐 Edad de jubilación ordinaria</div>
+              <div>• <strong>67 años</strong> si tienes menos de 38 años y 6 meses cotizados</div>
+              <div>• <strong>65 años</strong> si tienes ≥ 38 años y 6 meses cotizados</div>
+            </div>
+
+            <div style="background:var(--rose-pale);border-radius:var(--radius-sm);padding:12px">
+              <div style="font-weight:700;color:var(--rose);margin-bottom:6px">⏩ Jubilación anticipada voluntaria</div>
+              <div>• Mínimo <strong>63 años</strong> (o 4 años antes de la ordinaria)</div>
+              <div>• Mínimo <strong>35 años cotizados</strong></div>
+              <div>• Reducción: <strong>−2.75%/trimestre</strong> si &lt;44.5 años cotizados; <strong>−2%/trim</strong> si ≥44.5 años cotizados</div>
+            </div>
+
+            <div style="background:var(--amber-light);border-radius:var(--radius-sm);padding:12px">
+              <div style="font-weight:700;color:var(--amber);margin-bottom:6px">📤 Jubilación anticipada involuntaria</div>
+              <div>• Por despido colectivo/causa objetiva reconocida</div>
+              <div>• Mínimo <strong>33 años cotizados</strong>, con 63 años cumplidos</div>
+              <div>• Reducción: <strong>−1.875%/trimestre</strong> si ≥44.5 años cotizados; <strong>−1.5%/trim</strong> si ≥41.5 años</div>
+            </div>
+
+            <div style="background:var(--sage-pale);border-radius:var(--radius-sm);padding:12px">
+              <div style="font-weight:700;color:var(--sage);margin-bottom:6px">📐 Cálculo de la base reguladora</div>
+              <div>Base Reguladora = <strong>Suma bases 300 meses / 350</strong></div>
+              <div style="color:var(--stone);margin-top:4px">Últimos 25 años: los 24 más recientes a valor nominal; los restantes 276 meses actualizados por IPC.</div>
+            </div>
+
+            <div style="background:var(--cream);border:1px solid var(--stone-light);border-radius:var(--radius-sm);padding:12px">
+              <div style="font-weight:700;color:var(--ink);margin-bottom:6px">% Aplicable según años cotizados</div>
+              <div>• 15 años → <strong>50%</strong></div>
+              <div>• Años 16–25: <strong>+0.19%/mes</strong> (+2.28%/año)</div>
+              <div>• Años 26–37: <strong>+0.18%/mes</strong> (+2.16%/año)</div>
+              <div>• Máximo: <strong>100%</strong> (≈ 36–37 años cotizados)</div>
+            </div>
+
+            <div style="background:var(--purple-pale);border-radius:var(--radius-sm);padding:12px">
+              <div style="font-weight:700;color:var(--purple);margin-bottom:6px">💰 Límites 2024</div>
+              <div>• Pensión máxima: <strong>3.175,04 €/mes</strong> (14 pagas)</div>
+              <div>• Pensión mínima (con cónyuge): <strong>1.124,60 €/mes</strong></div>
+              <div>• Base cotización máxima: <strong>4.720,50 €/mes</strong></div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- LÍNEA TEMPORAL -->
+    <div class="panel">
+      <div class="panel-header"><div class="panel-header-left"><div class="panel-icon rose">📅</div><h2>Línea temporal de jubilación</h2></div></div>
+      <div class="panel-body">
+        <div class="jub-timeline" id="jubTimeline">
+          <div style="color:var(--stone);font-size:13px">Calculando línea temporal...</div>
+        </div>
       </div>
     </div>
+
+    <!-- ESCENARIOS -->
+    <div>
+      <div class="ov-title" style="font-size:1.1rem">Escenarios de jubilación</div>
+      <div class="ov-sub">Comparativa de los principales escenarios según normativa vigente. La pensión estimada se calcula sobre la base reguladora proyectada.</div>
+    </div>
+    <div class="scenario-grid" id="jubScenarios">
+      <div style="color:var(--stone);font-size:13px;padding:12px 0">Configura los datos y pulsa Recalcular.</div>
+    </div>
+
+    <!-- GRÁFICOS -->
+    <div class="two-col">
+      <div class="panel">
+        <div class="panel-header"><div class="panel-header-left"><div class="panel-icon rose">📊</div><h2>Pensión mensual por escenario</h2></div></div>
+        <div class="panel-body"><div style="height:270px"><canvas id="jubChartEscenarios"></canvas></div></div>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><div class="panel-header-left"><div class="panel-icon rose">📈</div><h2>Evolución pensión vs inflación (20 años)</h2></div></div>
+        <div class="panel-body"><div style="height:270px"><canvas id="jubChartEvolucion"></canvas></div></div>
+      </div>
+    </div>
+
+    <!-- TABLA SENSIBILIDAD -->
+    <div class="panel">
+      <div class="panel-header"><div class="panel-header-left"><div class="panel-icon rose">🔬</div><h2>Análisis de sensibilidad · Pensión según años cotizados y base</h2></div></div>
+      <div class="panel-body" style="padding:0">
+        <div class="table-wrapper">
+          <table class="sens-table" id="jubSensTable">
+            <thead><tr><th style="text-align:left">Años cotizados</th><th>% aplicado</th><th>Base reguladora</th><th>Pensión bruta/mes</th><th>Pensión neta/mes</th><th>Edad jubilación</th><th>Estado</th></tr></thead>
+            <tbody><tr><td colspan="7" style="text-align:center;padding:20px;color:var(--stone)">Calculando...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- COBERTURA DEL VACÍO -->
+    <div class="panel" id="jubGapPanel">
+      <div class="panel-header"><div class="panel-header-left"><div class="panel-icon amber">⏳</div><h2>Cobertura del periodo sin ingresos laborales</h2></div></div>
+      <div class="panel-body" id="jubGapBody">
+        <p style="color:var(--stone);font-size:13px">Calculando periodo de transición...</p>
+      </div>
+    </div>
+
+    <!-- REFERENCIAS SS -->
+    <div class="panel">
+      <div class="panel-header"><div class="panel-header-left"><div class="panel-icon rose">🏛️</div><h2>Referencias oficiales · Seguridad Social</h2></div></div>
+      <div class="panel-body">
+        <div class="ss-ref-grid">
+          <div class="ss-ref-card" style="background:var(--blue-pale);border-color:#b8d4e8">
+            <div style="font-weight:700;font-size:13px;color:var(--blue)">Tu pensión estimada (SS)</div>
+            <div style="font-size:12px;margin-top:6px">Consulta el simulador oficial de la Seguridad Social para obtener un cálculo personalizado con tus datos reales de cotización.</div>
+            <a href="https://www.seg-social.es/wps/portal/wss/internet/Trabajadores/PrestacionesPensionesContributivas/10952" target="_blank" style="color:var(--blue)">Simulador SS oficial ↗</a>
+          </div>
+          <div class="ss-ref-card" style="background:var(--rose-pale);border-color:var(--rose-mid)">
+            <div style="font-weight:700;font-size:13px;color:var(--rose)">Tu vida laboral</div>
+            <div style="font-size:12px;margin-top:6px">Accede a tu informe de vida laboral actualizado para conocer tus días cotizados reales, bases y periodos de alta.</div>
+            <a href="https://portal.seg-social.gob.es/wps/portal/importass/importass/Categorias/Vida+laboral+e+informes" target="_blank" style="color:var(--rose)">Vida laboral ↗</a>
+          </div>
+          <div class="ss-ref-card" style="background:var(--amber-light);border-color:#f0c97a">
+            <div style="font-weight:700;font-size:13px;color:var(--amber)">Jubilación anticipada</div>
+            <div style="font-size:12px;margin-top:6px">Información oficial sobre los requisitos, coeficientes reductores y condiciones de acceso a la jubilación anticipada voluntaria e involuntaria.</div>
+            <a href="https://www.seg-social.es/wps/portal/wss/internet/Trabajadores/PrestacionesPensionesContributivas/10964" target="_blank" style="color:var(--amber)">Jubilación anticipada ↗</a>
+          </div>
+          <div class="ss-ref-card" style="background:var(--sage-pale);border-color:var(--sage-light)">
+            <div style="font-weight:700;font-size:13px;color:var(--sage)">Convenio especial SS</div>
+            <div style="font-size:12px;margin-top:6px">Si dejas de trabajar antes de jubilarte, puedes mantener el periodo de cotización mediante convenio especial con la Seguridad Social.</div>
+            <a href="https://www.seg-social.es/wps/portal/wss/internet/InformacionUtil/44539/44803" target="_blank" style="color:var(--sage)">Convenio especial ↗</a>
+          </div>
+          <div class="ss-ref-card" style="background:var(--purple-pale);border-color:#c8b8e8">
+            <div style="font-weight:700;font-size:13px;color:var(--purple)">Jubilación activa parcial</div>
+            <div style="font-size:12px;margin-top:6px">Compatibilizar una pensión de jubilación con trabajo a tiempo parcial. Requiere cumplir requisitos de edad y cotización.</div>
+            <a href="https://www.seg-social.es/wps/portal/wss/internet/Trabajadores/PrestacionesPensionesContributivas/10969" target="_blank" style="color:var(--purple)">Jubilación activa ↗</a>
+          </div>
+          <div class="ss-ref-card" style="background:var(--cream);border-color:var(--stone-light)">
+            <div style="font-weight:700;font-size:13px;color:var(--ink)">IMPORT@SS · Notificaciones</div>
+            <div style="font-size:12px;margin-top:6px">Recibe en tu móvil o email avisos sobre tu situación laboral, accesos a tu expediente y notificaciones de la Seguridad Social.</div>
+            <a href="https://portal.seg-social.gob.es/wps/portal/importass/importass" target="_blank" style="color:var(--ink)">IMPORT@SS ↗</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
-
-  <!-- TABLA DE PROYECCIÓN -->
-  <div class="panel">
-    <div class="panel-header">
-      <div class="panel-icon green">📋</div>
-      <h2>Tabla de previsiones detallada</h2>
-    </div>
-    <div class="panel-body" style="padding:0">
-      <div class="table-wrapper">
-        <table id="tablaPrevisiones">
-          <!-- Rendered by JS -->
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <!-- PANEL NOTAS -->
-  <div class="panel">
-    <div class="panel-header">
-      <div class="panel-icon amber">📌</div>
-      <h2>Notas y supuestos del cálculo</h2>
-    </div>
-    <div class="panel-body">
-      <div class="info-box">
-        <span>⚠️</span>
-        <div>Esta proyección es orientativa. Las cifras reales dependerán de la evolución del IPC, posibles cambios en la legislación del subsidio de mayores de 52 años, y situación laboral. Se recomienda revisar anualmente con un asesor financiero.</div>
-      </div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;font-size:13px;">
-        <div style="background:var(--sage-pale);border-radius:var(--radius-sm);padding:14px;">
-          <div style="font-weight:600;margin-bottom:6px;color:var(--sage)">🌱 Ingresos</div>
-          Los ingresos por nómina se aplicarán según meses trabajados. El subsidio +52 años se activa en el año que indiques y asume 12 mensualidades completas. La devolución IRPF es fija anual.
-        </div>
-        <div style="background:var(--red-pale);border-radius:var(--radius-sm);padding:14px;">
-          <div style="font-weight:600;margin-bottom:6px;color:var(--red-soft)">🏠 Gastos</div>
-          Los gastos de casa se actualizan con el IPC cada año. La hipoteca y autónomos se eliminan al llegar al año de fin que indiques. Los "Otros gastos" se suman fijos sin IPC salvo los de casa.
-        </div>
-        <div style="background:var(--blue-pale);border-radius:var(--radius-sm);padding:14px;">
-          <div style="font-weight:600;margin-bottom:6px;color:var(--blue)">📐 Metodología</div>
-          Saldo final = Saldo inicial + Ingresos año − Gastos año. El saldo se acumula año a año. El IPC se aplica progresivamente sobre gastos del hogar. Valores en euros corrientes.
-        </div>
-        <div style="background:var(--amber-light);border-radius:var(--radius-sm);padding:14px;">
-          <div style="font-weight:600;margin-bottom:6px;color:var(--amber)">📅 Jubilación</div>
-          La edad legal de jubilación ordinaria en 2026 es 66 años y 8 meses para trabajadores con menos de 37 años y 9 meses cotizados. A los 65 años si tienes el período mínimo completo.
-          <a href="https://www.seg-social.es/wps/portal/wss/internet/Trabajadores/PrestacionesPensionesContributivasTrabajadores/10967/28399" target="_blank" style="display:block;margin-top:6px;color:var(--blue);font-size:12px;">Ver condiciones SS →</a>
-        </div>
-      </div>
-    </div>
-  </div>
-
-</main>
+</div>
 
 <footer>
-  Panel Financiero Personal · José · <a href="https://www.sepe.es" target="_blank">SEPE</a> · <a href="https://www.seg-social.es" target="_blank">Seguridad Social</a> · Generado Feb 2026
+  Panel Financiero Personal · José ·
+  <a href="https://www.sepe.es" target="_blank">SEPE</a> ·
+  <a href="https://www.seg-social.es" target="_blank">Seguridad Social</a> ·
+  <a href="https://www.aeat.es" target="_blank">AEAT</a> ·
+  Actualizado Feb 2026
 </footer>
 
+<!-- ══════════════════════════════════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════════════════════════════════════ -->
 <script>
-// ─── Chart instances ───────────────────────────────────────────────────────────
-let chartSaldo = null;
-let chartBarras = null;
+'use strict';
 
-// ─── Format helpers ────────────────────────────────────────────────────────────
-function fmt(v) {
-  const abs = Math.abs(v);
-  return (v < 0 ? '-' : '') + abs.toLocaleString('es-ES', { style: 'currency', currency: 'EUR', minimumFractionDigits: 0, maximumFractionDigits: 0 });
+/* ── UTILITIES ───────────────────────────────────────────────────── */
+const fmt     = (v,d=0)=>(v<0?'−':'')+Math.abs(v).toLocaleString('es-ES',{style:'currency',currency:'EUR',minimumFractionDigits:d,maximumFractionDigits:d});
+const fmtPct  = (v,d=1)=>(v>=0?'':'-')+Math.abs(v).toFixed(d)+'%';
+const getVal  = id=>parseFloat(document.getElementById(id)?.value)||0;
+const getSel  = id=>document.getElementById(id)?.value;
+const clsCss  = v=>v>=0?'positive':'negative';
+const killChart = c=>{if(c){try{c.destroy()}catch(e){}}};
+function compact(v){const a=Math.abs(v);return a>=1e6?(v/1e6).toFixed(1)+'M€':a>=1e3?(v/1e3).toFixed(0)+'K€':v.toLocaleString('es-ES',{style:'currency',currency:'EUR',maximumFractionDigits:0})}
+
+/* ── STATE ───────────────────────────────────────────────────────── */
+let finRows=[], props=[], propCnt=0;
+let cryptoPrices={}, cryptoPortfolio=[], cryptoPosIdCnt=0;
+let jubData=null; // latest jubilacion calculation results
+let CH={saldo:null,barras:null,ovPat:null,ovFlujo:null,prDonut:null,prRent:null,crDonut:null,crPnl:null,ovDonutTotal:null,jubEsc:null,jubEvo:null};
+
+/* ── TAB SWITCH ─────────────────────────────────────────────────── */
+function switchTab(name,btn){
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('pane-'+name).classList.add('active');
+  if(btn) btn.classList.add('active');
+  if(name==='overview') renderOverview();
 }
-function fmtDec(v) {
-  return v.toLocaleString('es-ES', { style: 'currency', currency: 'EUR', minimumFractionDigits: 2, maximumFractionDigits: 2 });
-}
-function val(id) { return parseFloat(document.getElementById(id).value) || 0; }
-function sel(id) { return document.getElementById(id).value; }
 
-// ─── RECALCULATE ───────────────────────────────────────────────────────────────
-function recalculate() {
-  const nominaMensual   = val('nomina');
-  const mesesNomina     = val('mesesNomina');
-  const irpfAnual       = val('irpf');
-  const subsidioMensual = val('subsidio');
-  const anoSubsidio     = parseInt(sel('anoSubsidio'));
-  const anoNominaFull   = parseInt(sel('anoNominaFull'));
-  const otrosIngresos   = val('otrosIngresos');
+/* ══════════════════════════════════════════════════════════════════
+   MODULE 1: PLANIFICACIÓN FINANCIERA
+══════════════════════════════════════════════════════════════════════ */
+function recalculate(){
+  const nomM   =getVal('nomina'), mesesN=getVal('mesesNomina'), irpfA=getVal('irpf');
+  const subM   =getVal('subsidio'), anoSub=+getSel('anoSubsidio'), anoNF=+getSel('anoNominaFull');
+  const oIngA  =getVal('otrosIngresos');
+  const hipoM  =getVal('hipoteca'), anoFH=+getSel('anoFinHipoteca');
+  const autM   =getVal('autonomos'), anoFA=+getSel('anoFinAutonomos');
+  const casaM  =getVal('gastosCasa'), oGasA=getVal('otrosGastos');
+  const saldo0 =getVal('saldoInicial'), ipc=getVal('ipc')/100;
+  const anoIni =+getSel('anoInicio'), hor=+getSel('horizonte');
 
-  const hipotecaMensual = val('hipoteca');
-  const anoFinHipoteca  = parseInt(sel('anoFinHipoteca'));
-  const autonomosMensual= val('autonomos');
-  const anoFinAutonomos = parseInt(sel('anoFinAutonomos'));
-  const gastosCasaMens  = val('gastosCasa');
-  const otrosGastos     = val('otrosGastos');
-
-  const saldoInicial    = val('saldoInicial');
-  const ipc             = val('ipc') / 100;
-  const anoInicio       = parseInt(sel('anoInicio'));
-  const horizonte       = parseInt(sel('horizonte'));
-
-  const edadInicio      = 54; // José tiene 54 en 2026
-
-  const rows = [];
-  let saldo = saldoInicial;
-
-  for (let i = 0; i < horizonte; i++) {
-    const ano  = anoInicio + i;
-    const edad = edadInicio + i;
-    const ipcFactor = Math.pow(1 + ipc, i);
-
-    // Ingresos
-    const nominaAnual = (ano >= anoNominaFull) 
-      ? nominaMensual * 12
-      : nominaMensual * mesesNomina;
-    const subsidioAnual = (ano >= anoSubsidio) ? subsidioMensual * 12 : 0;
-    const ingresosTotal = nominaAnual + irpfAnual + subsidioAnual + otrosIngresos;
-
-    // Gastos
-    const hipotecaAnual  = (ano <= anoFinHipoteca) ? hipotecaMensual * 12 : 0;
-    const autonomosAnual = (ano <= anoFinAutonomos) ? autonomosMensual * 12 : 0;
-    const casaAnual      = gastosCasaMens * 12 * ipcFactor;
-    const gastosTotal    = hipotecaAnual + autonomosAnual + casaAnual + otrosGastos;
-
-    const subtotal = ingresosTotal - gastosTotal;
-    const saldoFin = saldo + subtotal;
-
-    rows.push({
-      ano, edad, ingresosTotal, nominaAnual, subsidioAnual, irpfAnual,
-      gastosTotal, hipotecaAnual, autonomosAnual, casaAnual, otrosGastos,
-      subtotal, saldoInicio: saldo, saldoFin
-    });
-
-    saldo = saldoFin;
+  finRows=[]; let saldo=saldo0;
+  for(let i=0;i<hor;i++){
+    const ano=anoIni+i, edad=54+i, ipcF=Math.pow(1+ipc,i);
+    const nomA   =(ano>=anoNF)?nomM*12:nomM*mesesN;
+    const subA   =(ano>=anoSub)?subM*12:0;
+    const ingT   =nomA+irpfA+subA+oIngA;
+    const hipoA  =(ano<=anoFH)?hipoM*12:0;
+    const autA   =(ano<=anoFA)?autM*12:0;
+    const casaA  =casaM*12*ipcF;
+    const gasT   =hipoA+autA+casaA+oGasA;
+    const subtot =ingT-gasT;
+    const saldoFin=saldo+subtot;
+    finRows.push({ano,edad,ingT,nomA,subA,irpfA,gasT,hipoA,autA,casaA,oGasA,subtot,saldoFin});
+    saldo=saldoFin;
   }
-
-  renderKPIs(rows, saldoInicial);
-  renderTable(rows);
-  renderChartSaldo(rows, saldoInicial);
-  renderChartBarras(rows);
+  renderFinKPIs(saldo0);
+  renderFinTable();
+  renderChartSaldo(saldo0);
+  renderChartBarras();
+  renderOverview();
 }
 
-// ─── KPI CARDS ────────────────────────────────────────────────────────────────
-function renderKPIs(rows, saldoInicial) {
-  const last = rows[rows.length - 1];
-  const minRow = rows.reduce((m, r) => r.saldoFin < m.saldoFin ? r : m, rows[0]);
-  const breakEvenRow = rows.find(r => r.subtotal >= 0);
-  const ingresosMedio = rows.reduce((s, r) => s + r.ingresosTotal, 0) / rows.length;
+function renderFinKPIs(saldo0){
+  if(!finRows.length)return;
+  const last=finRows[finRows.length-1];
+  const minR=finRows.reduce((m,r)=>r.saldoFin<m.saldoFin?r:m,finRows[0]);
+  const bkR =finRows.find(r=>r.subtot>=0);
+  document.getElementById('kpiRow').innerHTML=`
+    <div class="kpi-card blue"><div class="kpi-badge">💰</div><div class="label">Saldo inicial</div><div class="value">${fmt(saldo0)}</div><div class="sub">Capital disponible hoy</div></div>
+    <div class="kpi-card ${last.saldoFin>=0?'green':'red'}"><div class="kpi-badge">🏁</div><div class="label">Saldo en ${last.ano} (${last.edad} a.)</div><div class="value">${fmt(Math.round(last.saldoFin))}</div><div class="sub">${last.saldoFin>=0?'Proyección positiva ✓':'⚠ Déficit proyectado'}</div></div>
+    <div class="kpi-card ${minR.saldoFin>=0?'amber':'red'}"><div class="kpi-badge">📉</div><div class="label">Mínimo liquidez (${minR.ano})</div><div class="value">${fmt(Math.round(minR.saldoFin))}</div><div class="sub">Punto de mayor tensión</div></div>
+    <div class="kpi-card ${bkR?'green':'red'}"><div class="kpi-badge">⚖️</div><div class="label">Equilibrio ingresos/gastos</div><div class="value">${bkR?bkR.ano:'N/A'}</div><div class="sub">${bkR?'A los '+bkR.edad+' años':'No se alcanza'}</div></div>`;
+}
 
-  const html = `
-    <div class="kpi-card blue">
-      <div class="kpi-badge">💰</div>
-      <div class="label">Saldo inicial</div>
-      <div class="value">${fmt(saldoInicial)}</div>
-      <div class="sub">Capital disponible hoy</div>
-    </div>
-    <div class="kpi-card ${last.saldoFin >= 0 ? 'green' : 'red'}">
-      <div class="kpi-badge">🏁</div>
-      <div class="label">Saldo en ${last.ano} (${last.edad} años)</div>
-      <div class="value">${fmt(Math.round(last.saldoFin))}</div>
-      <div class="sub">${last.saldoFin >= 0 ? 'Proyección positiva ✓' : '⚠ Déficit proyectado'}</div>
-    </div>
-    <div class="kpi-card ${minRow.saldoFin >= 0 ? 'amber' : 'red'}">
-      <div class="kpi-badge">📉</div>
-      <div class="label">Saldo mínimo (${minRow.ano})</div>
-      <div class="value">${fmt(Math.round(minRow.saldoFin))}</div>
-      <div class="sub">Punto de mayor tensión</div>
-    </div>
-    <div class="kpi-card ${breakEvenRow ? 'green' : 'red'}">
-      <div class="kpi-badge">⚖️</div>
-      <div class="label">Equilibrio ingresos/gastos</div>
-      <div class="value">${breakEvenRow ? breakEvenRow.ano : 'N/A'}</div>
-      <div class="sub">${breakEvenRow ? `A los ${breakEvenRow.edad} años` : 'No se alcanza en el horizonte'}</div>
+function renderFinTable(){
+  const R=finRows; if(!R.length)return;
+  let h=`<thead><tr class="age-row"><th style="text-align:left">Edad</th>${R.map(r=>`<th>${r.edad} a.</th>`).join('')}</tr>
+    <tr class="year-row"><th style="text-align:left">Año</th>${R.map(r=>`<th>${r.ano}</th>`).join('')}</tr></thead><tbody>`;
+  const sr=(l,t)=>`<tr class="row-section ${t}"><td colspan="${R.length+1}">${l}</td></tr>`;
+  const dr=(l,fn)=>`<tr><td>${l}</td>${R.map(r=>`<td>${fmt(fn(r))}</td>`).join('')}</tr>`;
+  const tr=(l,fn,sgn)=>`<tr class="row-total"><td>${l}</td>${R.map(r=>`<td${sgn?' class="'+clsCss(fn(r))+'"':''}>${fmt(fn(r))}</td>`).join('')}</tr>`;
+  h+=sr('INGRESOS','ing');
+  h+=dr('Nómina anual',r=>r.nomA);
+  h+=dr('Subsidio +52 años',r=>r.subA);
+  h+=dr('Devolución IRPF',r=>r.irpfA);
+  if(R.some(r=>r.ingT-r.nomA-r.subA-r.irpfA!==0)) h+=dr('Otros ingresos',r=>r.ingT-r.nomA-r.subA-r.irpfA);
+  h+=tr('TOTAL INGRESOS',r=>r.ingT,false);
+  h+=sr('GASTOS','gas');
+  h+=dr('Hipoteca',r=>r.hipoA);
+  h+=dr('Cuota autónomos',r=>r.autA);
+  h+=dr('Gastos del hogar (c/IPC)',r=>r.casaA);
+  if(R.some(r=>r.oGasA!==0)) h+=dr('Otros gastos',r=>r.oGasA);
+  h+=tr('TOTAL GASTOS',r=>r.gasT,false);
+  h+=sr('RESULTADO','res');
+  h+=tr('Resultado anual (±)',r=>r.subtot,true);
+  h+=`<tr class="row-saldo"><td>💰 SALDO ACUMULADO</td>${R.map(r=>`<td class="${clsCss(r.saldoFin)}">${fmt(Math.round(r.saldoFin))}</td>`).join('')}</tr>`;
+  h+='</tbody>';
+  document.getElementById('tablaPrevisiones').innerHTML=h;
+}
+
+function renderChartSaldo(saldo0){
+  const ctx=document.getElementById('chartSaldo').getContext('2d');
+  killChart(CH.saldo);
+  const R=finRows;
+  CH.saldo=new Chart(ctx,{type:'line',data:{labels:R.map(r=>`${r.ano} (${r.edad}a)`),datasets:[
+    {label:'Saldo acumulado',data:R.map(r=>Math.round(r.saldoFin)),borderColor:'#4a7fa5',backgroundColor:'rgba(74,127,165,.10)',borderWidth:2.5,pointRadius:5,pointBackgroundColor:'#4a7fa5',fill:true,tension:.35,yAxisID:'y1'},
+    {label:'Ingresos anuales',data:R.map(r=>Math.round(r.ingT)),borderColor:'#7fa67a',backgroundColor:'transparent',borderWidth:2,borderDash:[5,4],pointRadius:3,tension:.35,yAxisID:'y2'},
+    {label:'Gastos anuales',data:R.map(r=>Math.round(r.gasT)),borderColor:'#d95f52',backgroundColor:'transparent',borderWidth:2,borderDash:[5,4],pointRadius:3,tension:.35,yAxisID:'y2'}
+  ]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},tooltip:{backgroundColor:'rgba(44,42,39,.92)',padding:12,callbacks:{label:c=>` ${c.dataset.label}: ${c.raw.toLocaleString('es-ES',{style:'currency',currency:'EUR',maximumFractionDigits:0})}`}}},scales:{x:{grid:{color:'#eee'},ticks:{font:{size:10}}},y1:{type:'linear',position:'left',title:{display:true,text:'Saldo (€)',font:{size:10}},grid:{color:'#eee'},ticks:{callback:v=>compact(v)}},y2:{type:'linear',position:'right',title:{display:true,text:'Flujo anual (€)',font:{size:10}},grid:{display:false},ticks:{callback:v=>compact(v)}}}}});
+  const last=R[R.length-1];
+  document.getElementById('retirementNote').innerHTML=`Proyección hasta <strong>${last.ano}</strong> (${last.edad} años) · Saldo estimado: <strong style="color:${last.saldoFin>=0?'var(--sage)':'var(--red-soft)'}">${fmt(Math.round(last.saldoFin))}</strong>`;
+}
+
+function renderChartBarras(){
+  const ctx=document.getElementById('chartBarras').getContext('2d');
+  killChart(CH.barras);
+  const R=finRows;
+  CH.barras=new Chart(ctx,{type:'bar',data:{labels:R.map(r=>`${r.ano}`),datasets:[
+    {label:'Ingresos',data:R.map(r=>Math.round(r.ingT)),backgroundColor:'rgba(127,166,122,.75)',borderColor:'#7fa67a',borderWidth:1.5,borderRadius:4},
+    {label:'Gastos',data:R.map(r=>-Math.round(r.gasT)),backgroundColor:'rgba(217,95,82,.65)',borderColor:'#d95f52',borderWidth:1.5,borderRadius:4}
+  ]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{labels:{font:{size:11,family:'DM Sans'},boxWidth:12}},tooltip:{backgroundColor:'rgba(44,42,39,.92)',padding:12,callbacks:{label:c=>` ${c.dataset.label}: ${Math.abs(c.raw).toLocaleString('es-ES',{style:'currency',currency:'EUR',maximumFractionDigits:0})}`}}},scales:{x:{grid:{display:false},ticks:{font:{size:11}}},y:{grid:{color:'#eee'},ticks:{callback:v=>(v<0?'−':'')+compact(Math.abs(v))}}}}});
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   MODULE 2: PATRIMONIO INMOBILIARIO
+══════════════════════════════════════════════════════════════════════ */
+function calcProp(p){
+  const ingBruto    =p.alquiler*p.meses;
+  const gastosInmob =ingBruto*(p.pctInmob/100);
+  const gastosTot   =gastosInmob+p.comunidad+p.ibi+p.caldera+p.otros+p.hipoMens*12;
+  const benNeto     =ingBruto-gastosTot;
+  const rentBruta   =p.valActual>0?(ingBruto/p.valActual)*100:0;
+  const rentNeta    =p.valActual>0?(benNeto/p.valActual)*100:0;
+  const plusvalia   =p.valActual-p.valCompra;
+  const plusPct     =p.valCompra>0?((p.valActual-p.valCompra)/p.valCompra)*100:0;
+  return{ingBruto,gastosInmob,gastosTot,benNeto,rentBruta,rentNeta,plusvalia,plusPct};
+}
+
+function addProperty(def){
+  propCnt++;
+  const id=propCnt;
+  const p=def||{id,nombre:'Vivienda '+id,dir:'',valCompra:150000,valActual:180000,alquiler:800,meses:11,pctInmob:10,comunidad:600,ibi:400,caldera:150,otros:200,hipoMens:0};
+  if(!def)p.id=id;
+  props.push(p);
+  renderPropList();
+  refreshPropSummaries();
+  updateBadge();
+}
+
+function removeProperty(id){
+  props=props.filter(p=>p.id!==id);
+  renderPropList();
+  refreshPropSummaries();
+  updateBadge();
+}
+
+function updateBadge(){
+  const b=document.getElementById('propBadge');
+  if(b)b.textContent=props.length+(props.length===1?' vivienda':' viviendas');
+}
+
+function syncProp(id){
+  const p=props.find(p=>p.id===id);
+  if(!p)return;
+  const g=(k)=>parseFloat(document.getElementById(`p${id}_${k}`)?.value)||0;
+  const t=(k)=>document.getElementById(`p${id}_${k}`)?.value||'';
+  p.nombre=t('nom')||'Vivienda '+id;
+  p.dir=t('dir');
+  p.valCompra=g('vc'); p.valActual=g('va');
+  p.alquiler=g('alq'); p.meses=g('mes');
+  p.pctInmob=g('inm'); p.comunidad=g('com');
+  p.ibi=g('ibi'); p.caldera=g('cal');
+  p.otros=g('otr'); p.hipoMens=g('hip');
+}
+
+function refreshCard(id){
+  const p=props.find(p=>p.id===id);
+  if(!p)return;
+  const kDiv=document.getElementById(`pkpis_${id}`);
+  if(kDiv)kDiv.innerHTML=buildKpiHtml(p);
+  const nm=document.querySelector(`#pcard_${id} .prop-card-name`);
+  if(nm)nm.textContent=p.nombre;
+  refreshPropSummaries();
+}
+
+function refreshPropSummaries(){
+  renderPropKPIs();
+  renderPropCharts();
+  renderPropTable();
+  renderOverview();
+}
+
+function buildKpiHtml(p){
+  const c=calcProp(p);
+  return `
+    <div class="prop-kpi"><div class="pk-label">Ingresos brutos/año</div><div class="pk-value pos">${fmt(c.ingBruto)}</div><div class="pk-sub">${p.meses} meses × ${fmt(p.alquiler)}/mes</div></div>
+    <div class="prop-kpi"><div class="pk-label">Total gastos/año</div><div class="pk-value neg">${fmt(c.gastosTot)}</div><div class="pk-sub">Inm.+comunidad+IBI+otros</div></div>
+    <div class="prop-kpi"><div class="pk-label">Beneficio neto/año</div><div class="pk-value ${c.benNeto>=0?'pos':'neg'}">${fmt(c.benNeto)}</div><div class="pk-sub">${fmt(c.benNeto/12)}/mes neto</div></div>
+    <div class="prop-kpi"><div class="pk-label">Rentabilidad bruta</div><div class="pk-value teal">${fmtPct(c.rentBruta)}</div><div class="pk-sub">Sobre valor actual</div></div>
+    <div class="prop-kpi"><div class="pk-label">Rentabilidad neta</div><div class="pk-value ${c.rentNeta>=4?'pos':c.rentNeta>=2?'teal':'neg'}">${fmtPct(c.rentNeta)}</div><div class="pk-sub">${c.rentNeta>=4?'✓ Óptima (>4%)':c.rentNeta>=2?'Aceptable':'⚠ Baja'}</div></div>
+    <div class="prop-kpi"><div class="pk-label">Plusvalía acumulada</div><div class="pk-value ${c.plusvalia>=0?'pos':'neg'}">${fmt(c.plusvalia)}</div><div class="pk-sub">${fmtPct(c.plusPct)} desde compra</div></div>
+    <div class="prop-kpi"><div class="pk-label">Comisión inmobiliaria/año</div><div class="pk-value amber">${fmt(c.gastosInmob)}</div><div class="pk-sub">${p.pctInmob}% s/ingresos brutos</div></div>
+    <div class="prop-kpi"><div class="pk-label">Gastos fijos/año</div><div class="pk-value neg">${fmt(p.comunidad+p.ibi+p.caldera+p.otros)}</div><div class="pk-sub">Comunidad+IBI+Caldera+Otros</div></div>`;
+}
+
+function renderPropList(){
+  const list=document.getElementById('propList');
+  const empty=document.getElementById('propEmpty');
+  if(!props.length){list.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+  list.innerHTML=props.map(p=>{
+    const c=calcProp(p);
+    return `<div class="prop-card" id="pcard_${p.id}">
+      <div class="prop-card-header">
+        <div class="prop-card-title-row">
+          <div class="prop-card-icon">🏠</div>
+          <div><div class="prop-card-name">${p.nombre}</div><div class="prop-card-addr">${p.dir||'Sin dirección'}</div></div>
+        </div>
+        <div class="prop-card-actions">
+          <button class="btn btn-danger" onclick="removeProperty(${p.id})">🗑 Eliminar</button>
+        </div>
+      </div>
+      <div class="prop-card-body">
+        <div class="prop-form-grid">
+          <div class="form-group"><label>Nombre / Referencia</label><input type="text" id="p${p.id}_nom" value="${p.nombre}" oninput="syncProp(${p.id});refreshCard(${p.id})"></div>
+          <div class="form-group"><label>Dirección</label><input type="text" id="p${p.id}_dir" value="${p.dir}" oninput="syncProp(${p.id})"></div>
+          <div class="form-group"><label>Valor de compra</label><div class="input-prefix"><span>€</span><input type="number" id="p${p.id}_vc" value="${p.valCompra}" step="1000" oninput="syncProp(${p.id});refreshCard(${p.id})"></div></div>
+          <div class="form-group"><label>Valor actual estimado</label><div class="input-prefix"><span>€</span><input type="number" id="p${p.id}_va" value="${p.valActual}" step="1000" oninput="syncProp(${p.id});refreshCard(${p.id})"></div></div>
+          <div class="form-group"><label>Alquiler mensual</label><div class="input-prefix"><span>€</span><input type="number" id="p${p.id}_alq" value="${p.alquiler}" step="25" oninput="syncProp(${p.id});refreshCard(${p.id})"></div></div>
+          <div class="form-group"><label>Meses alquilados/año</label><input type="number" id="p${p.id}_mes" value="${p.meses}" min="0" max="12" oninput="syncProp(${p.id});refreshCard(${p.id})"></div>
+          <div class="form-group"><label>Comisión inmobiliaria (%)</label><div class="input-prefix"><span>%</span><input type="number" id="p${p.id}_inm" value="${p.pctInmob}" step="1" min="0" max="30" oninput="syncProp(${p.id});refreshCard(${p.id})"></div><small>Sobre ingresos brutos de alquiler</small></div>
+          <div class="form-group"><label>Comunidad de vecinos/año</label><div class="input-prefix"><span>€</span><input type="number" id="p${p.id}_com" value="${p.comunidad}" step="50" oninput="syncProp(${p.id});refreshCard(${p.id})"></div></div>
+          <div class="form-group"><label>IBI anual</label><div class="input-prefix"><span>€</span><input type="number" id="p${p.id}_ibi" value="${p.ibi}" step="10" oninput="syncProp(${p.id});refreshCard(${p.id})"></div></div>
+          <div class="form-group"><label>Revisiones / Caldera (anual)</label><div class="input-prefix"><span>€</span><input type="number" id="p${p.id}_cal" value="${p.caldera}" step="10" oninput="syncProp(${p.id});refreshCard(${p.id})"></div></div>
+          <div class="form-group"><label>Otros gastos anuales</label><div class="input-prefix"><span>€</span><input type="number" id="p${p.id}_otr" value="${p.otros}" step="50" oninput="syncProp(${p.id});refreshCard(${p.id})"></div><small>Seguros, reparaciones, derramas…</small></div>
+          <div class="form-group"><label>Hipoteca mensual (si tiene)</label><div class="input-prefix"><span>€</span><input type="number" id="p${p.id}_hip" value="${p.hipoMens}" step="25" oninput="syncProp(${p.id});refreshCard(${p.id})"></div></div>
+        </div>
+        <div class="prop-kpis" id="pkpis_${p.id}">${buildKpiHtml(p)}</div>
+      </div>
     </div>`;
-  document.getElementById('kpiRow').innerHTML = html;
+  }).join('');
 }
 
-// ─── TABLE ─────────────────────────────────────────────────────────────────────
-function renderTable(rows) {
-  const tbl = document.getElementById('tablaPrevisiones');
-  const cls = (v) => v >= 0 ? 'positive' : 'negative';
-  
-  let html = `<thead>
-    <tr class="age-row">
-      <th style="text-align:left">Concepto / Edad</th>
-      ${rows.map(r => `<th>${r.edad} años</th>`).join('')}
-    </tr>
-    <tr class="year-row">
-      <th style="text-align:left">AÑO</th>
-      ${rows.map(r => `<th>${r.ano}</th>`).join('')}
-    </tr>
-  </thead><tbody>`;
+function renderPropKPIs(){
+  const row=document.getElementById('propKpiRow');
+  if(!props.length){row.innerHTML='<div style="grid-column:1/-1;color:var(--stone);font-size:13px;padding:12px 0">Añade tu primera vivienda para ver los indicadores.</div>';return;}
+  const calcs=props.map(p=>({p,c:calcProp(p)}));
+  const totVal  =calcs.reduce((s,x)=>s+x.p.valActual,0);
+  const totIng  =calcs.reduce((s,x)=>s+x.c.ingBruto,0);
+  const totNeto =calcs.reduce((s,x)=>s+x.c.benNeto,0);
+  const rNM     =totVal>0?(totNeto/totVal)*100:0;
+  const totPlus =calcs.reduce((s,x)=>s+x.c.plusvalia,0);
+  row.innerHTML=`
+    <div class="kpi-card teal"><div class="kpi-badge">🏘️</div><div class="label">Valor cartera</div><div class="value">${fmt(totVal)}</div><div class="sub">${props.length} ${props.length===1?'vivienda':'viviendas'}</div></div>
+    <div class="kpi-card green"><div class="kpi-badge">💰</div><div class="label">Ingresos brutos/año</div><div class="value">${fmt(totIng)}</div><div class="sub">${fmt(totIng/12)}/mes promedio</div></div>
+    <div class="kpi-card ${totNeto>=0?'green':'red'}"><div class="kpi-badge">📊</div><div class="label">Beneficio neto anual</div><div class="value">${fmt(totNeto)}</div><div class="sub">Tras todos los gastos</div></div>
+    <div class="kpi-card ${rNM>=4?'green':rNM>=2?'amber':'red'}"><div class="kpi-badge">%</div><div class="label">Rentabilidad neta media</div><div class="value">${fmtPct(rNM)}</div><div class="sub">${rNM>=4?'✓ Óptima':rNM>=2?'Aceptable':'⚠ Mejorable'}</div></div>
+    <div class="kpi-card ${totPlus>=0?'teal':'red'}"><div class="kpi-badge">📈</div><div class="label">Plusvalía total</div><div class="value">${fmt(totPlus)}</div><div class="sub">Revalorización sobre compra</div></div>`;
+}
 
-  // INGRESOS
-  html += `<tr class="row-highlight"><td colspan="${rows.length+1}" style="background:#e8f5e4;color:var(--sage);font-weight:700;font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:8px 14px;">INGRESOS</td></tr>`;
-  html += row('Nómina anual', rows, r => r.nominaAnual);
-  html += row('Subsidio +52 años', rows, r => r.subsidioAnual);
-  html += row('Devolución IRPF', rows, r => r.irpfAnual);
-  if (rows.some(r => r.ingresosTotal - r.nominaAnual - r.subsidioAnual - r.irpfAnual !== 0)) {
-    html += row('Otros ingresos', rows, r => r.ingresosTotal - r.nominaAnual - r.subsidioAnual - r.irpfAnual);
+function renderPropCharts(){
+  updatePropSelect();
+  renderPropDonut();
+  renderPropRentChart();
+}
+
+function updatePropSelect(){
+  const s=document.getElementById('propChartSelect');
+  if(!s)return;
+  const cur=s.value;
+  s.innerHTML='<option value="all">Todas las viviendas</option>'+props.map(p=>`<option value="${p.id}">${p.nombre}</option>`).join('');
+  if(props.find(p=>p.id==cur))s.value=cur;
+}
+
+function renderPropDonut(){
+  const ctx=document.getElementById('propChartDonut').getContext('2d');
+  killChart(CH.prDonut);
+  const sv=document.getElementById('propChartSelect')?.value||'all';
+  const cols=['#3a9e8f','#4a7fa5','#d4892a','#d95f52','#8264b0','#7fa67a'];
+  let lbs,dat;
+  if(sv==='all'&&props.length){
+    const calcs=props.map(p=>({p,c:calcProp(p)}));
+    lbs=['Inmobiliaria','Comunidad','IBI','Caldera/Mto.','Otros','Hipoteca'];
+    dat=[
+      calcs.reduce((s,x)=>s+x.c.gastosInmob,0),
+      calcs.reduce((s,x)=>s+x.p.comunidad,0),
+      calcs.reduce((s,x)=>s+x.p.ibi,0),
+      calcs.reduce((s,x)=>s+x.p.caldera,0),
+      calcs.reduce((s,x)=>s+x.p.otros,0),
+      calcs.reduce((s,x)=>s+x.p.hipoMens*12,0)
+    ];
+  } else {
+    const p=props.find(p=>p.id==sv);
+    if(!p)return;
+    const c=calcProp(p);
+    lbs=['Inmobiliaria','Comunidad','IBI','Caldera/Mto.','Otros','Hipoteca'];
+    dat=[c.gastosInmob,p.comunidad,p.ibi,p.caldera,p.otros,p.hipoMens*12];
   }
-  html += rowTotal('TOTAL INGRESOS', rows, r => r.ingresosTotal);
-
-  // GASTOS
-  html += `<tr class="row-highlight"><td colspan="${rows.length+1}" style="background:#fde8e6;color:var(--red-soft);font-weight:700;font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:8px 14px;">GASTOS</td></tr>`;
-  html += row('Hipoteca', rows, r => r.hipotecaAnual);
-  html += row('Cuota autónomos', rows, r => r.autonomosAnual);
-  html += row('Gastos del hogar (c/IPC)', rows, r => r.casaAnual);
-  if (rows.some(r => r.otrosGastos !== 0)) {
-    html += row('Otros gastos', rows, r => r.otrosGastos);
-  }
-  html += rowTotal('TOTAL GASTOS', rows, r => r.gastosTotal);
-
-  // RESULTADO
-  html += `<tr class="row-highlight"><td colspan="${rows.length+1}" style="background:#e3eff8;color:var(--blue);font-weight:700;font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:8px 14px;">RESULTADO</td></tr>`;
-  html += rowSignedTotal('Resultado anual (±)', rows, r => r.subtotal);
-
-  // SALDO
-  html += `<tr class="row-saldo"><td>💰 SALDO ACUMULADO</td>${rows.map(r => `<td class="${cls(r.saldoFin)}">${fmt(Math.round(r.saldoFin))}</td>`).join('')}</tr>`;
-
-  html += '</tbody>';
-  tbl.innerHTML = html;
+  const filt=lbs.map((l,i)=>({l,d:dat[i],c:cols[i]})).filter(x=>x.d>0);
+  if(!filt.length)return;
+  CH.prDonut=new Chart(ctx,{type:'doughnut',data:{labels:filt.map(x=>x.l),datasets:[{data:filt.map(x=>x.d),backgroundColor:filt.map(x=>x.c),borderWidth:2,borderColor:'white',hoverOffset:8}]},options:{responsive:true,maintainAspectRatio:false,cutout:'65%',plugins:{legend:{position:'right',labels:{font:{size:11,family:'DM Sans'},boxWidth:12,padding:14}},tooltip:{backgroundColor:'rgba(44,42,39,.92)',padding:12,callbacks:{label:c=>{const tot=c.dataset.data.reduce((a,b)=>a+b,0);return ` ${c.label}: ${fmt(c.raw)} (${fmtPct(c.raw/tot*100)})`}}}}}});
 }
 
-function row(label, rows, fn) {
-  return `<tr><td>${label}</td>${rows.map(r => `<td>${fmt(fn(r))}</td>`).join('')}</tr>`;
-}
-function rowTotal(label, rows, fn) {
-  return `<tr class="row-total"><td>${label}</td>${rows.map(r => `<td>${fmt(fn(r))}</td>`).join('')}</tr>`;
-}
-function rowSignedTotal(label, rows, fn) {
-  const cls = v => v >= 0 ? 'positive' : 'negative';
-  return `<tr class="row-total"><td>${label}</td>${rows.map(r => `<td class="${cls(fn(r))}">${fmt(fn(r))}</td>`).join('')}</tr>`;
+function renderPropRentChart(){
+  const ctx=document.getElementById('propChartRent').getContext('2d');
+  killChart(CH.prRent);
+  if(!props.length)return;
+  const calcs=props.map(p=>({p,c:calcProp(p)}));
+  CH.prRent=new Chart(ctx,{type:'bar',data:{labels:calcs.map(x=>x.p.nombre),datasets:[
+    {label:'Rent. bruta %',data:calcs.map(x=>+x.c.rentBruta.toFixed(2)),backgroundColor:'rgba(58,158,143,.5)',borderColor:'#3a9e8f',borderWidth:1.5,borderRadius:6,yAxisID:'y'},
+    {label:'Rent. neta %', data:calcs.map(x=>+x.c.rentNeta.toFixed(2)), backgroundColor:'rgba(127,166,122,.75)',borderColor:'#7fa67a',borderWidth:1.5,borderRadius:6,yAxisID:'y'}
+  ]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{labels:{font:{size:11,family:'DM Sans'},boxWidth:12}},tooltip:{backgroundColor:'rgba(44,42,39,.92)',padding:12,callbacks:{label:c=>` ${c.dataset.label}: ${c.raw}%`}}},scales:{x:{grid:{color:'#eee'},ticks:{callback:v=>v+'%'}},y:{grid:{display:false},ticks:{font:{size:11}}}}}});
 }
 
-// ─── CHART SALDO ──────────────────────────────────────────────────────────────
-function renderChartSaldo(rows, saldoInicial) {
-  const ctx = document.getElementById('chartSaldo').getContext('2d');
-  if (chartSaldo) chartSaldo.destroy();
-
-  const labels = rows.map(r => `${r.ano}\n(${r.edad}a)`);
-  const saldos = rows.map(r => Math.round(r.saldoFin));
-  const ingresos = rows.map(r => Math.round(r.ingresosTotal));
-  const gastos = rows.map(r => Math.round(r.gastosTotal));
-
-  chartSaldo = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels,
-      datasets: [
-        {
-          label: 'Saldo acumulado',
-          data: saldos,
-          borderColor: '#4a7fa5',
-          backgroundColor: 'rgba(74,127,165,0.10)',
-          borderWidth: 2.5,
-          pointRadius: 5,
-          pointBackgroundColor: '#4a7fa5',
-          fill: true,
-          tension: 0.35,
-          yAxisID: 'y1'
-        },
-        {
-          label: 'Ingresos anuales',
-          data: ingresos,
-          borderColor: '#7fa67a',
-          backgroundColor: 'transparent',
-          borderWidth: 2,
-          borderDash: [4, 4],
-          pointRadius: 4,
-          tension: 0.35,
-          yAxisID: 'y2'
-        },
-        {
-          label: 'Gastos anuales',
-          data: gastos,
-          borderColor: '#d95f52',
-          backgroundColor: 'transparent',
-          borderWidth: 2,
-          borderDash: [4, 4],
-          pointRadius: 4,
-          tension: 0.35,
-          yAxisID: 'y2'
-        }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      interaction: { mode: 'index', intersect: false },
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          backgroundColor: 'rgba(44,42,39,0.92)',
-          padding: 12,
-          callbacks: {
-            label: ctx => ` ${ctx.dataset.label}: ${ctx.raw.toLocaleString('es-ES', {style:'currency',currency:'EUR',maximumFractionDigits:0})}`
-          }
-        }
-      },
-      scales: {
-        x: { grid: { color: '#eee' }, ticks: { font: { size: 11 } } },
-        y1: {
-          type: 'linear', position: 'left',
-          title: { display: true, text: 'Saldo (€)', font: { size: 11 } },
-          grid: { color: '#eee' },
-          ticks: { callback: v => v.toLocaleString('es-ES', {style:'currency',currency:'EUR',maximumFractionDigits:0,notation:'compact'}) }
-        },
-        y2: {
-          type: 'linear', position: 'right',
-          title: { display: true, text: 'Flujo anual (€)', font: { size: 11 } },
-          grid: { display: false },
-          ticks: { callback: v => v.toLocaleString('es-ES', {style:'currency',currency:'EUR',maximumFractionDigits:0,notation:'compact'}) }
-        }
-      }
-    }
+function renderPropTable(){
+  const panel=document.getElementById('propTablePanel');
+  const tbl=document.getElementById('propTabla');
+  if(!props.length){panel.style.display='none';return;}
+  panel.style.display='block';
+  const calcs=props.map(p=>({p,c:calcProp(p)}));
+  let h=`<thead><tr><th style="text-align:left">Vivienda</th><th>Valor actual</th><th>Ing. brutos</th><th>Total gastos</th><th>Ben. neto</th><th>Rent. bruta</th><th>Rent. neta</th><th>Plusvalía</th></tr></thead><tbody>`;
+  calcs.forEach(({p,c})=>{
+    h+=`<tr>
+      <td style="text-align:left;font-size:13px;font-weight:600;color:var(--ink)">${p.nombre}</td>
+      <td>${fmt(p.valActual)}</td>
+      <td class="positive">${fmt(c.ingBruto)}</td>
+      <td class="negative">${fmt(c.gastosTot)}</td>
+      <td class="${clsCss(c.benNeto)}">${fmt(c.benNeto)}</td>
+      <td style="color:var(--teal);font-weight:600">${fmtPct(c.rentBruta)}</td>
+      <td class="${c.rentNeta>=4?'positive':c.rentNeta>=2?'':'negative'}">${fmtPct(c.rentNeta)}</td>
+      <td class="${clsCss(c.plusvalia)}">${fmt(c.plusvalia)}</td>
+    </tr>`;
   });
-
-  const lastRow = rows[rows.length - 1];
-  document.getElementById('retirementNote').innerHTML =
-    `Proyección hasta <strong>${lastRow.ano}</strong> (${lastRow.edad} años) · Saldo estimado: <strong style="color:${lastRow.saldoFin>=0?'var(--sage)':'var(--red-soft)'}">${fmt(Math.round(lastRow.saldoFin))}</strong>`;
+  const tV=calcs.reduce((s,x)=>s+x.p.valActual,0),tI=calcs.reduce((s,x)=>s+x.c.ingBruto,0),tG=calcs.reduce((s,x)=>s+x.c.gastosTot,0),tN=calcs.reduce((s,x)=>s+x.c.benNeto,0),tRB=tV>0?(tI/tV)*100:0,tRN=tV>0?(tN/tV)*100:0,tP=calcs.reduce((s,x)=>s+x.c.plusvalia,0);
+  h+=`<tr class="row-total row-saldo"><td style="text-align:left">TOTAL CARTERA</td><td>${fmt(tV)}</td><td class="positive">${fmt(tI)}</td><td class="negative">${fmt(tG)}</td><td class="${clsCss(tN)}">${fmt(tN)}</td><td style="color:var(--teal);font-weight:700">${fmtPct(tRB)}</td><td class="${tRN>=4?'positive':tRN>=2?'':'negative'}">${fmtPct(tRN)}</td><td class="${clsCss(tP)}">${fmt(tP)}</td></tr>`;
+  h+='</tbody>';
+  tbl.innerHTML=h;
 }
 
-// ─── CHART BARRAS ─────────────────────────────────────────────────────────────
-function renderChartBarras(rows) {
-  const ctx = document.getElementById('chartBarras').getContext('2d');
-  if (chartBarras) chartBarras.destroy();
+/* ══════════════════════════════════════════════════════════════════
+   MODULE 3: OVERVIEW GLOBAL
+══════════════════════════════════════════════════════════════════════ */
+function renderOverview(){
+  renderOvKPIs();
+  renderOvWealthBar();
+  renderOvPatrimonio();
+  renderOvFlujo();
+  renderOvSummaries();
+  renderOvDonutTotal();
+  renderOvResumenJub();
+}
 
-  chartBarras = new Chart(ctx, {
+function renderOvKPIs(){
+  const row=document.getElementById('ovKpiRow');
+  const lastFin=finRows.length?finRows[finRows.length-1]:null;
+  const saldoCuenta=lastFin?lastFin.saldoFin:0;
+  const calcs=props.map(p=>({p,c:calcProp(p)}));
+  const valInm=calcs.reduce((s,x)=>s+x.p.valActual,0);
+  const {totVal:cryptoVal,totPnl:cryptoPnl}=getCryptoTotals();
+  const pat=saldoCuenta+valInm+cryptoVal;
+  const netInm=calcs.reduce((s,x)=>s+x.c.benNeto,0);
+  const netFin=lastFin?lastFin.subtot:0;
+  const netTot=netFin+netInm;
+  row.innerHTML=`
+    <div class="kpi-card purple"><div class="kpi-badge">🏗️</div><div class="label">Patrimonio neto total</div><div class="value">${fmt(Math.round(pat))}</div><div class="sub">Cuenta + inmuebles + crypto</div></div>
+    <div class="kpi-card blue"><div class="kpi-badge">💳</div><div class="label">Saldo cuenta (proyectado)</div><div class="value">${fmt(Math.round(saldoCuenta))}</div><div class="sub">${lastFin?'En '+lastFin.ano:'—'}</div></div>
+    <div class="kpi-card teal"><div class="kpi-badge">🏘️</div><div class="label">Valor cartera inmobiliaria</div><div class="value">${fmt(valInm)}</div><div class="sub">${props.length} ${props.length===1?'vivienda':'viviendas'}</div></div>
+    <div class="kpi-card gold"><div class="kpi-badge">₿</div><div class="label">Cartera crypto</div><div class="value">${fmt(Math.round(cryptoVal))}</div><div class="sub">${cryptoPnl>=0?'+':''}${fmt(Math.round(cryptoPnl))} P&L total</div></div>
+    <div class="kpi-card ${netTot>=0?'green':'red'}"><div class="kpi-badge">📈</div><div class="label">Flujo neto anual</div><div class="value">${fmt(Math.round(netTot))}</div><div class="sub">Finanzas + inmobiliario</div></div>
+    ${jubData?('<div class="kpi-card rose"><div class="kpi-badge">🏖️</div><div class="label">Pensión ordinaria est.</div><div class="value">'+fmt(Math.round(jubData.ordinary.pensionNetaMes))+'</div><div class="sub">mensual neta en '+jubData.ordinary.anoJubilacion+'</div></div>'):''}`;
+}
+
+function renderOvWealthBar(){
+  const div=document.getElementById('ovWealthBar');
+  const lastFin=finRows.length?finRows[finRows.length-1]:null;
+  const saldo=lastFin?Math.max(lastFin.saldoFin,0):0;
+  const calcs=props.map(p=>({p,c:calcProp(p)}));
+  const valInm=calcs.reduce((s,x)=>s+x.p.valActual,0);
+  const plus=calcs.reduce((s,x)=>s+x.c.plusvalia,0);
+  const {totVal:cryptoVal}=getCryptoTotals();
+  const total=saldo+valInm+cryptoVal;
+  if(!total){div.innerHTML='<p style="color:var(--stone);font-size:13px">Configura los módulos para ver la composición patrimonial.</p>';return;}
+  const pS=(saldo/total*100).toFixed(1), pI=(valInm/total*100).toFixed(1), pC=(cryptoVal/total*100).toFixed(1);
+  div.innerHTML=`
+    <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:10px">
+      <strong>Patrimonio total estimado: ${fmt(Math.round(total))}</strong>
+      <span style="color:var(--stone)">${lastFin?'Proyectado en '+lastFin.ano:''}</span>
+    </div>
+    <div class="wealth-bar-track">
+      <div class="wealth-bar-fill" style="width:${pS}%;background:var(--blue)"></div>
+      <div class="wealth-bar-fill" style="width:${pI}%;background:var(--teal)"></div>
+      <div class="wealth-bar-fill" style="width:${pC}%;background:var(--gold)"></div>
+    </div>
+    <div class="wealth-legend">
+      <div class="wealth-legend-item"><div class="wealth-legend-dot" style="background:var(--blue)"></div><span>Saldo cuenta: <strong>${fmt(Math.round(saldo))}</strong> (${pS}%)</span></div>
+      <div class="wealth-legend-item"><div class="wealth-legend-dot" style="background:var(--teal)"></div><span>Inmuebles: <strong>${fmt(Math.round(valInm))}</strong> (${pI}%)</span></div>
+      ${cryptoVal>0?`<div class="wealth-legend-item"><div class="wealth-legend-dot" style="background:var(--gold)"></div><span>Crypto: <strong>${fmt(Math.round(cryptoVal))}</strong> (${pC}%)</span></div>`:''}
+      ${plus!==0?`<div class="wealth-legend-item"><div class="wealth-legend-dot" style="background:var(--sage)"></div><span>Plusvalía inmobiliaria: <strong style="color:${plus>=0?'var(--sage)':'var(--red-soft)'}">${fmt(Math.round(plus))}</strong></span></div>`:''}
+    </div>`;
+}
+
+function renderOvPatrimonio(){
+  const ctx=document.getElementById('ovChartPatrimonio').getContext('2d');
+  killChart(CH.ovPat);
+  if(!finRows.length)return;
+  const ipc=getVal('ipc')/100;
+  const calcs=props.map(p=>({p,c:calcProp(p)}));
+  const valInm0=calcs.reduce((s,x)=>s+x.p.valActual,0);
+  const {totVal:cryptoVal0}=getCryptoTotals();
+  const labels=finRows.map(r=>`${r.ano}`);
+  const saldos=finRows.map(r=>Math.round(r.saldoFin));
+  const valInms=finRows.map((r,i)=>Math.round(valInm0*Math.pow(1+ipc,i+1)));
+  // Crypto assumed flat (no projection) as it's too volatile
+  const cryptoVals=finRows.map(()=>Math.round(cryptoVal0));
+  const pats=saldos.map((s,i)=>s+valInms[i]+cryptoVals[i]);
+  CH.ovPat=new Chart(ctx,{type:'line',data:{labels,datasets:[
+    {label:'Patrimonio total',data:pats,borderColor:'#8264b0',backgroundColor:'rgba(130,100,176,.08)',borderWidth:2.5,fill:true,tension:.35,pointRadius:4,pointBackgroundColor:'#8264b0'},
+    {label:'Saldo cuenta',   data:saldos, borderColor:'#4a7fa5',backgroundColor:'transparent',borderWidth:2,borderDash:[5,4],tension:.35,pointRadius:3},
+    {label:'Valor inmuebles',data:valInms,borderColor:'#3a9e8f',backgroundColor:'transparent',borderWidth:2,borderDash:[5,4],tension:.35,pointRadius:3},
+    {label:'Crypto (val. actual)',data:cryptoVals,borderColor:'#c8972a',backgroundColor:'transparent',borderWidth:2,borderDash:[3,6],tension:.35,pointRadius:3}
+  ]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{labels:{font:{size:11,family:'DM Sans'},boxWidth:12}},tooltip:{backgroundColor:'rgba(44,42,39,.92)',padding:12,callbacks:{label:c=>` ${c.dataset.label}: ${fmt(c.raw)}`}}},scales:{x:{grid:{color:'#eee'},ticks:{font:{size:11}}},y:{grid:{color:'#eee'},ticks:{callback:v=>compact(v)}}}}});
+}
+
+function renderOvFlujo(){
+  const ctx=document.getElementById('ovChartFlujo').getContext('2d');
+  killChart(CH.ovFlujo);
+  if(!finRows.length)return;
+  const calcs=props.map(p=>({p,c:calcProp(p)}));
+  const netInm=calcs.reduce((s,x)=>s+x.c.benNeto,0);
+  const ingInm=calcs.reduce((s,x)=>s+x.c.ingBruto,0);
+  const gasInm=calcs.reduce((s,x)=>s+x.c.gastosTot,0);
+  const labels=finRows.map(r=>`${r.ano}`);
+  const ingTot=finRows.map(r=>Math.round(r.ingT+ingInm));
+  const gasTot=finRows.map(r=>Math.round(r.gasT+gasInm));
+  const netTot=finRows.map(r=>Math.round(r.subtot+netInm));
+  CH.ovFlujo=new Chart(ctx,{type:'bar',data:{labels,datasets:[
+    {label:'Ingresos totales',data:ingTot,backgroundColor:'rgba(127,166,122,.7)',borderColor:'#7fa67a',borderWidth:1.5,borderRadius:4},
+    {label:'Gastos totales',  data:gasTot.map(v=>-v),backgroundColor:'rgba(217,95,82,.6)',borderColor:'#d95f52',borderWidth:1.5,borderRadius:4},
+    {type:'line',label:'Resultado neto',data:netTot,borderColor:'#4a7fa5',backgroundColor:'transparent',borderWidth:2.5,pointRadius:5,pointBackgroundColor:'#4a7fa5',tension:.3}
+  ]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{labels:{font:{size:11,family:'DM Sans'},boxWidth:12}},tooltip:{backgroundColor:'rgba(44,42,39,.92)',padding:12,callbacks:{label:c=>` ${c.dataset.label}: ${fmt(Math.abs(c.raw))}`}}},scales:{x:{grid:{display:false},ticks:{font:{size:11}}},y:{grid:{color:'#eee'},ticks:{callback:v=>(v<0?'−':'')+compact(Math.abs(v))}}}}});
+}
+
+function renderOvSummaries(){
+  // Financial
+  const finEl=document.getElementById('ovResumenFin');
+  if(finRows.length){
+    const last=finRows[finRows.length-1];
+    const minR=finRows.reduce((m,r)=>r.saldoFin<m.saldoFin?r:m,finRows[0]);
+    finEl.innerHTML=`<div style="display:grid;gap:10px">
+      ${ovRow('Saldo inicial',fmt(getVal('saldoInicial')),'var(--blue)')}
+      ${ovRow('Saldo proyectado en '+last.ano,fmt(Math.round(last.saldoFin)),last.saldoFin>=0?'var(--sage)':'var(--red-soft)')}
+      ${ovRow('Mínimo de liquidez',fmt(Math.round(minR.saldoFin))+' ('+minR.ano+')',minR.saldoFin>=0?'var(--amber)':'var(--red-soft)')}
+      ${ovRow('Horizonte',getSel('horizonte')+' años · hasta '+last.ano,'var(--ink)')}
+    </div>`;
+  }
+  // Inmobiliario
+  const inmEl=document.getElementById('ovResumenInm');
+  if(props.length){
+    const calcs=props.map(p=>({p,c:calcProp(p)}));
+    const tV=calcs.reduce((s,x)=>s+x.p.valActual,0);
+    const tN=calcs.reduce((s,x)=>s+x.c.benNeto,0);
+    const rN=tV>0?(tN/tV)*100:0;
+    const tP=calcs.reduce((s,x)=>s+x.c.plusvalia,0);
+    inmEl.innerHTML=`<div style="display:grid;gap:10px">
+      ${ovRow('Nº de viviendas',props.length,'var(--teal)')}
+      ${ovRow('Valor total cartera',fmt(tV),'var(--teal)')}
+      ${ovRow('Beneficio neto anual',fmt(tN),tN>=0?'var(--sage)':'var(--red-soft)')}
+      ${ovRow('Rentabilidad neta media',fmtPct(rN),rN>=4?'var(--sage)':rN>=2?'var(--amber)':'var(--red-soft)')}
+      ${ovRow('Plusvalía total',fmt(tP),tP>=0?'var(--sage)':'var(--red-soft)')}
+    </div>`;
+  }
+  // Crypto
+  const crEl=document.getElementById('ovResumenCrypto');
+  if(crEl && cryptoPortfolio.length){
+    const {totVal,totCost,totPnl}=getCryptoTotals();
+    const pct=totCost>0?(totPnl/totCost)*100:0;
+    const best=cryptoPortfolio.map(p=>({p,k:calcPosition(p)})).reduce((b,x)=>x.k.pnlPct>b.k.pnlPct?x:b);
+    crEl.innerHTML=`<div style="display:grid;gap:10px">
+      ${ovRow('Activos en cartera',cryptoPortfolio.length,'var(--gold)')}
+      ${ovRow('Valor actual crypto',fmt(Math.round(totVal)),'var(--gold)')}
+      ${ovRow('Capital invertido',fmt(Math.round(totCost)),'var(--ink)')}
+      ${ovRow('P&L total',(totPnl>=0?'+':'')+fmt(Math.round(totPnl))+' ('+pct.toFixed(1)+'%)',totPnl>=0?'var(--sage)':'var(--red-soft)')}
+      ${ovRow('Mejor activo',best.p.coin.name+' +'+best.k.pnlPct.toFixed(1)+'%','var(--sage)')}
+    </div>`;
+  } else if(crEl){
+    crEl.innerHTML='<p style="color:var(--stone);font-size:13px">Añade activos en el módulo de inversiones.</p>';
+  }
+}
+
+// ── Overview donut total ──────────────────────────────────────────
+function renderOvDonutTotal(){
+  const ctx=document.getElementById('ovChartDonutTotal')?.getContext('2d');
+  if(!ctx)return;
+  killChart(CH.ovDonutTotal);
+  const lastFin=finRows.length?finRows[finRows.length-1]:null;
+  const saldo=lastFin?Math.max(lastFin.saldoFin,0):0;
+  const calcs=props.map(p=>({p,c:calcProp(p)}));
+  const valInm=calcs.reduce((s,x)=>s+x.p.valActual,0);
+  const {totVal:cryptoVal}=getCryptoTotals();
+  const total=saldo+valInm+cryptoVal;
+  if(!total)return;
+  const labels=['Saldo cuenta','Inmuebles','Crypto'];
+  const data=[Math.round(saldo),Math.round(valInm),Math.round(cryptoVal)];
+  const colors=['#4a7fa5','#3a9e8f','#c8972a'];
+  CH.ovDonutTotal=new Chart(ctx,{type:'doughnut',data:{labels,datasets:[{data,backgroundColor:colors.map(c=>c+'cc'),borderColor:colors,borderWidth:2,hoverOffset:8}]},options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{position:'bottom',labels:{font:{size:12,family:'DM Sans'},boxWidth:14,padding:16}},tooltip:{backgroundColor:'rgba(44,42,39,.92)',padding:12,callbacks:{label:function(c){const tot=c.dataset.data.reduce(function(a,b){return a+b;},0);return ' '+c.label+': '+fmt(c.raw)+' ('+(c.raw/tot*100).toFixed(1)+'%)';}}}}}});
+}
+
+function ovRow(label,value,color){
+  return `<div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--stone-light);padding-bottom:8px;last-child:border:none">
+    <span style="color:var(--stone);font-size:13px">${label}</span>
+    <strong style="color:${color}">${value}</strong>
+  </div>`;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   MODULE 4: INVERSIONES / CRYPTO
+══════════════════════════════════════════════════════════════════════ */
+
+// ── Coin catalog ──────────────────────────────────────────────────
+const COINS = [
+  {id:'bitcoin',     sym:'BTC', name:'Bitcoin',    logo:'🟠', color:'#f7931a'},
+  {id:'ethereum',    sym:'ETH', name:'Ethereum',   logo:'🔷', color:'#627eea'},
+  {id:'binancecoin', sym:'BNB', name:'BNB',        logo:'🟡', color:'#f3ba2f'},
+  {id:'solana',      sym:'SOL', name:'Solana',     logo:'🟣', color:'#9945ff'},
+  {id:'ripple',      sym:'XRP', name:'XRP',        logo:'🔵', color:'#0085c0'},
+  {id:'cardano',     sym:'ADA', name:'Cardano',    logo:'🔹', color:'#0033ad'},
+  {id:'dogecoin',    sym:'DOGE',name:'Dogecoin',   logo:'🐕', color:'#c2a633'},
+  {id:'polkadot',    sym:'DOT', name:'Polkadot',   logo:'⚫', color:'#e6007a'},
+  {id:'chainlink',   sym:'LINK',name:'Chainlink',  logo:'🔗', color:'#2a5ada'},
+  {id:'avalanche-2', sym:'AVAX',name:'Avalanche',  logo:'🔺', color:'#e84142'}
+];
+
+// ── Fallback prices (realistic Feb 2026 estimates in EUR) ─────────
+const FALLBACK = {
+  bitcoin:     {eur:91500, eur_24h_change:1.8,  eur_7d_change:5.2,  eur_market_cap:1.81e12, eur_24h_vol:3.2e10},
+  ethereum:    {eur:3280,  eur_24h_change:-0.7, eur_7d_change:2.1,  eur_market_cap:3.94e11, eur_24h_vol:1.4e10},
+  binancecoin: {eur:595,   eur_24h_change:0.9,  eur_7d_change:3.0,  eur_market_cap:8.8e10,  eur_24h_vol:1.6e9},
+  solana:      {eur:198,   eur_24h_change:3.2,  eur_7d_change:8.4,  eur_market_cap:9.4e10,  eur_24h_vol:4.1e9},
+  ripple:      {eur:2.18,  eur_24h_change:-1.4, eur_7d_change:-2.1, eur_market_cap:1.25e11, eur_24h_vol:2.8e9},
+  cardano:     {eur:0.88,  eur_24h_change:2.1,  eur_7d_change:6.0,  eur_market_cap:3.1e10,  eur_24h_vol:9.2e8},
+  dogecoin:    {eur:0.29,  eur_24h_change:-2.8, eur_7d_change:-4.3, eur_market_cap:4.2e10,  eur_24h_vol:1.8e9},
+  polkadot:    {eur:8.70,  eur_24h_change:1.1,  eur_7d_change:3.5,  eur_market_cap:1.2e10,  eur_24h_vol:4.0e8},
+  chainlink:   {eur:19.2,  eur_24h_change:4.1,  eur_7d_change:9.2,  eur_market_cap:1.14e10, eur_24h_vol:7.5e8},
+  'avalanche-2':{eur:29.5, eur_24h_change:-0.4, eur_7d_change:1.8,  eur_market_cap:1.22e10, eur_24h_vol:6.1e8}
+};
+
+// ── Fetch prices from CoinGecko (free, no key) ────────────────────
+async function fetchCryptoPrices(){
+  const icon=document.getElementById('refreshIcon');
+  if(icon) icon.classList.add('spinning');
+  try{
+    const ids=COINS.map(c=>c.id).join(',');
+    const url=`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=eur&include_24hr_change=true&include_7d_change=true&include_market_cap=true&include_24hr_vol=true`;
+    const res=await fetch(url,{signal:AbortSignal.timeout(6000)});
+    if(!res.ok) throw new Error('API error');
+    const data=await res.json();
+    // Merge, keeping 7d as fallback if missing
+    COINS.forEach(c=>{
+      if(data[c.id]){
+        cryptoPrices[c.id]={
+          eur:           data[c.id].eur||FALLBACK[c.id].eur,
+          eur_24h_change:data[c.id].eur_24h_change||FALLBACK[c.id].eur_24h_change,
+          eur_7d_change: data[c.id].eur_7d_change||FALLBACK[c.id].eur_7d_change,
+          eur_market_cap:data[c.id].eur_market_cap||FALLBACK[c.id].eur_market_cap,
+          eur_24h_vol:   data[c.id].eur_24h_vol||FALLBACK[c.id].eur_24h_vol,
+          live:true
+        };
+      } else { cryptoPrices[c.id]={...FALLBACK[c.id],live:false}; }
+    });
+    document.getElementById('lastUpdated').innerHTML=`✅ Actualizado ${new Date().toLocaleTimeString('es-ES')}`;
+  } catch(e){
+    // Use fallback
+    COINS.forEach(c=>{ cryptoPrices[c.id]={...FALLBACK[c.id],live:false}; });
+    document.getElementById('lastUpdated').innerHTML=`📋 Precios de referencia Feb 2026`;
+  }
+  if(icon) icon.classList.remove('spinning');
+  renderCryptoAll();
+  renderOverview();
+}
+
+function renderCryptoAll(){
+  renderTickerStrip();
+  renderCoinTable();
+  renderCryptoKPIs();
+  renderCryptoCharts();
+  renderCryptoPosList();
+  renderCryptoSignals();
+  populateCoinSelect();
+  updateCryptoBadge();
+}
+
+// ── Ticker strip ──────────────────────────────────────────────────
+function renderTickerStrip(){
+  const strip=document.getElementById('tickerStrip');
+  if(!strip)return;
+  strip.innerHTML=COINS.map(c=>{
+    const p=cryptoPrices[c.id];
+    if(!p)return'';
+    const chg=p.eur_24h_change||0;
+    const cls=chg>0.5?'up':chg<-0.5?'dn':'flat';
+    const arrow=chg>0.5?'▲':chg<-0.5?'▼':'—';
+    return `<div class="ticker-item" onclick="highlightCoin('${c.id}')">
+      <div class="ticker-sym">${c.sym}</div>
+      <div class="ticker-price">${fmtCoin(p.eur)}</div>
+      <div class="ticker-chg ${cls}">${arrow} ${chg>=0?'+':''}${chg.toFixed(2)}%</div>
+    </div>`;
+  }).join('');
+}
+
+function highlightCoin(id){
+  document.querySelectorAll('.ticker-item').forEach(el=>el.classList.remove('selected'));
+  const idx=COINS.findIndex(c=>c.id===id);
+  if(idx>=0) document.querySelectorAll('.ticker-item')[idx]?.classList.add('selected');
+}
+
+// ── Coin table ────────────────────────────────────────────────────
+function getSignal(c,p){
+  const chg24=p.eur_24h_change||0, chg7=p.eur_7d_change||0;
+  if(chg24>5 && chg7>10)  return{label:'COMPRA',cls:'buy',tip:'Momentum alcista fuerte. Posible continuación de tendencia positiva.'};
+  if(chg24>2 && chg7>5)   return{label:'ACUMULAR',cls:'buy',tip:'Tendencia positiva moderada. Buen momento para acumular posiciones.'};
+  if(chg24<-5 && chg7<-10)return{label:'VENTA',cls:'sell',tip:'Corrección significativa. Considera reducir exposición o usar stop-loss.'};
+  if(chg24<-2 && chg7<-5) return{label:'PRECAUCIÓN',cls:'sell',tip:'Debilidad de precio. Espera confirmación antes de añadir posiciones.'};
+  if(Math.abs(chg24)<1)   return{label:'NEUTRAL',cls:'hold',tip:'Precio estable. Mantener posiciones actuales sin cambios.'};
+  return{label:'VIGILAR',cls:'watch',tip:'Volatilidad moderada. Monitorea de cerca antes de actuar.'};
+}
+
+function renderCoinTable(){
+  const tbody=document.getElementById('coinTableBody');
+  if(!tbody||!Object.keys(cryptoPrices).length)return;
+  const inPortfolio=new Set(cryptoPortfolio.map(p=>p.coinId));
+  tbody.innerHTML=COINS.map((c,i)=>{
+    const p=cryptoPrices[c.id]; if(!p)return'';
+    const chg24=p.eur_24h_change||0, chg7=p.eur_7d_change||0;
+    const cls24=chg24>0?'up':chg24<0?'dn':'flat';
+    const cls7 =chg7>0?'up':chg7<0?'dn':'flat';
+    const sig=getSignal(c,p);
+    const inCart=inPortfolio.has(c.id);
+    const pos=cryptoPortfolio.find(p=>p.coinId===c.id);
+    const cartBadge=inCart
+      ?`<span style="color:var(--sage);font-weight:700;font-size:11px">✓ ${fmtCoin(pos.qty*p.eur)}</span>`
+      :`<span style="color:var(--stone-light);font-size:11px">—</span>`;
+    return `<tr onclick="highlightCoin('${c.id}')">
+      <td>
+        <div class="coin-name-cell">
+          <div class="coin-logo" style="background:${c.color}22">${c.logo}</div>
+          <div><div class="coin-name">${c.name}</div><div class="coin-sym">${c.sym}</div></div>
+        </div>
+      </td>
+      <td style="font-family:'DM Serif Display',serif;font-size:1.05rem">${fmtCoin(p.eur)}</td>
+      <td><span class="chg-badge ${cls24}">${chg24>=0?'+':''}${chg24.toFixed(2)}%</span></td>
+      <td><span class="chg-badge ${cls7}">${chg7>=0?'+':''}${chg7.toFixed(2)}%</span></td>
+      <td style="color:var(--stone)">${compactNum(p.eur_market_cap)}</td>
+      <td style="color:var(--stone)">${compactNum(p.eur_24h_vol)}</td>
+      <td><span class="signal-badge ${sig.cls}" title="${sig.tip}">${sig.label}</span></td>
+      <td>${cartBadge}</td>
+    </tr>`;
+  }).join('');
+}
+
+function fmtCoin(v){
+  if(!v && v!==0) return'—';
+  if(v>=1000)  return v.toLocaleString('es-ES',{style:'currency',currency:'EUR',maximumFractionDigits:0});
+  if(v>=1)     return v.toLocaleString('es-ES',{style:'currency',currency:'EUR',minimumFractionDigits:2,maximumFractionDigits:4});
+  return v.toLocaleString('es-ES',{style:'currency',currency:'EUR',minimumFractionDigits:4,maximumFractionDigits:6});
+}
+function compactNum(v){
+  if(!v)return'—';
+  if(v>=1e12)return(v/1e12).toFixed(2)+'B€';
+  if(v>=1e9) return(v/1e9).toFixed(1)+'K M€';
+  if(v>=1e6) return(v/1e6).toFixed(0)+'M€';
+  return v.toLocaleString('es-ES',{style:'currency',currency:'EUR',maximumFractionDigits:0});
+}
+
+// ── Portfolio management ──────────────────────────────────────────
+function populateCoinSelect(){
+  const sel=document.getElementById('addCoinSelect');
+  if(!sel)return;
+  const cur=sel.value;
+  sel.innerHTML='<option value="">— Selecciona activo —</option>'+COINS.map(c=>`<option value="${c.id}">${c.logo} ${c.name} (${c.sym})</option>`).join('');
+  if(cur)sel.value=cur;
+}
+
+function addCryptoPosition(){
+  const selEl=document.getElementById('addCoinSelect');
+  const coinId=selEl?.value;
+  if(!coinId){alert('Selecciona un activo primero.');return;}
+  // Check if already exists → add buy to existing
+  const existing=cryptoPortfolio.find(p=>p.coinId===coinId);
+  if(existing){
+    // Scroll to it and open buy form
+    document.getElementById('crpos_'+existing.id)?.scrollIntoView({behavior:'smooth',block:'center'});
+    return;
+  }
+  const coin=COINS.find(c=>c.id===coinId);
+  cryptoPosIdCnt++;
+  const id=cryptoPosIdCnt;
+  const price=cryptoPrices[coinId]?.eur||0;
+  const pos={id, coinId, coin, buys:[
+    {date:new Date().toISOString().slice(0,10), qty:0.01, priceEur:price, note:'Primera compra'}
+  ]};
+  cryptoPortfolio.push(pos);
+  selEl.value='';
+  renderCryptoPosList();
+  renderCryptoKPIs();
+  renderCryptoCharts();
+  renderCoinTable();
+  renderCryptoSignals();
+  updateCryptoBadge();
+  renderOverview();
+  setTimeout(()=>document.getElementById('crpos_'+id)?.scrollIntoView({behavior:'smooth',block:'center'}),100);
+}
+
+function removeCryptoPos(id){
+  cryptoPortfolio=cryptoPortfolio.filter(p=>p.id!==id);
+  renderCryptoPosList();
+  renderCryptoKPIs();
+  renderCryptoCharts();
+  renderCoinTable();
+  updateCryptoBadge();
+  renderOverview();
+}
+
+function updateCryptoBadge(){
+  const b=document.getElementById('cryptoBadge');
+  if(b) b.textContent=cryptoPortfolio.length+(cryptoPortfolio.length===1?' activo':' activos');
+}
+
+function calcPosition(pos){
+  const price=cryptoPrices[pos.coinId]?.eur||0;
+  const totalQty=pos.buys.reduce((s,b)=>s+b.qty,0);
+  const totalCost=pos.buys.reduce((s,b)=>s+(b.qty*b.priceEur),0);
+  const avgBuy=totalQty>0?totalCost/totalQty:0;
+  const currentVal=totalQty*price;
+  const pnlAbs=currentVal-totalCost;
+  const pnlPct=totalCost>0?(pnlAbs/totalCost)*100:0;
+  return{totalQty,totalCost,avgBuy,currentVal,pnlAbs,pnlPct,price};
+}
+
+function addBuyToCryptoPos(posId){
+  const pos=cryptoPortfolio.find(p=>p.id===posId);
+  if(!pos)return;
+  const date=document.getElementById(`crb_${posId}_date`)?.value||new Date().toISOString().slice(0,10);
+  const qty=parseFloat(document.getElementById(`crb_${posId}_qty`)?.value)||0;
+  const price=parseFloat(document.getElementById(`crb_${posId}_price`)?.value)||cryptoPrices[pos.coinId]?.eur||0;
+  const note=document.getElementById(`crb_${posId}_note`)?.value||'';
+  if(!qty||!price){alert('Introduce cantidad y precio válidos.');return;}
+  pos.buys.push({date,qty,priceEur:price,note});
+  renderCryptoPosList();
+  renderCryptoKPIs();
+  renderCryptoCharts();
+  updateCryptoBadge();
+  renderOverview();
+}
+
+function removeBuy(posId, buyIdx){
+  const pos=cryptoPortfolio.find(p=>p.id===posId);
+  if(!pos)return;
+  pos.buys.splice(buyIdx,1);
+  if(!pos.buys.length){removeCryptoPos(posId);return;}
+  renderCryptoPosList();
+  renderCryptoKPIs();
+  renderCryptoCharts();
+  renderOverview();
+}
+
+// ── Render portfolio cards ────────────────────────────────────────
+function renderCryptoPosList(){
+  const list=document.getElementById('cryptoPosList');
+  const empty=document.getElementById('cryptoPosEmpty');
+  if(!cryptoPortfolio.length){list.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+  list.innerHTML=cryptoPortfolio.map(pos=>{
+    const c=pos.coin, k=calcPosition(pos);
+    const price=cryptoPrices[pos.coinId]?.eur||0;
+    const pnlColor=k.pnlAbs>=0?'var(--sage)':'var(--red-soft)';
+    const pnlSign=k.pnlAbs>=0?'+':'';
+    // Precompute signal and 24h change BEFORE template literal (avoids nested backtick issues)
+    const sig=getSignal(c,cryptoPrices[pos.coinId]||{});
+    const sigHtml='<span class="signal-badge '+sig.cls+'">'+sig.label+'</span>';
+    const p2=cryptoPrices[pos.coinId]||{};
+    const chg24val=(p2.eur_24h_change||0);
+    const chg24txt='24h: '+(chg24val>=0?'+':'')+chg24val.toFixed(2)+'%';
+    const histRows=pos.buys.map((b,i)=>{
+      const bVal=b.qty*price;
+      const bCost=b.qty*b.priceEur;
+      const bPnl=bVal-bCost;
+      return `<div class="buy-row">
+        <span style="color:var(--stone)">${b.date}</span>
+        <span>${b.qty.toLocaleString('es-ES',{maximumFractionDigits:8})} ${c.sym}</span>
+        <span>${fmtCoin(b.priceEur)}</span>
+        <span class="pnl-cell" style="color:${bPnl>=0?'var(--sage)':'var(--red-soft)'}">${bPnl>=0?'+':''}${fmt(Math.round(bPnl))}</span>
+        <button class="btn btn-danger" style="padding:3px 8px;font-size:11px" onclick="removeBuy(${pos.id},${i})">✕</button>
+      </div>`;
+    }).join('');
+    return `<div class="crypto-pos-card" id="crpos_${pos.id}">
+      <div class="crypto-pos-header" style="background:linear-gradient(135deg,${c.color}12,var(--gold-pale))">
+        <div class="crypto-pos-left">
+          <div style="width:40px;height:40px;border-radius:12px;background:${c.color}22;display:flex;align-items:center;justify-content:center;font-size:22px">${c.logo}</div>
+          <div>
+            <div style="font-family:'DM Serif Display',serif;font-size:1.05rem">${c.name} <span style="font-size:13px;color:var(--stone);font-family:'DM Sans',sans-serif">(${c.sym})</span></div>
+            <div style="font-size:12px;color:var(--stone)">Precio actual: <strong style="color:${c.color}">${fmtCoin(price)}</strong></div>
+          </div>
+        </div>
+        <div class="crypto-pos-right">
+          <div style="text-align:right">
+            <div style="font-family:'DM Serif Display',serif;font-size:1.4rem;color:${pnlColor}">${pnlSign}${fmt(Math.round(k.pnlAbs))}</div>
+            <div style="font-size:11px;color:${pnlColor}">${pnlSign}${k.pnlPct.toFixed(2)}% P&L total</div>
+          </div>
+          <button class="btn btn-danger" style="padding:6px 12px;font-size:12px" onclick="removeCryptoPos(${pos.id})">🗑 Eliminar</button>
+        </div>
+      </div>
+
+      <div class="pos-kpis">
+        <div class="pos-kpi"><div class="pk-label">Cantidad total</div><div class="pk-value gold">${k.totalQty.toLocaleString('es-ES',{maximumFractionDigits:8})} ${c.sym}</div><div class="pk-sub">${pos.buys.length} compra(s)</div></div>
+        <div class="pos-kpi"><div class="pk-label">Precio medio compra</div><div class="pk-value blue">${fmtCoin(k.avgBuy)}</div><div class="pk-sub">vs ${fmtCoin(price)} actual</div></div>
+        <div class="pos-kpi"><div class="pk-label">Capital invertido</div><div class="pk-value" style="color:var(--ink)">${fmt(Math.round(k.totalCost))}</div><div class="pk-sub">Coste total</div></div>
+        <div class="pos-kpi"><div class="pk-label">Valor actual</div><div class="pk-value ${k.currentVal>=k.totalCost?'pos':'neg'}">${fmt(Math.round(k.currentVal))}</div><div class="pk-sub">Al precio de mercado</div></div>
+        <div class="pos-kpi"><div class="pk-label">Ganancia / Pérdida</div><div class="pk-value ${k.pnlAbs>=0?'pos':'neg'}">${pnlSign}${fmt(Math.round(k.pnlAbs))}</div><div class="pk-sub">${pnlSign}${k.pnlPct.toFixed(2)}% sobre invertido</div></div>
+        <div class="pos-kpi"><div class="pk-label">Señal actual</div>
+          <div style="margin-top:4px">${sigHtml}</div>
+          <div class="pk-sub">${chg24txt}</div>
+        </div>
+      </div>
+
+      <!-- HISTORIAL DE COMPRAS -->
+      <div style="padding:0 18px 18px">
+        <div class="buy-history">
+          <div class="buy-history-title">📋 Historial de compras</div>
+          <div class="buy-row-head"><span>Fecha</span><span>Cantidad</span><span>Precio compra</span><span>P&L actual</span><span></span></div>
+          ${histRows}
+        </div>
+
+        <!-- AÑADIR COMPRA -->
+        <div style="margin-top:14px">
+          <div class="buy-history-title">➕ Registrar nueva compra</div>
+          <div class="add-buy-form" style="background:var(--gold-pale);border:1px solid var(--gold-mid);border-radius:var(--radius-sm);display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;padding:14px">
+            <div class="form-group"><label>Fecha</label><input type="date" id="crb_${pos.id}_date" value="${new Date().toISOString().slice(0,10)}"></div>
+            <div class="form-group"><label>Cantidad (${c.sym})</label><div class="input-prefix"><span>${c.sym}</span><input type="number" id="crb_${pos.id}_qty" placeholder="0.001" step="0.00001" min="0"></div></div>
+            <div class="form-group"><label>Precio de compra (€)</label><div class="input-prefix"><span>€</span><input type="number" id="crb_${pos.id}_price" value="${price.toFixed(2)}" step="0.01" min="0"></div></div>
+            <div class="form-group"><label>Nota (opcional)</label><input type="text" id="crb_${pos.id}_note" placeholder="Ej: DCA mensual"></div>
+            <div class="form-group" style="justify-content:flex-end">
+              <label>&nbsp;</label>
+              <button class="btn btn-primary" onclick="addBuyToCryptoPos(${pos.id})" style="padding:8px 16px;font-size:13px">✓ Registrar compra</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── Crypto KPI cards ──────────────────────────────────────────────
+function renderCryptoKPIs(){
+  const row=document.getElementById('cryptoKpiRow');
+  if(!row)return;
+  if(!cryptoPortfolio.length){
+    row.innerHTML='<div style="grid-column:1/-1;color:var(--stone);font-size:13px;padding:12px 0">Añade activos a tu cartera para ver los indicadores de rendimiento.</div>';
+    return;
+  }
+  const calcs=cryptoPortfolio.map(p=>({p,k:calcPosition(p)}));
+  const totCost=calcs.reduce((s,x)=>s+x.k.totalCost,0);
+  const totVal =calcs.reduce((s,x)=>s+x.k.currentVal,0);
+  const totPnl =totVal-totCost;
+  const totPct =totCost>0?(totPnl/totCost)*100:0;
+  const bestPnl=calcs.reduce((b,x)=>x.k.pnlPct>b.k.pnlPct?x:b,calcs[0]);
+  const worstPnl=calcs.reduce((w,x)=>x.k.pnlPct<w.k.pnlPct?x:w,calcs[0]);
+  row.innerHTML=`
+    <div class="kpi-card gold"><div class="kpi-badge">₿</div><div class="label">Valor cartera crypto</div><div class="value">${fmt(Math.round(totVal))}</div><div class="sub">${cryptoPortfolio.length} activos</div></div>
+    <div class="kpi-card blue"><div class="kpi-badge">💵</div><div class="label">Capital invertido</div><div class="value">${fmt(Math.round(totCost))}</div><div class="sub">Total comprometido</div></div>
+    <div class="kpi-card ${totPnl>=0?'green':'red'}"><div class="kpi-badge">📊</div><div class="label">Ganancia / Pérdida total</div><div class="value">${totPnl>=0?'+':''}${fmt(Math.round(totPnl))}</div><div class="sub">${totPnl>=0?'+':''}${totPct.toFixed(2)}% sobre invertido</div></div>
+    <div class="kpi-card green"><div class="kpi-badge">🚀</div><div class="label">Mejor activo</div><div class="value" style="font-size:1.4rem">${bestPnl.p.coin.sym}</div><div class="sub">+${bestPnl.k.pnlPct.toFixed(1)}% P&L</div></div>
+    <div class="kpi-card ${worstPnl.k.pnlPct<0?'red':'amber'}"><div class="kpi-badge">📉</div><div class="label">Peor activo</div><div class="value" style="font-size:1.4rem">${worstPnl.p.coin.sym}</div><div class="sub">${worstPnl.k.pnlPct.toFixed(1)}% P&L</div></div>`;
+}
+
+// ── Crypto charts ─────────────────────────────────────────────────
+function renderCryptoCharts(){
+  renderCrDonut();
+  renderCrPnlChart();
+}
+
+function renderCrDonut(){
+  const ctx=document.getElementById('crChartDonut')?.getContext('2d');
+  if(!ctx)return;
+  killChart(CH.crDonut);
+  if(!cryptoPortfolio.length)return;
+  const calcs=cryptoPortfolio.map(p=>({p,k:calcPosition(p)}));
+  const labels=calcs.map(x=>x.p.coin.sym);
+  const data=calcs.map(x=>Math.max(x.k.currentVal,0));
+  const colors=calcs.map(x=>x.p.coin.color);
+  CH.crDonut=new Chart(ctx,{type:'doughnut',data:{labels,datasets:[{data,backgroundColor:colors.map(c=>c+'cc'),borderColor:colors,borderWidth:2,hoverOffset:8}]},options:{responsive:true,maintainAspectRatio:false,cutout:'62%',plugins:{legend:{position:'right',labels:{font:{size:11,family:'DM Sans'},boxWidth:12,padding:14}},tooltip:{backgroundColor:'rgba(44,42,39,.92)',padding:12,callbacks:{label:c=>{const tot=c.dataset.data.reduce((a,b)=>a+b,0);return ` ${c.label}: ${fmt(c.raw)} (${(c.raw/tot*100).toFixed(1)}%)`;}}}}}});
+}
+
+function renderCrPnlChart(){
+  const ctx=document.getElementById('crChartPnl')?.getContext('2d');
+  if(!ctx)return;
+  killChart(CH.crPnl);
+  if(!cryptoPortfolio.length)return;
+  const calcs=cryptoPortfolio.map(p=>({p,k:calcPosition(p)}));
+  const labels=calcs.map(x=>x.p.coin.sym);
+  const pnls=calcs.map(x=>Math.round(x.k.pnlAbs));
+  const colors=pnls.map(v=>v>=0?'rgba(127,166,122,.8)':'rgba(217,95,82,.8)');
+  const borderColors=pnls.map(v=>v>=0?'#7fa67a':'#d95f52');
+  CH.crPnl=new Chart(ctx,{type:'bar',data:{labels,datasets:[{label:'P&L (€)',data:pnls,backgroundColor:colors,borderColor:borderColors,borderWidth:1.5,borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'rgba(44,42,39,.92)',padding:12,callbacks:{label:c=>` ${c.label}: ${c.raw>=0?'+':''}${fmt(c.raw)}`}}},scales:{x:{grid:{display:false},ticks:{font:{size:12}}},y:{grid:{color:'#eee'},ticks:{callback:v=>(v<0?'−':'')+compact(Math.abs(v))}}}}});
+}
+
+// ── Señales panel ─────────────────────────────────────────────────
+function renderCryptoSignals(){
+  const panel=document.getElementById('cryptoSignalsPanel');
+  if(!panel)return;
+  panel.innerHTML=COINS.map(c=>{
+    const p=cryptoPrices[c.id]; if(!p)return'';
+    const sig=getSignal(c,p);
+    const chg24=p.eur_24h_change||0, chg7=p.eur_7d_change||0;
+    const inCart=cryptoPortfolio.find(pos=>pos.coinId===c.id);
+    const bgMap={buy:'#eafaf0',sell:'#fde8e6',hold:'#f0f0ec',watch:'var(--amber-light)'};
+    const borderMap={buy:'#b7e4c7',sell:'#f0b8b3',hold:'var(--stone-light)',watch:'#f0c97a'};
+    return `<div style="background:${bgMap[sig.cls]};border:1px solid ${borderMap[sig.cls]};border-radius:var(--radius-sm);padding:14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:20px">${c.logo}</span>
+          <span style="font-weight:700;font-size:14px">${c.name} <span style="font-size:11px;color:var(--stone)">${c.sym}</span></span>
+        </div>
+        <span class="signal-badge ${sig.cls}">${sig.label}</span>
+      </div>
+      <div style="font-size:12px;color:var(--ink);margin-bottom:8px">${sig.tip}</div>
+      <div style="display:flex;gap:10px;font-size:11px;flex-wrap:wrap">
+        <span><strong>${fmtCoin(p.eur)}</strong></span>
+        <span style="color:${chg24>=0?'var(--sage)':'var(--red-soft)'}">24h: ${chg24>=0?'+':''}${chg24.toFixed(2)}%</span>
+        <span style="color:${chg7>=0?'var(--sage)':'var(--red-soft)'}">7d: ${chg7>=0?'+':''}${chg7.toFixed(2)}%</span>
+        ${inCart?`<span style="color:var(--sage);font-weight:600">✓ En cartera</span>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── Overview crypto totals ────────────────────────────────────────
+function getCryptoTotals(){
+  if(!cryptoPortfolio.length)return{totVal:0,totCost:0,totPnl:0};
+  const calcs=cryptoPortfolio.map(p=>({p,k:calcPosition(p)}));
+  const totCost=calcs.reduce((s,x)=>s+x.k.totalCost,0);
+  const totVal =calcs.reduce((s,x)=>s+x.k.currentVal,0);
+  return{totVal,totCost,totPnl:totVal-totCost};
+}
+
+
+/* ══════════════════════════════════════════════════════════════════
+   MODULE 5: SIMULACIÓN JUBILACIÓN
+   Normativa: LGSS RDL 8/2015 + Reforma 2021 + RDL 2/2023
+══════════════════════════════════════════════════════════════════════ */
+
+// ── Constants (2024 values) ───────────────────────────────────────
+const JUB = {
+  PENSION_MAX_MES:   3175.04,  // €/mes (14 pagas equiv.)
+  PENSION_MIN_CON:   1124.60,  // con cónyuge
+  PENSION_MIN_SIN:    980.27,  // sin cónyuge
+  BASE_COT_MAX:      4720.50,
+  BASE_COT_MIN:      1323.00,
+  MESES_BR:            300,    // 25 years × 12
+  DIVISOR_BR:          350,    // 25 years × 14 pagas
+  // Años exentos actualización IPC en BR
+  MESES_NOMINALES:      24,
+  // % por año cotizado
+  PCT_BASE:             50,    // first 15 years
+  PCT_ANIO_16_25:    0.0019,  // per month (years 16-25)
+  PCT_ANIO_26_37:    0.0018,  // per month (years 26-37)
+  PCT_MAX:              1.00,
+  // Thresholds
+  UMBRAL_65_ANOS: 38.5,       // years cotizados for 65yo retirement
+  // Early retirement coeff (per quarter)
+  EV_VOL_LT44:   0.0275,      // voluntary <44.5 years
+  EV_VOL_GE44:   0.0200,      // voluntary ≥44.5 years
+  EV_INV_GE44:   0.01875,     // involuntary ≥44.5 years
+  EV_INV_LT44:   0.0200,      // involuntary 41.5–44.5 years
+  EV_INV_LT41:   0.01875,     // involuntary <41.5 years (simplified)
+  MIN_ANOS_VOL:     35,        // min years for voluntary early retirement
+  MIN_ANOS_INV:     33,        // min years for involuntary
+};
+
+// ── Core calculation engine ───────────────────────────────────────
+function calcPctAplicado(anosCotizados) {
+  // anosCotizados can be fractional
+  const meses = Math.round(anosCotizados * 12);
+  let pct = 0;
+  if (meses < 15 * 12) return 0.50 * (meses / (15 * 12)); // partial
+  pct = JUB.PCT_BASE;
+  const m16to25 = Math.min(Math.max(meses - 15*12, 0), 10*12);
+  pct += m16to25 * JUB.PCT_ANIO_16_25;
+  const m26plus = Math.min(Math.max(meses - 25*12, 0), 12*12);
+  pct += m26plus * JUB.PCT_ANIO_26_37;
+  return Math.min(pct, JUB.PCT_MAX);
+}
+
+function calcBaseReguladora(baseCotActual, evolucionBase, anosHastaJub, ipc) {
+  // Reconstruct 300-month base history then project forward
+  // Phase 1: project forward from now until retirement
+  // Phase 2: go backwards for remaining months
+  const futureBases = [];
+  let base = baseCotActual;
+  for (let i = 0; i < anosHastaJub; i++) {
+    for (let m = 0; m < 12; m++) {
+      futureBases.push(Math.min(base, JUB.BASE_COT_MAX));
+    }
+    base *= (1 + evolucionBase / 100);
+  }
+  // Fill remaining months going backwards
+  const pastBases = [];
+  base = baseCotActual;
+  const remainingMonths = Math.max(0, JUB.MESES_BR - futureBases.length);
+  for (let i = 0; i < remainingMonths; i++) {
+    pastBases.unshift(Math.min(base, JUB.BASE_COT_MAX));
+    if (i % 12 === 11) base /= (1 + evolucionBase / 100);
+  }
+  const allBases = [...pastBases, ...futureBases].slice(-JUB.MESES_BR);
+  const total = allBases.length;
+  // Apply IPC update: last 24 nominal, rest updated
+  let suma = 0;
+  for (let i = 0; i < total; i++) {
+    const mesesAntesDeJub = total - i;
+    if (mesesAntesDeJub <= JUB.MESES_NOMINALES) {
+      suma += allBases[i];
+    } else {
+      const ipcFactor = Math.pow(1 + ipc / 100, (mesesAntesDeJub - JUB.MESES_NOMINALES) / 12);
+      suma += allBases[i] * ipcFactor;
+    }
+  }
+  return suma / JUB.DIVISOR_BR;
+}
+
+function calcCoeficienteReductor(anosCotizados, trimestresAnticipados, tipo) {
+  // tipo: 'voluntaria' | 'involuntaria'
+  let pctPorTrimestre;
+  if (tipo === 'voluntaria') {
+    pctPorTrimestre = anosCotizados >= 44.5 ? JUB.EV_VOL_GE44 : JUB.EV_VOL_LT44;
+  } else {
+    pctPorTrimestre = anosCotizados >= 44.5 ? JUB.EV_INV_GE44 : JUB.EV_INV_LT44;
+  }
+  return 1 - (pctPorTrimestre * trimestresAnticipados);
+}
+
+function calcScenario(params, edadJub, tipo) {
+  const { edadActual, anoActual, anosCotActuales, baseCotActual, evolucionBase,
+          anoFinActividad, mesesAnio, pctJornada, ipc, irpfPct } = params;
+
+  const anoJub = anoActual + (edadJub - edadActual);
+  const anosHastaJub = anoJub - anoActual;
+
+  // Years cotizados at retirement
+  // Active period: from now until anoFinActividad, partial year+months
+  const anoFinAct = parseInt(anoFinActividad);
+  const anosActivosRestantes = Math.max(0, anoFinAct - anoActual);
+  const fraccionAnioActivo = (mesesAnio / 12) * (pctJornada / 100);
+  const anosCotizadosExtra = anosActivosRestantes * fraccionAnioActivo;
+  const anosCotizadosEnJub = anosCotActuales + anosCotizadosExtra;
+
+  // Base reguladora: project bases until fin actividad, then 0 until retirement
+  // (simplified: use base at fin actividad projected forward with evolution)
+  const BR = calcBaseReguladora(baseCotActual, evolucionBase, anosActivosRestantes, ipc);
+  const pct = calcPctAplicado(anosCotizadosEnJub);
+
+  let pensionBrutaMes = BR * pct;
+
+  // Apply coeficiente reductor for early retirement
+  let coefReductor = 1;
+  let penalizacionPct = 0;
+  if (tipo === 'voluntaria' || tipo === 'involuntaria') {
+    const edadOrdinaria = anosCotizadosEnJub >= JUB.UMBRAL_65_ANOS ? 65 : 67;
+    const trimAnticipados = (edadOrdinaria - edadJub) * 4;
+    coefReductor = calcCoeficienteReductor(anosCotizadosEnJub, trimAnticipados, tipo);
+    penalizacionPct = (1 - coefReductor) * 100;
+    pensionBrutaMes *= coefReductor;
+  }
+
+  // Apply limits
+  pensionBrutaMes = Math.min(pensionBrutaMes, JUB.PENSION_MAX_MES);
+  pensionBrutaMes = Math.max(pensionBrutaMes, JUB.PENSION_MIN_SIN);
+
+  // Net pension (estimated IRPF)
+  const pensionNetaMes = pensionBrutaMes * (1 - irpfPct / 100);
+
+  // Gap: years between anoFinActividad and anoJub
+  const gapAnios = Math.max(0, anoJub - anoFinAct);
+  const gapCostTotal = gapAnios * 12 * (params.gastosMes || 1000);
+
+  // Viable checks
+  const viable = anosCotizadosEnJub >= (tipo === 'voluntaria' ? JUB.MIN_ANOS_VOL : tipo === 'involuntaria' ? JUB.MIN_ANOS_INV : 15) && edadJub >= (tipo === 'voluntaria' ? 63 : tipo === 'involuntaria' ? 63 : 65);
+
+  return {
+    tipo, edadJub, anoJub, anosCotizadosEnJub, BR, pct, pensionBrutaMes,
+    pensionNetaMes, coefReductor, penalizacionPct, gapAnios, viable
+  };
+}
+
+function getJubParams() {
+  const v = id => parseFloat(document.getElementById(id)?.value) || 0;
+  const s = id => document.getElementById(id)?.value || '';
+  return {
+    edadActual:       v('jub_edadActual') || 54,
+    anoActual:        2026,
+    anosCotActuales:  v('jub_anosCotizados') || 28,
+    baseCotActual:    v('jub_baseCotizacion') || 1200,
+    evolucionBase:    v('jub_evolucionBase') || 2,
+    anoFinActividad:  s('jub_anoFinActividad') || '2035',
+    mesesAnio:        v('jub_mesesAnio') || 9,
+    pctJornada:       v('jub_porcentajeJornada') || 100,
+    ipc:              v('jub_ipc') || 2,
+    irpfPct:          v('jub_irpfPension') || 12,
+    revaPension:      v('jub_revaPension') || 2,
+    esperanzaVida:    parseInt(s('jub_esperanzaVida') || '85'),
+    gastosMes:        1000,
+  };
+}
+
+function calcularJubilacion() {
+  const p = getJubParams();
+  const edadOrdinaria = (p.anosCotActuales + (Math.max(0, parseInt(p.anoFinActividad) - p.anoActual) * (p.mesesAnio/12))) >= JUB.UMBRAL_65_ANOS ? 65 : 67;
+
+  jubData = {
+    params: p,
+    edadOrdinaria,
+    ordinary:     calcScenario(p, edadOrdinaria, 'ordinaria'),
+    early65:      calcScenario(p, 65,            'ordinaria'),  // 65 always shown
+    earlyVol63:   calcScenario(p, 63,            'voluntaria'),
+    earlyInv63:   calcScenario(p, 63,            'involuntaria'),
+    earlyVol64:   calcScenario(p, 64,            'voluntaria'),
+  };
+
+  renderJubKPIs();
+  renderJubTimeline();
+  renderJubScenarios();
+  renderJubChartEscenarios();
+  renderJubChartEvolucion();
+  renderJubSensTable();
+  renderJubGap();
+  updateJubBadge();
+  renderOverview();
+}
+
+// ── KPI cards ─────────────────────────────────────────────────────
+function renderJubKPIs() {
+  const row = document.getElementById('jubKpiRow');
+  if (!row || !jubData) return;
+  const d = jubData.ordinary;
+  const p = jubData.params;
+  const anoFin = parseInt(p.anoFinActividad);
+  const gap = Math.max(0, d.anoJub - anoFin);
+  const totVidaJub = jubData.params.esperanzaVida - d.edadJub;
+  const totalPension = Math.round(totVidaJub * 12 * d.pensionNetaMes);
+  row.innerHTML =
+    '<div class="kpi-card rose"><div class="kpi-badge">🏖️</div><div class="label">Pensión ordinaria (neta/mes)</div><div class="value">' + fmt(Math.round(d.pensionNetaMes)) + '</div><div class="sub">Edad ' + d.edadJub + ' · ' + d.anoJub + ' · ' + Math.round(d.pct*100) + '% BR</div></div>' +
+    '<div class="kpi-card blue"><div class="kpi-badge">📋</div><div class="label">Base reguladora estimada</div><div class="value">' + fmt(Math.round(d.BR)) + '</div><div class="sub">Promedio ponderado 25 años</div></div>' +
+    '<div class="kpi-card amber"><div class="kpi-badge">⏳</div><div class="label">Años cotizados en jubilación</div><div class="value">' + d.anosCotizadosEnJub.toFixed(1) + ' años</div><div class="sub">% aplicado: ' + (d.pct*100).toFixed(1) + '%</div></div>' +
+    '<div class="kpi-card ' + (gap===0?'green':'red') + '"><div class="kpi-badge">🕳️</div><div class="label">Vacío hasta jubilación</div><div class="value">' + (gap>0?gap+' años':'Sin vacío') + '</div><div class="sub">' + (gap>0?'Fin actividad '+anoFin+' → Jub '+d.anoJub:'Actividad hasta jubilación') + '</div></div>' +
+    '<div class="kpi-card green"><div class="kpi-badge">💰</div><div class="label">Total pensión proyectada</div><div class="value">' + compact(totalPension) + '</div><div class="sub">Hasta los ' + p.esperanzaVida + ' años (' + totVidaJub + ' años jub.)</div></div>';
+}
+
+// ── Timeline ─────────────────────────────────────────────────────
+function renderJubTimeline() {
+  const div = document.getElementById('jubTimeline');
+  if (!div || !jubData) return;
+  const p = jubData.params;
+  const d = jubData.ordinary;
+  const anoFin = parseInt(p.anoFinActividad);
+  const anoOrd = d.anoJub;
+  const anoVol63 = jubData.earlyVol63.anoJub;
+  const nodes = [
+    { dot:'current',    ano:p.anoActual, label:'Hoy', sub:p.edadActual+' años'},
+    { dot:'study-end',  ano:anoFin,      label:'Fin actividad', sub:(p.edadActual+(anoFin-p.anoActual))+' años'},
+    { dot:'early-inv',  ano:anoVol63,    label:'Jub. anticipada', sub:'63 años'},
+    { dot:'ordinary',   ano:anoOrd,      label:'Jub. ordinaria', sub:d.edadJub+' años'},
+  ];
+  // Remove duplicates by ano
+  const unique = nodes.filter((n,i)=>nodes.findIndex(x=>x.ano===n.ano)===i);
+  unique.sort((a,b)=>a.ano-b.ano);
+  const minA = unique[0].ano, maxA = unique[unique.length-1].ano, span = maxA-minA||1;
+  const nodeHtml = unique.map(n=>{
+    const pct = ((n.ano-minA)/span*100).toFixed(1);
+    return '<div class="jub-node" style="position:absolute;left:'+pct+'%;transform:translateX(-50%)"><div class="jub-node-dot '+n.dot+'"></div><div class="jub-node-label">'+n.ano+'</div><div class="jub-node-sub">'+n.label+'</div><div class="jub-node-sub" style="color:var(--ink)">'+n.sub+'</div></div>';
+  }).join('');
+  div.innerHTML = '<div class="jub-timeline-track" style="height:80px;position:relative"><div class="jub-timeline-line"></div>'+nodeHtml+'</div>';
+}
+
+// ── Scenario cards ────────────────────────────────────────────────
+function scenarioCard(sc, title, icon, headerCls, tip) {
+  const canAccess = sc.viable;
+  const colorVal = sc.pensionNetaMes > 1500 ? 'green' : sc.pensionNetaMes > 900 ? 'amber' : 'red';
+  return '<div class="scenario-card ' + (canAccess?'':'penalized') + '">' +
+    '<div class="scenario-header ' + headerCls + '">' +
+      '<div class="scenario-icon" style="background:rgba(255,255,255,.7)">' + icon + '</div>' +
+      '<div><div class="scenario-title">' + title + '</div><div class="scenario-subtitle">'+tip+'</div></div>' +
+    '</div>' +
+    '<div class="scenario-body">' +
+      '<div class="scenario-kpi"><span class="sk-label">Edad jubilación</span><span class="sk-value big blue">' + sc.edadJub + ' años (' + sc.anoJub + ')</span></div>' +
+      '<div class="scenario-kpi"><span class="sk-label">Años cotizados</span><span class="sk-value">' + sc.anosCotizadosEnJub.toFixed(1) + ' años</span></div>' +
+      '<div class="scenario-kpi"><span class="sk-label">Base reguladora</span><span class="sk-value">' + fmt(Math.round(sc.BR)) + '/mes</span></div>' +
+      '<div class="scenario-kpi"><span class="sk-label">% aplicado</span><span class="sk-value">' + (sc.pct*100).toFixed(1) + '%</span></div>' +
+      (sc.penalizacionPct>0?'<div class="scenario-kpi"><span class="sk-label">Penalización</span><span class="sk-value red">−' + sc.penalizacionPct.toFixed(1) + '%</span></div>':'') +
+      '<div class="scenario-kpi"><span class="sk-label">Pensión bruta/mes</span><span class="sk-value">' + fmt(Math.round(sc.pensionBrutaMes)) + '</span></div>' +
+      '<div class="scenario-kpi"><span class="sk-label">Pensión neta/mes</span><span class="sk-value big ' + colorVal + '">' + fmt(Math.round(sc.pensionNetaMes)) + '</span></div>' +
+      '<div class="scenario-kpi"><span class="sk-label">Vacío antes jubilación</span><span class="sk-value ' + (sc.gapAnios>0?'red':'green') + '">' + (sc.gapAnios>0?sc.gapAnios+' años':'Sin vacío') + '</span></div>' +
+      '<div><span class="scenario-badge ' + (canAccess?'ok':'bad') + '">' + (canAccess?'✓ Accesible':'✗ No cumple requisitos') + '</span></div>' +
+    '</div></div>';
+}
+
+function renderJubScenarios() {
+  const div = document.getElementById('jubScenarios');
+  if (!div || !jubData) return;
+  div.innerHTML =
+    scenarioCard(jubData.ordinary,    'Jubilación ordinaria',          '🏆', 'ordinary',    jubData.edadOrdinaria===65?'65 años (≥38.5 años cotiz.)':'67 años (normativa general)') +
+    scenarioCard(jubData.earlyVol63,  'Anticipada voluntaria (63)',     '🏃', 'voluntary',   'Voluntaria · mín. 35 años cotizados') +
+    scenarioCard(jubData.earlyInv63,  'Anticipada involuntaria (63)',   '📤', 'involuntary', 'Por despido/ERE · mín. 33 años cotizados') +
+    scenarioCard(jubData.earlyVol64,  'Anticipada voluntaria (64)',     '⏩', 'voluntary',   'Voluntaria con menor penalización') +
+    scenarioCard(jubData.early65,     'Jubilación a los 65',            '📅', 'ordinary',    'Si alcanzas ≥38.5 años cotizados antes');
+}
+
+// ── Charts ────────────────────────────────────────────────────────
+function renderJubChartEscenarios() {
+  const ctx = document.getElementById('jubChartEscenarios')?.getContext('2d');
+  if (!ctx || !jubData) return;
+  killChart(CH.jubEsc);
+  const scenarios = [
+    { label: 'Ordinaria', sc: jubData.ordinary,   color: '#7fa67a' },
+    { label: '65 años',   sc: jubData.early65,    color: '#4a7fa5' },
+    { label: 'Ant.Vol.63',sc: jubData.earlyVol63, color: '#d4892a' },
+    { label: 'Ant.Inv.63',sc: jubData.earlyInv63, color: '#b5384f' },
+    { label: 'Ant.Vol.64',sc: jubData.earlyVol64, color: '#3a9e8f' },
+  ];
+  const labels = scenarios.map(s=>s.label);
+  const bruta  = scenarios.map(s=>Math.round(s.sc.pensionBrutaMes));
+  const neta   = scenarios.map(s=>Math.round(s.sc.pensionNetaMes));
+  CH.jubEsc = new Chart(ctx, {
     type: 'bar',
-    data: {
-      labels: rows.map(r => `${r.ano}`),
-      datasets: [
-        {
-          label: 'Ingresos',
-          data: rows.map(r => Math.round(r.ingresosTotal)),
-          backgroundColor: 'rgba(127,166,122,0.75)',
-          borderColor: '#7fa67a',
-          borderWidth: 1.5,
-          borderRadius: 4
-        },
-        {
-          label: 'Gastos',
-          data: rows.map(r => -Math.round(r.gastosTotal)),
-          backgroundColor: 'rgba(217,95,82,0.65)',
-          borderColor: '#d95f52',
-          borderWidth: 1.5,
-          borderRadius: 4
-        }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      interaction: { mode: 'index', intersect: false },
-      plugins: {
-        legend: { labels: { font: { size: 12, family: 'DM Sans' }, boxWidth: 12 } },
-        tooltip: {
-          backgroundColor: 'rgba(44,42,39,0.92)',
-          padding: 12,
-          callbacks: {
-            label: ctx => {
-              const v = Math.abs(ctx.raw);
-              return ` ${ctx.dataset.label}: ${v.toLocaleString('es-ES', {style:'currency',currency:'EUR',maximumFractionDigits:0})}`;
-            }
-          }
-        }
-      },
-      scales: {
-        x: { grid: { display: false }, ticks: { font: { size: 12 } } },
-        y: {
-          grid: { color: '#eee' },
-          ticks: {
-            callback: v => (v<0?'-':'') + Math.abs(v).toLocaleString('es-ES',{style:'currency',currency:'EUR',maximumFractionDigits:0,notation:'compact'})
-          }
-        }
-      }
-    }
+    data: { labels, datasets: [
+      { label: 'Bruta/mes', data: bruta, backgroundColor: scenarios.map(s=>s.color+'99'), borderColor: scenarios.map(s=>s.color), borderWidth: 1.5, borderRadius: 5 },
+      { label: 'Neta/mes',  data: neta,  backgroundColor: scenarios.map(s=>s.color+'55'), borderColor: scenarios.map(s=>s.color), borderWidth: 1, borderRadius: 3, borderDash: [4,3] }
+    ]},
+    options: { responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { labels: { font: { size:11, family:'DM Sans' }, boxWidth:12 }},
+        tooltip: { backgroundColor:'rgba(44,42,39,.92)', padding:12,
+          callbacks: { label: function(c){ return ' '+c.dataset.label+': '+fmt(c.raw); }}}},
+      scales: { x: { grid:{ display:false }, ticks:{ font:{size:11}}},
+        y: { grid:{ color:'#eee' }, ticks:{ callback: function(v){ return compact(v); }}}}}
   });
 }
 
-// ─── INIT ─────────────────────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
+function renderJubChartEvolucion() {
+  const ctx = document.getElementById('jubChartEvolucion')?.getContext('2d');
+  if (!ctx || !jubData) return;
+  killChart(CH.jubEvo);
+  const p = jubData.params;
+  const d = jubData.ordinary;
+  const years = Array.from({length:21},(_,i)=>i);
+  const labels = years.map(i=>String(d.anoJub+i));
+  const reva = p.revaPension / 100;
+  const ipc  = p.ipc / 100;
+  const pensionNominal = years.map(i=>Math.round(d.pensionNetaMes * Math.pow(1+reva,i)));
+  const pensionReal    = years.map(i=>Math.round(d.pensionNetaMes * Math.pow(1+reva,i) / Math.pow(1+ipc,i)));
+  CH.jubEvo = new Chart(ctx, {
+    type: 'line',
+    data: { labels, datasets: [
+      { label:'Pensión nominal',data:pensionNominal,borderColor:'#b5384f',backgroundColor:'rgba(181,56,79,.1)',borderWidth:2.5,fill:true,tension:.3,pointRadius:3 },
+      { label:'Poder adquisitivo real',data:pensionReal,borderColor:'#4a7fa5',backgroundColor:'transparent',borderWidth:2,borderDash:[5,4],tension:.3,pointRadius:3 }
+    ]},
+    options: { responsive: true, maintainAspectRatio: false,
+      interaction:{mode:'index',intersect:false},
+      plugins: { legend: { labels: { font:{size:11,family:'DM Sans'}, boxWidth:12 }},
+        tooltip: { backgroundColor:'rgba(44,42,39,.92)', padding:12,
+          callbacks: { label: function(c){ return ' '+c.dataset.label+': '+fmt(c.raw); }}}},
+      scales: { x:{ grid:{color:'#eee'}, ticks:{font:{size:10},maxTicksLimit:11}},
+        y:{ grid:{color:'#eee'}, ticks:{ callback: function(v){ return compact(v); }}}}}
+  });
+}
+
+// ── Sensitivity table ─────────────────────────────────────────────
+function renderJubSensTable() {
+  const tbody = document.getElementById('jubSensTable')?.querySelector('tbody');
+  if (!tbody || !jubData) return;
+  const p = jubData.params;
+  const currentYears = Math.round(jubData.ordinary.anosCotizadosEnJub * 10) / 10;
+  const rows = [30, 33, 35, 37, 38, 38.5, 40, 42].map(anos => {
+    const pct = calcPctAplicado(anos);
+    const BR = jubData.ordinary.BR;
+    const bruta = Math.min(BR * pct, JUB.PENSION_MAX_MES);
+    const neta  = bruta * (1 - p.irpfPct / 100);
+    const edad  = anos >= JUB.UMBRAL_65_ANOS ? 65 : 67;
+    const highlighted = Math.abs(anos - currentYears) < 0.5;
+    const estado = anos < JUB.MIN_ANOS_INV ? 'Insuficiente' : anos < JUB.MIN_ANOS_VOL ? 'Solo involuntaria' : anos >= JUB.UMBRAL_65_ANOS ? '65 años ✓' : 'Voluntaria ✓';
+    return '<tr class="' + (highlighted?'highlighted':'') + '">' +
+      '<td>' + anos.toFixed(1) + (highlighted?' ⬅ tu caso':'') + '</td>' +
+      '<td>' + (pct*100).toFixed(1) + '%</td>' +
+      '<td>' + fmt(Math.round(BR)) + '</td>' +
+      '<td class="pension-val">' + fmt(Math.round(bruta)) + '</td>' +
+      '<td class="pension-val">' + fmt(Math.round(neta)) + '</td>' +
+      '<td>' + edad + ' años</td>' +
+      '<td><span class="scenario-badge ' + (anos>=35?'ok':anos>=33?'warn':'bad') + '">' + estado + '</span></td>' +
+      '</tr>';
+  });
+  tbody.innerHTML = rows.join('');
+}
+
+// ── Gap analysis ──────────────────────────────────────────────────
+function renderJubGap() {
+  const body = document.getElementById('jubGapBody');
+  if (!body || !jubData) return;
+  const p = jubData.params;
+  const d = jubData.ordinary;
+  const anoFin = parseInt(p.anoFinActividad);
+  const gapAnios = Math.max(0, d.anoJub - anoFin);
+  if (gapAnios === 0) {
+    body.innerHTML = '<div class="info-box" style="background:var(--sage-pale);border:1px solid var(--sage-light);padding:14px;border-radius:var(--radius-sm)"><span>✅</span><div><strong>Sin vacío de ingresos</strong>: Tu actividad laboral llega hasta la jubilación. No hay periodo sin ingresos que cubrir.</div></div>';
+    return;
+  }
+  const gastosMesEstim = 1200;
+  const costoTotal = gapAnios * 12 * gastosMesEstim;
+  const subsidioAnios = Math.min(2, gapAnios); // max ~2 years subsidy
+  const subsidioTotal = subsidioAnios * 12 * 500; // ~500€/mes subsidy +52
+  const ahorroPrevio = finRows.length ? finRows[finRows.length-1].saldoFin : 0;
+  const cobertura = ahorroPrevio + subsidioTotal;
+  const deficit = costoTotal - cobertura;
+
+  // Build coverage bar segments
+  const pctAhorro  = Math.min(100, (ahorroPrevio / costoTotal * 100)).toFixed(1);
+  const pctSubsidio = Math.min(100 - parseFloat(pctAhorro), (subsidioTotal / costoTotal * 100)).toFixed(1);
+  const pctDeficit  = Math.max(0, 100 - parseFloat(pctAhorro) - parseFloat(pctSubsidio)).toFixed(1);
+
+  body.innerHTML =
+    '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px">' +
+      '<div class="pos-kpi"><div class="pk-label">Duración del vacío</div><div class="pk-value ' + (gapAnios>3?'neg':'amber') + '">' + gapAnios + ' años</div><div class="pk-sub">' + anoFin + ' → ' + d.anoJub + '</div></div>' +
+      '<div class="pos-kpi"><div class="pk-label">Coste estimado del vacío</div><div class="pk-value neg">' + fmt(Math.round(costoTotal)) + '</div><div class="pk-sub">~' + fmt(gastosMesEstim) + '/mes</div></div>' +
+      '<div class="pos-kpi"><div class="pk-label">Subsidio +52 estimado</div><div class="pk-value amber">' + fmt(Math.round(subsidioTotal)) + '</div><div class="pk-sub">~' + subsidioAnios.toFixed(0) + ' años · 500€/mes</div></div>' +
+      '<div class="pos-kpi"><div class="pk-label">Saldo cuenta (fin estudio)</div><div class="pk-value blue">' + fmt(Math.round(ahorroPrevio)) + '</div><div class="pk-sub">Proyectado fin planificación</div></div>' +
+      '<div class="pos-kpi"><div class="pk-label">Déficit / superávit</div><div class="pk-value ' + (deficit<=0?'pos':'neg') + '">' + (deficit<=0?'+':'-') + fmt(Math.abs(Math.round(deficit))) + '</div><div class="pk-sub">' + (deficit<=0?'✓ Cubierto':'⚠ Déficit') + '</div></div>' +
+    '</div>' +
+    '<div style="font-size:12px;color:var(--stone);margin-bottom:6px">Cobertura del vacío de ingresos</div>' +
+    '<div class="coverage-bar">' +
+      '<div class="coverage-seg" style="width:' + pctAhorro + '%;background:var(--blue)" title="Ahorro">Ahorro</div>' +
+      '<div class="coverage-seg" style="width:' + pctSubsidio + '%;background:var(--amber)" title="Subsidio">Subsidio</div>' +
+      (parseFloat(pctDeficit)>2?'<div class="coverage-seg" style="width:' + pctDeficit + '%;background:var(--red-soft)" title="Déficit">Déficit</div>':'') +
+    '</div>' +
+    (deficit>0?'<div class="info-box amber" style="margin-top:12px"><span>💡</span><div>Para cubrir el déficit de <strong>' + fmt(Math.round(deficit)) + '</strong> considera: <strong>Convenio especial SS</strong> (cotizar voluntariamente), ampliar el horizonte laboral, o disponer de ingresos por alquileres/inversiones. <a href="https://www.seg-social.es/wps/portal/wss/internet/InformacionUtil/44539/44803" target="_blank" style="color:var(--blue)">Convenio especial SS →</a></div></div>':'');
+}
+
+// ── Badge ─────────────────────────────────────────────────────────
+function updateJubBadge() {
+  const b = document.getElementById('jubBadge');
+  if (!b || !jubData) return;
+  b.textContent = fmt(Math.round(jubData.ordinary.pensionNetaMes)) + '/mes';
+}
+
+// ── Overview jubilación summary ───────────────────────────────────
+function renderOvResumenJub() {
+  const el = document.getElementById('ovResumenJub');
+  if (!el) return;
+  if (!jubData) {
+    el.innerHTML = '<p style="color:var(--stone);font-size:13px">Configura los datos en el módulo de jubilación.</p>';
+    return;
+  }
+  const d = jubData.ordinary;
+  const p = jubData.params;
+  const anoFin = parseInt(p.anoFinActividad);
+  const gap = Math.max(0, d.anoJub - anoFin);
+  el.innerHTML = '<div style="display:grid;gap:10px">' +
+    ovRow('Pensión ordinaria (neta/mes)', fmt(Math.round(d.pensionNetaMes)), 'var(--rose)') +
+    ovRow('Pensión bruta/mes', fmt(Math.round(d.pensionBrutaMes)), 'var(--ink)') +
+    ovRow('Edad jubilación', d.edadJub + ' años (' + d.anoJub + ')', 'var(--blue)') +
+    ovRow('Años cotizados al jubilarse', d.anosCotizadosEnJub.toFixed(1), 'var(--ink)') +
+    ovRow('Vacío antes de jubilación', gap > 0 ? gap + ' años' : 'Sin vacío ✓', gap > 0 ? 'var(--red-soft)' : 'var(--sage)') +
+    ovRow('Pensión anticipada vol. (63)', fmt(Math.round(jubData.earlyVol63.pensionNetaMes)) + '/mes', jubData.earlyVol63.viable ? 'var(--amber)' : 'var(--stone)') +
+    '</div>';
+}
+
+/* ── INIT ────────────────────────────────────────────────────────── */
+document.addEventListener('DOMContentLoaded',()=>{
   recalculate();
 
-  // Live recalc on any input change
-  document.querySelectorAll('input, select').forEach(el => {
-    el.addEventListener('change', recalculate);
-    el.addEventListener('input', () => {
-      clearTimeout(el._t);
-      el._t = setTimeout(recalculate, 400);
+  // Add demo property
+  addProperty({id:++propCnt,nombre:'Piso ejemplo',dir:'Calle Mayor 1',valCompra:120000,valActual:155000,alquiler:750,meses:11,pctInmob:10,comunidad:600,ibi:380,caldera:150,otros:200,hipoMens:0});
+
+  // Initialize crypto prices then add demo portfolio
+  fetchCryptoPrices().then(()=>{
+    // Demo BTC positions (DCA strategy)
+    cryptoPosIdCnt++;
+    cryptoPortfolio.push({
+      id:cryptoPosIdCnt,
+      coinId:'bitcoin',
+      coin:COINS.find(c=>c.id==='bitcoin'),
+      buys:[
+        {date:'2023-11-15',qty:0.05, priceEur:31200, note:'Primera compra DCA'},
+        {date:'2024-03-20',qty:0.03, priceEur:58400, note:'DCA marzo 2024'},
+        {date:'2024-10-10',qty:0.02, priceEur:58900, note:'DCA octubre 2024'}
+      ]
     });
+    // Demo ETH positions
+    cryptoPosIdCnt++;
+    cryptoPortfolio.push({
+      id:cryptoPosIdCnt,
+      coinId:'ethereum',
+      coin:COINS.find(c=>c.id==='ethereum'),
+      buys:[
+        {date:'2023-12-01',qty:0.5, priceEur:1980, note:'Entrada ETH'},
+        {date:'2024-06-15',qty:0.3, priceEur:2850, note:'DCA junio 2024'}
+      ]
+    });
+    renderCryptoAll();
+    renderOverview();
+  });
+
+  // Live recalc on financial inputs
+  document.querySelectorAll('#pane-financiero input, #pane-financiero select').forEach(el=>{
+    el.addEventListener('change',recalculate);
+    el.addEventListener('input',()=>{clearTimeout(el._t);el._t=setTimeout(recalculate,400);});
+  });
+
+  // Auto-refresh crypto every 2 minutes
+  setInterval(fetchCryptoPrices, 120000);
+
+  // Jubilacion: initial calculation
+  calcularJubilacion();
+
+  // Live recalc on jubilacion inputs
+  document.querySelectorAll('#pane-jubilacion input, #pane-jubilacion select').forEach(function(el){
+    el.addEventListener('change', calcularJubilacion);
+    el.addEventListener('input', function(){ clearTimeout(el._jt); el._jt = setTimeout(calcularJubilacion, 400); });
   });
 });
 </script>
