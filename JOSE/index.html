@@ -317,9 +317,105 @@ td.negative{color:var(--red-soft);font-weight:600}
 /* ══ FOOTER ══════════════════════════════════════ */
 footer{text-align:center;padding:24px;font-size:12px;color:var(--stone);border-top:1px solid var(--stone-light);background:var(--white)}
 footer a{color:var(--blue);text-decoration:none}
+
+/* ══ LOGIN OVERLAY ═══════════════════════════════ */
+#loginOverlay{position:fixed;inset:0;background:linear-gradient(135deg,#1a1f2e 0%,#2c3e50 50%,#34495e 100%);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px}
+.login-card{background:var(--white);border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,0.35);padding:40px 36px;width:100%;max-width:380px;animation:loginIn .6s cubic-bezier(.2,.9,.3,1.2)}
+@keyframes loginIn{from{opacity:0;transform:translateY(20px) scale(.95)}to{opacity:1;transform:none}}
+.login-logo{width:60px;height:60px;border-radius:16px;background:linear-gradient(135deg,var(--sage),var(--blue));display:flex;align-items:center;justify-content:center;color:white;font-size:28px;margin:0 auto 18px;box-shadow:0 8px 24px rgba(74,127,165,.35)}
+.login-title{font-family:'DM Serif Display',serif;font-size:1.5rem;text-align:center;margin-bottom:6px;color:var(--ink)}
+.login-sub{text-align:center;color:var(--stone);font-size:13px;margin-bottom:24px}
+.login-form .form-group{margin-bottom:14px}
+.login-form input{padding:11px 14px;font-size:14px}
+.login-form .btn-primary{width:100%;justify-content:center;padding:13px;font-size:14px;margin-top:8px}
+.login-error{background:var(--red-pale);color:var(--red-soft);border:1px solid #f0b8b3;border-radius:var(--radius-sm);padding:10px 14px;font-size:13px;margin-bottom:14px;display:none}
+.login-error.show{display:block;animation:shake .4s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.login-footer{text-align:center;color:var(--stone);font-size:11px;margin-top:20px;border-top:1px solid var(--stone-light);padding-top:14px}
+.logout-btn{display:inline-flex;align-items:center;gap:6px;background:var(--red-pale);color:var(--red-soft);border:1px solid #f0b8b3;border-radius:20px;padding:6px 12px;font-size:11px;font-weight:600;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif}
+.logout-btn:hover{background:var(--red-soft);color:white}
+
+/* ══ GENERIC MODAL ═══════════════════════════════ */
+.modal-overlay{position:fixed;inset:0;background:rgba(20,20,30,.6);backdrop-filter:blur(4px);z-index:5000;display:none;align-items:center;justify-content:center;padding:20px;animation:fadeIn .2s}
+.modal-overlay.active{display:flex}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal-box{background:var(--white);border-radius:var(--radius);max-width:920px;width:100%;max-height:90vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 30px 60px rgba(0,0,0,.4);animation:modalIn .35s cubic-bezier(.2,.9,.3,1.1)}
+@keyframes modalIn{from{transform:translateY(20px) scale(.98);opacity:0}to{transform:none;opacity:1}}
+.modal-head{padding:18px 24px;border-bottom:1px solid var(--stone-light);display:flex;align-items:center;justify-content:space-between;gap:12px;background:linear-gradient(135deg,#fdf5e0,#fef9ec)}
+.modal-head h2{font-family:'DM Serif Display',serif;font-size:1.2rem;color:var(--ink);display:flex;align-items:center;gap:10px}
+.modal-close{background:transparent;border:none;width:32px;height:32px;border-radius:50%;font-size:22px;color:var(--stone);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s}
+.modal-close:hover{background:var(--stone-light);color:var(--ink)}
+.modal-body{padding:24px;overflow-y:auto}
+.tip-card{background:var(--white);border:1.5px solid var(--stone-light);border-left:4px solid var(--gold);border-radius:var(--radius-sm);padding:16px 18px;margin-bottom:12px;transition:box-shadow .2s}
+.tip-card:hover{box-shadow:var(--shadow)}
+.tip-card.green{border-left-color:var(--sage)}
+.tip-card.blue{border-left-color:var(--blue)}
+.tip-card.teal{border-left-color:var(--teal)}
+.tip-card.rose{border-left-color:var(--rose)}
+.tip-card.amber{border-left-color:var(--amber)}
+.tip-card h3{font-family:'DM Serif Display',serif;font-size:1.05rem;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.tip-card p{font-size:13px;color:var(--ink);line-height:1.55;margin-bottom:6px}
+.tip-card .tip-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.tip-pill{font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;background:var(--cream);color:var(--stone);border:1px solid var(--stone-light);letter-spacing:.04em;text-transform:uppercase}
+.tip-pill.risk-low{background:var(--sage-pale);color:var(--sage);border-color:#c4ddc1}
+.tip-pill.risk-mid{background:var(--amber-light);color:var(--amber);border-color:#f0c97a}
+.tip-pill.risk-hi{background:var(--red-pale);color:var(--red-soft);border-color:#f0b8b3}
+.tip-pill.yield{background:var(--blue-pale);color:var(--blue);border-color:#b8d4e8}
+.tip-section-title{font-family:'DM Serif Display',serif;font-size:1.1rem;color:var(--ink);margin:18px 0 10px;display:flex;align-items:center;gap:8px;padding-bottom:6px;border-bottom:2px solid var(--gold-pale)}
+.tip-section-title:first-child{margin-top:0}
+.tip-grid{display:grid;gap:10px}
+.allocation-bar{background:var(--cream);border-radius:var(--radius-sm);padding:14px 16px;margin-top:14px}
+.alloc-bar-track{display:flex;height:24px;border-radius:6px;overflow:hidden;margin:10px 0 8px}
+.alloc-seg{display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:white;min-width:2px}
+.alloc-legend{display:flex;flex-wrap:wrap;gap:10px;font-size:11px}
+.alloc-legend-item{display:flex;align-items:center;gap:5px}
+.alloc-dot{width:10px;height:10px;border-radius:3px}
+
+/* Botón "Optimiza tu capital" en header del overview */
+.opt-cta{display:inline-flex;align-items:center;gap:7px;background:linear-gradient(135deg,#c8972a,#e2b446);color:white;border:none;border-radius:20px;padding:9px 16px;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;box-shadow:0 4px 14px rgba(200,151,42,.3)}
+.opt-cta:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(200,151,42,.45)}
+
+/* Panel duración del capital */
+.dur-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-top:14px}
+.dur-card{background:var(--cream);border-radius:var(--radius-sm);padding:14px 16px;border-left:3px solid var(--blue)}
+.dur-card .dur-label{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--stone);margin-bottom:5px}
+.dur-card .dur-value{font-family:'DM Serif Display',serif;font-size:1.4rem;color:var(--ink);line-height:1.1}
+.dur-card .dur-sub{font-size:11px;color:var(--stone);margin-top:4px}
+.dur-card.scenario-base{border-left-color:var(--blue)}
+.dur-card.scenario-rem{border-left-color:var(--sage)}
+.dur-card.scenario-best{border-left-color:var(--gold)}
+.dur-card.scenario-warn{border-left-color:var(--amber)}
+.dur-coverage{margin-top:14px;background:var(--cream);border-radius:var(--radius-sm);padding:14px 16px}
+.dur-cov-track{background:var(--stone-light);height:22px;border-radius:6px;overflow:hidden;margin:10px 0;display:flex}
+.dur-cov-seg{display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:white;min-width:2px}
 </style>
 </head>
 <body>
+
+<!-- ══ LOGIN OVERLAY ═══════════════════════════════════════════════ -->
+<div id="loginOverlay" style="display:none">
+  <div class="login-card">
+    <div class="login-logo">💼</div>
+    <div class="login-title">Panel Financiero Personal</div>
+    <div class="login-sub">Acceso privado · Introduce tus credenciales</div>
+    <div class="login-error" id="loginError">⚠ Usuario o contraseña incorrectos</div>
+    <form class="login-form" id="loginForm" onsubmit="return doLogin(event)">
+      <div class="form-group">
+        <label>Usuario</label>
+        <input type="text" id="loginUser" autocomplete="username" required autofocus>
+      </div>
+      <div class="form-group">
+        <label>Contraseña</label>
+        <input type="password" id="loginPass" autocomplete="current-password" required>
+      </div>
+      <button type="submit" class="btn btn-primary">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+        Entrar
+      </button>
+    </form>
+    <div class="login-footer">🔒 Sesión privada · 2026</div>
+  </div>
+</div>
 
 <!-- ══ HEADER ══════════════════════════════════════════════════════ -->
 <header>
@@ -330,11 +426,21 @@ footer a{color:var(--blue);text-decoration:none}
       <div class="header-sub">Planificación hasta jubilación · 54 años · Feb 2026</div>
     </div>
   </div>
-  <a href="https://www.sepe.es/HomeSepe/Personas/distributiva-prestaciones/prestacion-contributiva/prestacion-contributiva-para-mayores-de-52.html"
-     target="_blank" rel="noopener" class="sepe-link">
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-    <span class="sepe-text">Subsidio +52 años · SEPE</span>
-  </a>
+  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+    <button class="opt-cta" onclick="openOptModal()" title="Optimiza la rentabilidad de tu capital">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      <span>Optimiza tu capital</span>
+    </button>
+    <a href="https://www.sepe.es/HomeSepe/Personas/distributiva-prestaciones/prestacion-contributiva/prestacion-contributiva-para-mayores-de-52.html"
+       target="_blank" rel="noopener" class="sepe-link">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      <span class="sepe-text">Subsidio +52 · SEPE</span>
+    </a>
+    <button class="logout-btn" onclick="doLogout()" title="Cerrar sesión">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Salir
+    </button>
+  </div>
 </header>
 
 <!-- ══ TAB NAVIGATION ══════════════════════════════════════════════ -->
@@ -381,6 +487,17 @@ footer a{color:var(--blue);text-decoration:none}
       </div>
       <div class="panel-body" id="ovWealthBar">
         <p style="color:var(--stone);font-size:13px">Configura los módulos para ver la composición patrimonial.</p>
+      </div>
+    </div>
+
+    <!-- Duración del capital -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-header-left"><div class="panel-icon amber">⏳</div><h2>¿Cuánto durará tu capital?</h2></div>
+        <button class="opt-cta" onclick="openOptModal()" style="font-size:11px;padding:7px 14px">💡 Cómo hacer que dure más</button>
+      </div>
+      <div class="panel-body" id="ovDurationBody">
+        <p style="color:var(--stone);font-size:13px">Calculando proyección de duración…</p>
       </div>
     </div>
 
@@ -503,6 +620,7 @@ footer a{color:var(--blue);text-decoration:none}
             <div class="form-grid">
               <div class="form-group"><label>Saldo inicial en cuenta</label><div class="input-prefix"><span>€</span><input type="number" id="saldoInicial" value="50000" step="1000"></div></div>
               <div class="form-group"><label>IPC anual previsto (%)</label><div class="input-prefix"><span>%</span><input type="number" id="ipc" value="2" step="0.1" min="0" max="10"></div></div>
+              <div class="form-group"><label>Rentabilidad cuenta/fondo (%)</label><div class="input-prefix"><span>%</span><input type="number" id="rentSaldo" value="2.5" step="0.1" min="0" max="15"></div><small>Cuenta remunerada o fondo monetario · <a href="#" onclick="openOptModal();return false;" style="color:var(--blue);font-weight:600">ver opciones →</a></small></div>
               <div class="form-group"><label>Año inicio</label><select id="anoInicio"><option value="2026" selected>2026</option><option value="2025">2025</option></select></div>
               <div class="form-group"><label>Horizonte</label>
                 <select id="horizonte"><option value="10">10 años (2035)</option><option value="12">12 años (2037)</option><option value="15">15 años (2040)</option></select></div>
@@ -974,6 +1092,164 @@ footer a{color:var(--blue);text-decoration:none}
   </div>
 </div>
 
+<!-- ══════════════════════════════════════════════════════════════════
+     MODAL · OPTIMIZA TU CAPITAL
+══════════════════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="optModal" onclick="if(event.target===this)closeOptModal()">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h2>💡 Optimiza tu capital · Cómo hacer que dure más</h2>
+      <button class="modal-close" onclick="closeOptModal()" aria-label="Cerrar">×</button>
+    </div>
+    <div class="modal-body">
+
+      <div class="info-box blue" style="margin-bottom:18px">
+        <span style="font-size:18px">🎯</span>
+        <div>
+          <strong>Objetivo:</strong> proteger tu capital del IPC (≈2-3% anual) y generar entre un <strong>2% y un 4% de rentabilidad sin asumir riesgo elevado</strong>. Combinando varias opciones puedes <strong>alargar 3-6 años la duración del capital</strong> hasta la jubilación.
+          <div style="font-size:11px;color:var(--stone);margin-top:6px">Cifras orientativas Feb 2026. Verifica condiciones actuales en cada entidad.</div>
+        </div>
+      </div>
+
+      <!-- Cuentas remuneradas -->
+      <div class="tip-section-title">💳 Cuentas remuneradas (liquidez inmediata · sin riesgo)</div>
+      <div class="tip-grid">
+        <div class="tip-card green">
+          <h3>🏦 Trade Republic · cuenta remunerada</h3>
+          <p>Cuenta del bróker alemán que paga interés sobre tu saldo en euros, abonado mensualmente. Garantía hasta 100.000 € (Fondo de Garantía alemán). Sin permanencia ni cantidad mínima. Ideal para parking de capital.</p>
+          <div class="tip-meta"><span class="tip-pill yield">≈ 2,75% TAE</span><span class="tip-pill risk-low">Riesgo bajo</span><span class="tip-pill">Liquidez total</span></div>
+        </div>
+        <div class="tip-card green">
+          <h3>🏦 MyInvestor · cuenta nómina y ahorro</h3>
+          <p>Cuenta sin comisiones del Banco Inversis. Remunera el primer tramo a un tipo atractivo durante el primer año y mantiene rentabilidad alta en la cuenta ahorro. Acceso a fondos y planes desde 1 €.</p>
+          <div class="tip-meta"><span class="tip-pill yield">≈ 2,0-2,5% TAE</span><span class="tip-pill risk-low">Riesgo bajo</span><span class="tip-pill">FGD 100.000€</span></div>
+        </div>
+        <div class="tip-card green">
+          <h3>🏦 Revolut · cuenta Flexible Account €</h3>
+          <p>Cuenta flexible vinculada a un fondo monetario diversificado. Interés diario, sin comisiones de retirada en el plan estándar. Permite mover capital al instante.</p>
+          <div class="tip-meta"><span class="tip-pill yield">≈ 2,0% TAE</span><span class="tip-pill risk-low">Riesgo bajo-muy bajo</span><span class="tip-pill">Liquidez total</span></div>
+        </div>
+        <div class="tip-card green">
+          <h3>🏦 BBVA · Cuenta Online sin comisiones</h3>
+          <p>Promociones para nuevos clientes con bonificación inicial (típicamente 1er año al ~2%). Útil si ya operas con BBVA: integración con tarjetas, hipoteca y app.</p>
+          <div class="tip-meta"><span class="tip-pill yield">≈ 1,5-2,0% TAE promo</span><span class="tip-pill risk-low">Riesgo bajo</span><span class="tip-pill">FGD 100.000€</span></div>
+        </div>
+        <div class="tip-card green">
+          <h3>🏦 EBN Banco / Pibank / Sabadell</h3>
+          <p>Cuentas remuneradas para nuevos clientes. EBN paga hasta el primer año al 2,75% bruto (un tramo). Pibank ofrece 2% sin nómina. Sabadell tiene cuenta online expansión con bonificación si domicilias nómina o subsidio.</p>
+          <div class="tip-meta"><span class="tip-pill yield">≈ 2-2,75% TAE</span><span class="tip-pill risk-low">Riesgo bajo</span><span class="tip-pill">FGD</span></div>
+        </div>
+      </div>
+
+      <!-- Depósitos y letras -->
+      <div class="tip-section-title">📜 Depósitos y Letras del Tesoro (rentabilidad fija · 6-12 meses)</div>
+      <div class="tip-grid">
+        <div class="tip-card blue">
+          <h3>🇪🇸 Letras del Tesoro Español</h3>
+          <p>Deuda pública española a 3, 6, 9 y 12 meses. Subasta quincenal a través del Banco de España o en bancos como ING, MyInvestor o Renta 4. Rentabilidad estable; al vencimiento recuperas principal + intereses. Tributan como rendimientos del capital mobiliario.</p>
+          <div class="tip-meta"><span class="tip-pill yield">≈ 2,5-3,2%</span><span class="tip-pill risk-low">Garantía Estado</span><span class="tip-pill">Plazo 3-12m</span></div>
+        </div>
+        <div class="tip-card blue">
+          <h3>💼 Depósitos a plazo · Banco Pichincha / Wizink</h3>
+          <p>Depósitos a 12-24 meses con tipo fijo. Cubiertos por el FGD hasta 100.000 € por titular y banco. Sin riesgo de mercado: sabes exactamente lo que ganarás. Penalización si cancelas antes.</p>
+          <div class="tip-meta"><span class="tip-pill yield">≈ 2,5-3,0% TAE</span><span class="tip-pill risk-low">FGD 100.000€</span><span class="tip-pill">Sin liquidez</span></div>
+        </div>
+        <div class="tip-card blue">
+          <h3>🇪🇺 Bonos europeos cortos (vía ETFs)</h3>
+          <p>ETF como el iShares € Govt Bond 0-1yr (IB01) o Lyxor EuroMTS 1-3y agrupan deuda pública europea de corto plazo. Liquidez diaria en bolsa, comisiones mínimas. Perfecto si no quieres ir a subastas.</p>
+          <div class="tip-meta"><span class="tip-pill yield">≈ 2,3-2,8%</span><span class="tip-pill risk-low">Riesgo muy bajo</span><span class="tip-pill">Liquidez diaria</span></div>
+        </div>
+      </div>
+
+      <!-- Fondos monetarios y conservadores -->
+      <div class="tip-section-title">📈 Fondos monetarios y conservadores (rentabilidad estable + ventaja fiscal)</div>
+      <div class="tip-grid">
+        <div class="tip-card amber">
+          <h3>🏆 Renta 4 Monetario FI</h3>
+          <p>Fondo monetario español puro: invierte en deuda pública y corporativa muy corta. Suscripción y reembolso D+1. Comisión total &lt; 0,30%. Traspasable fiscalmente sin tributar (gran ventaja vs depósito).</p>
+          <div class="tip-meta"><span class="tip-pill yield">≈ 2,7-3,0%</span><span class="tip-pill risk-low">Volatilidad &lt;0,5%</span><span class="tip-pill">Traspasable</span></div>
+        </div>
+        <div class="tip-card amber">
+          <h3>🏆 MyInvestor Money Market</h3>
+          <p>Fondo monetario en euros con coste ultra bajo (comisión total &lt; 0,15%) replicando el €STR. Misma fiscalidad que cualquier fondo: traspasos entre fondos sin peaje fiscal hasta el reembolso final.</p>
+          <div class="tip-meta"><span class="tip-pill yield">≈ 2,8-3,0%</span><span class="tip-pill risk-low">Volatilidad mínima</span><span class="tip-pill">Coste &lt;0,15%</span></div>
+        </div>
+        <div class="tip-card amber">
+          <h3>🌐 Indexa Capital · Cartera 1/10 (perfil muy conservador)</h3>
+          <p>Cartera de fondos indexados gestionada con perfil de riesgo bajo (≥80% renta fija europea corto plazo). Aportaciones desde 1.000 €. Comisión total ≈ 0,55%. Histórico ≈ 3% anualizado a largo plazo.</p>
+          <div class="tip-meta"><span class="tip-pill yield">≈ 2,5-3,5% medio</span><span class="tip-pill risk-mid">Riesgo bajo-medio</span><span class="tip-pill">Diversificada</span></div>
+        </div>
+        <div class="tip-card amber">
+          <h3>🌐 Finizens · Cartera 1 (conservadora)</h3>
+          <p>Roboadvisor con cartera de bonos globales cubiertos a euros. Cuenta omnibus en Cecabank. Aportaciones automáticas, rebalanceo trimestral. Buena para construir colchón sin tener que decidir.</p>
+          <div class="tip-meta"><span class="tip-pill yield">≈ 2,5-3,0% medio</span><span class="tip-pill risk-mid">Riesgo bajo</span><span class="tip-pill">Auto-rebalanceo</span></div>
+        </div>
+      </div>
+
+      <!-- Estrategia recomendada -->
+      <div class="tip-section-title">🎯 Estrategia recomendada para tu perfil (54 años · sin trabajo · 11-13 años hasta jubilarse)</div>
+      <div class="tip-card teal" style="border-left-color:var(--teal)">
+        <h3>📊 Distribución sugerida del capital líquido</h3>
+        <p>Reparto orientativo para combinar <strong>liquidez inmediata + rentabilidad + protección frente al IPC</strong>:</p>
+        <div class="allocation-bar">
+          <div class="alloc-bar-track">
+            <div class="alloc-seg" style="width:35%;background:var(--blue)">35% liquidez</div>
+            <div class="alloc-seg" style="width:30%;background:var(--sage)">30% letras/depósitos</div>
+            <div class="alloc-seg" style="width:25%;background:var(--amber)">25% fondo monetario</div>
+            <div class="alloc-seg" style="width:10%;background:var(--teal)">10% renta fija</div>
+          </div>
+          <div class="alloc-legend">
+            <div class="alloc-legend-item"><div class="alloc-dot" style="background:var(--blue)"></div><span><strong>35%</strong> en cuenta remunerada (Trade Republic / MyInvestor) — para gastos 12-18 meses</span></div>
+            <div class="alloc-legend-item"><div class="alloc-dot" style="background:var(--sage)"></div><span><strong>30%</strong> en Letras del Tesoro 6-12m escalonadas (escalera mensual)</span></div>
+            <div class="alloc-legend-item"><div class="alloc-dot" style="background:var(--amber)"></div><span><strong>25%</strong> en fondo monetario (Renta 4 o MyInvestor) — fiscalmente eficiente</span></div>
+            <div class="alloc-legend-item"><div class="alloc-dot" style="background:var(--teal)"></div><span><strong>10%</strong> en cartera conservadora indexada (Indexa/Finizens 1/10)</span></div>
+          </div>
+          <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--stone-light);font-size:13px;color:var(--ink)">
+            <strong style="color:var(--teal)">📈 Rentabilidad media esperada: 2,5% - 3,0% anual</strong> · sobre 50.000 € son ≈ <strong>1.250-1.500 €/año extra</strong> · ≈ <strong>14.000-17.000 €</strong> acumulados hasta los 67. Suficiente para cubrir 1-2 años más de gastos.
+          </div>
+        </div>
+      </div>
+
+      <!-- Consejos extra -->
+      <div class="tip-section-title">📌 Consejos adicionales para alargar el capital</div>
+      <div class="tip-grid">
+        <div class="tip-card rose">
+          <h3>🔄 1. Activa el subsidio +52 cuanto antes</h3>
+          <p>El subsidio para mayores de 52 años cotiza un 125% de la base mínima a tu cargo, lo que <strong>aumenta significativamente tu pensión futura</strong>. Solicítalo en el SEPE en cuanto agotes el paro contributivo y cumplas los requisitos (6 años cotizados, +52 años, derecho a jubilación contributiva).</p>
+        </div>
+        <div class="tip-card rose">
+          <h3>🏠 2. Optimiza el alquiler de tu vivienda</h3>
+          <p>Si la propiedad es vivienda habitual del inquilino, tienes derecho a <strong>reducción del 60% IRPF sobre los rendimientos netos</strong>. En zonas tensionadas la reducción puede llegar al 90% (Ley 12/2023). Considera contratos de larga duración y subir alquiler con IPC anual.</p>
+        </div>
+        <div class="tip-card rose">
+          <h3>💸 3. Ajusta gastos del hogar (target -10%)</h3>
+          <p>Revisión anual: <strong>luz</strong> (Octopus, Holaluz, indexada a pool), <strong>móvil/fibra</strong> (Finetwork, Lowi, Pepephone), <strong>seguros</strong> (renegociación o cambio bienal). Una reducción del 10% en gastos fijos puede equivaler a <strong>+1.500 €/año de ahorro</strong>.</p>
+        </div>
+        <div class="tip-card rose">
+          <h3>🎓 4. Plan de Pensiones / PIAS para los últimos años</h3>
+          <p>Si retomas trabajo, aporta al plan de pensiones de empleo (deducción hasta 8.500 €) o un PIAS si quieres rescate como renta vitalicia exenta. Es la última ventana fiscal antes de jubilarte.</p>
+        </div>
+        <div class="tip-card rose">
+          <h3>⏳ 5. Retrasa la jubilación si puedes</h3>
+          <p>Cada año que retrases la jubilación más allá de la edad ordinaria <strong>incrementa tu pensión un 4%</strong> de por vida (LGSS art. 210.2). Si puedes trabajar parcialmente desde los 65-67, el efecto es enorme.</p>
+        </div>
+        <div class="tip-card rose">
+          <h3>🚫 6. Evita riesgos altos en el corto plazo</h3>
+          <p>A 11 años de la jubilación <strong>no es momento de exponer más del 20-25% a renta variable</strong> ni a crypto. La regla "100 − edad" para % en bolsa sugiere ≤ 45% en RV, pero en tu situación (sin ingresos) reduce a ≤ 25%. Mantén un colchón mínimo de 18-24 meses de gastos en líquido.</p>
+        </div>
+      </div>
+
+      <div class="info-box amber" style="margin-top:18px">
+        <span style="font-size:18px">⚠️</span>
+        <div>
+          <strong>Aviso:</strong> esta información es orientativa y educativa, no constituye asesoramiento financiero. Las rentabilidades pueden variar. Antes de contratar cualquier producto consulta el folleto, la TAE actual y los riesgos. Para situaciones complejas, valora hablar con un asesor financiero independiente (EAF/EAFI registrada en CNMV).
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
 <footer>
   Panel Financiero Personal · José ·
   <a href="https://www.sepe.es" target="_blank">SEPE</a> ·
@@ -987,6 +1263,61 @@ footer a{color:var(--blue);text-decoration:none}
 ══════════════════════════════════════════════════════════════════════ -->
 <script>
 'use strict';
+
+/* ══════════════════════════════════════════════════════════════════
+   AUTH · LOGIN / LOGOUT
+══════════════════════════════════════════════════════════════════════ */
+const AUTH_USER='josean';
+const AUTH_PASS='soytuangel2026';
+const AUTH_KEY='__panelJoseSession__';
+
+function checkAuth(){
+  let ok=false;
+  try{ ok=(sessionStorage.getItem(AUTH_KEY)==='1'); }catch(e){}
+  const ov=document.getElementById('loginOverlay');
+  if(!ok){
+    if(ov) ov.style.display='flex';
+    document.body.style.overflow='hidden';
+  } else {
+    if(ov) ov.style.display='none';
+    document.body.style.overflow='';
+  }
+  return ok;
+}
+function doLogin(ev){
+  if(ev) ev.preventDefault();
+  const u=(document.getElementById('loginUser').value||'').trim();
+  const p=document.getElementById('loginPass').value||'';
+  const err=document.getElementById('loginError');
+  if(u===AUTH_USER && p===AUTH_PASS){
+    try{ sessionStorage.setItem(AUTH_KEY,'1'); }catch(e){}
+    if(err) err.classList.remove('show');
+    document.getElementById('loginOverlay').style.display='none';
+    document.body.style.overflow='';
+    // Si los módulos no se inicializaron aún por estar bloqueados, los activamos
+    if(typeof initApp==='function' && !window.__appReady){ initApp(); }
+  } else {
+    if(err) err.classList.add('show');
+    document.getElementById('loginPass').value='';
+    document.getElementById('loginPass').focus();
+  }
+  return false;
+}
+function doLogout(){
+  try{ sessionStorage.removeItem(AUTH_KEY); }catch(e){}
+  document.getElementById('loginUser').value='';
+  document.getElementById('loginPass').value='';
+  const err=document.getElementById('loginError'); if(err) err.classList.remove('show');
+  document.getElementById('loginOverlay').style.display='flex';
+  document.body.style.overflow='hidden';
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   MODAL · OPTIMIZA TU CAPITAL
+══════════════════════════════════════════════════════════════════════ */
+function openOptModal(){ const m=document.getElementById('optModal'); if(m) m.classList.add('active'); document.body.style.overflow='hidden'; }
+function closeOptModal(){ const m=document.getElementById('optModal'); if(m) m.classList.remove('active'); if(checkAuth()) document.body.style.overflow=''; }
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ const m=document.getElementById('optModal'); if(m&&m.classList.contains('active')) closeOptModal(); } });
 
 /* ── UTILITIES ───────────────────────────────────────────────────── */
 const fmt     = (v,d=0)=>(v<0?'−':'')+Math.abs(v).toLocaleString('es-ES',{style:'currency',currency:'EUR',minimumFractionDigits:d,maximumFractionDigits:d});
@@ -1025,19 +1356,33 @@ function recalculate(){
   const saldo0 =getVal('saldoInicial'), ipc=getVal('ipc')/100;
   const anoIni =+getSel('anoInicio'), hor=+getSel('horizonte');
 
+  // ── Ingresos inmobiliarios integrados (alquileres − gastos asociados)
+  // se suman al flujo de caja anual para que el saldo proyectado refleje
+  // la realidad completa (nómina + subsidio + alquileres + IRPF − gastos).
+  const inmCalcs   = (typeof props !== 'undefined' && props.length) ? props.map(p=>calcProp(p)) : [];
+  const inmIngBrut = inmCalcs.reduce((s,c)=>s+c.ingBruto,0);
+  const inmGastos  = inmCalcs.reduce((s,c)=>s+c.gastosTot,0);
+
+  // Rentabilidad opcional del saldo en cuenta (cuenta remunerada / fondo monetario)
+  const remunPct = (getVal('rentSaldo')||0)/100;
+
   finRows=[]; let saldo=saldo0;
   for(let i=0;i<hor;i++){
     const ano=anoIni+i, edad=54+i, ipcF=Math.pow(1+ipc,i);
     const nomA   =(ano>=anoNF)?nomM*12:nomM*mesesN;
     const subA   =(ano>=anoSub)?subM*12:0;
-    const ingT   =nomA+irpfA+subA+oIngA;
+    const alqA   =inmIngBrut;            // ingresos brutos alquiler (estables)
+    const gAlqA  =inmGastos*ipcF;        // gastos asociados a inmuebles c/IPC
+    const ingT   =nomA+irpfA+subA+oIngA+alqA;
     const hipoA  =(ano<=anoFH)?hipoM*12:0;
     const autA   =(ano<=anoFA)?autM*12:0;
     const casaA  =casaM*12*ipcF;
-    const gasT   =hipoA+autA+casaA+oGasA;
+    const gasT   =hipoA+autA+casaA+oGasA+gAlqA;
     const subtot =ingT-gasT;
-    const saldoFin=saldo+subtot;
-    finRows.push({ano,edad,ingT,nomA,subA,irpfA,gasT,hipoA,autA,casaA,oGasA,subtot,saldoFin});
+    // Rendimiento de la cuenta remunerada sobre el saldo medio del año
+    const rendCta = remunPct>0 ? Math.max(0,(saldo+subtot/2))*remunPct : 0;
+    const saldoFin=saldo+subtot+rendCta;
+    finRows.push({ano,edad,ingT,nomA,subA,irpfA,alqA,gasT,hipoA,autA,casaA,oGasA,gAlqA,subtot,rendCta,saldoFin});
     saldo=saldoFin;
   }
   renderFinKPIs(saldo0);
@@ -1070,16 +1415,19 @@ function renderFinTable(){
   h+=dr('Nómina anual',r=>r.nomA);
   h+=dr('Subsidio +52 años',r=>r.subA);
   h+=dr('Devolución IRPF',r=>r.irpfA);
-  if(R.some(r=>r.ingT-r.nomA-r.subA-r.irpfA!==0)) h+=dr('Otros ingresos',r=>r.ingT-r.nomA-r.subA-r.irpfA);
+  if(R.some(r=>r.alqA!==0)) h+=dr('Alquileres (inmobiliario)',r=>r.alqA||0);
+  if(R.some(r=>(r.ingT-r.nomA-r.subA-r.irpfA-(r.alqA||0))!==0)) h+=dr('Otros ingresos',r=>r.ingT-r.nomA-r.subA-r.irpfA-(r.alqA||0));
   h+=tr('TOTAL INGRESOS',r=>r.ingT,false);
   h+=sr('GASTOS','gas');
   h+=dr('Hipoteca',r=>r.hipoA);
   h+=dr('Cuota autónomos',r=>r.autA);
   h+=dr('Gastos del hogar (c/IPC)',r=>r.casaA);
+  if(R.some(r=>(r.gAlqA||0)!==0)) h+=dr('Gastos inmobiliarios (c/IPC)',r=>r.gAlqA||0);
   if(R.some(r=>r.oGasA!==0)) h+=dr('Otros gastos',r=>r.oGasA);
   h+=tr('TOTAL GASTOS',r=>r.gasT,false);
   h+=sr('RESULTADO','res');
   h+=tr('Resultado anual (±)',r=>r.subtot,true);
+  if(R.some(r=>(r.rendCta||0)!==0)) h+=dr('Rendimiento cuenta/fondo',r=>r.rendCta||0);
   h+=`<tr class="row-saldo"><td>💰 SALDO ACUMULADO</td>${R.map(r=>`<td class="${clsCss(r.saldoFin)}">${fmt(Math.round(r.saldoFin))}</td>`).join('')}</tr>`;
   h+='</tbody>';
   document.getElementById('tablaPrevisiones').innerHTML=h;
@@ -1330,11 +1678,106 @@ function renderPropTable(){
 function renderOverview(){
   renderOvKPIs();
   renderOvWealthBar();
+  renderOvDuration();
   renderOvPatrimonio();
   renderOvFlujo();
   renderOvSummaries();
   renderOvDonutTotal();
   renderOvResumenJub();
+}
+
+// ── Panel "¿Cuánto durará tu capital?" en el overview ────────────
+function renderOvDuration(){
+  const el=document.getElementById('ovDurationBody');
+  if(!el) return;
+  if(!finRows.length){
+    el.innerHTML='<p style="color:var(--stone);font-size:13px">Configura la planificación financiera primero.</p>';
+    return;
+  }
+  const saldo0=getVal('saldoInicial');
+  const dur=calcCapitalDuration();
+  const anoIni=finRows[0].ano;
+  const anoJub=jubData?jubData.ordinary.anoJub:(anoIni+12);
+  const ipc=getVal('ipc')/100;
+  const rentActual=(getVal('rentSaldo')||0)/100;
+
+  // Simulamos 3 escenarios: base (sin remuneración), conservador (2,5%), óptimo (3,5%)
+  function simulate(rentPct){
+    let s=saldo0; let yr=anoIni-1; let agot=null;
+    const inmCalcs   = props.length ? props.map(p=>calcProp(p)) : [];
+    const inmIngBrut = inmCalcs.reduce((a,c)=>a+c.ingBruto,0);
+    const inmGastos  = inmCalcs.reduce((a,c)=>a+c.gastosTot,0);
+    const nomM=getVal('nomina'), mesesN=getVal('mesesNomina'), irpfA=getVal('irpf');
+    const subM=getVal('subsidio'), anoSub=+getSel('anoSubsidio'), anoNF=+getSel('anoNominaFull');
+    const oIngA=getVal('otrosIngresos');
+    const hipoM=getVal('hipoteca'), anoFH=+getSel('anoFinHipoteca');
+    const autM=getVal('autonomos'), anoFA=+getSel('anoFinAutonomos');
+    const casaM=getVal('gastosCasa'), oGasA=getVal('otrosGastos');
+    for(let i=0;i<40;i++){
+      yr=anoIni+i;
+      const ipcF=Math.pow(1+ipc,i);
+      const nomA=(yr>=anoNF)?nomM*12:nomM*mesesN;
+      const subA=(yr>=anoSub)?subM*12:0;
+      const alqA=inmIngBrut;
+      const gAlqA=inmGastos*ipcF;
+      const ingT=nomA+irpfA+subA+oIngA+alqA;
+      const hipoA=(yr<=anoFH)?hipoM*12:0;
+      const autA=(yr<=anoFA)?autM*12:0;
+      const casaA=casaM*12*ipcF;
+      const gasT=hipoA+autA+casaA+oGasA+gAlqA;
+      const sub=ingT-gasT;
+      const rend=rentPct>0?Math.max(0,(s+sub/2))*rentPct:0;
+      s+=sub+rend;
+      if(s<=0 && agot===null){agot=yr;break;}
+    }
+    return {agot, anos: agot? (agot-anoIni+1) : 41};
+  }
+  const escBase = simulate(0);
+  const escConsv= simulate(0.025);
+  const escOpt  = simulate(0.035);
+
+  const card=(cls,label,sim,sub)=>`<div class="dur-card ${cls}"><div class="dur-label">${label}</div><div class="dur-value">${sim.agot?sim.anos+' años':'>40 años'}</div><div class="dur-sub">${sub}${sim.agot?(' · agotamiento en '+sim.agot):' · capital se mantiene'}</div></div>`;
+
+  // Cobertura hasta la jubilación
+  const anosHastaJub=anoJub-anoIni;
+  const cubreBase=escBase.agot?escBase.agot>=anoJub:true;
+  const cubreCons=escConsv.agot?escConsv.agot>=anoJub:true;
+  const cubreOpt =escOpt.agot ?escOpt.agot >=anoJub:true;
+  const pctBase=Math.min(100, ((escBase.agot?escBase.anos:anosHastaJub*1.5)/anosHastaJub)*100);
+  const pctCons=Math.min(100, ((escConsv.agot?escConsv.anos:anosHastaJub*1.5)/anosHastaJub)*100);
+  const pctOpt =Math.min(100, ((escOpt.agot ?escOpt.anos :anosHastaJub*1.5)/anosHastaJub)*100);
+
+  el.innerHTML=`
+    <p style="font-size:13px;color:var(--ink);margin-bottom:6px">Con un <strong>saldo inicial de ${fmt(saldo0)}</strong> y los flujos previstos (incluyendo alquileres y subsidios), simulamos cuánto durará tu capital según la rentabilidad que obtengas de él:</p>
+    <div class="dur-grid">
+      ${card('scenario-warn','Sin remunerar (0%)',escBase,'❌ Pierde poder adquisitivo con IPC')}
+      ${card('scenario-rem','Cuenta remunerada / monetario (2,5%)',escConsv,'✅ Bate al IPC')}
+      ${card('scenario-best','Cartera conservadora (3,5%)',escOpt,'🏆 Crecimiento real positivo')}
+      ${card(rentActual>=0.025?'scenario-rem':'scenario-base','Con tu rentabilidad actual ('+(rentActual*100).toFixed(1)+'%)',dur.anos>=99?{agot:null,anos:99}:{agot:dur.anoAgotamiento,anos:dur.anos},'Según el input de planificación')}
+    </div>
+
+    <div class="dur-coverage">
+      <div style="font-size:12px;color:var(--ink);margin-bottom:6px"><strong>Cobertura hasta tu jubilación</strong> (${anosHastaJub} años hasta ${anoJub}):</div>
+      <div style="display:grid;gap:8px">
+        <div>
+          <div style="font-size:11px;color:var(--stone);margin-bottom:3px">Escenario sin remuneración (0%)</div>
+          <div class="dur-cov-track"><div class="dur-cov-seg" style="width:${pctBase}%;background:${cubreBase?'var(--sage)':'var(--red-soft)'}">${escBase.agot?escBase.anos+' años':'>40 años'}</div></div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--stone);margin-bottom:3px">Escenario con cuenta remunerada (2,5%)</div>
+          <div class="dur-cov-track"><div class="dur-cov-seg" style="width:${pctCons}%;background:${cubreCons?'var(--sage)':'var(--amber)'}">${escConsv.agot?escConsv.anos+' años':'>40 años'}</div></div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--stone);margin-bottom:3px">Escenario óptimo conservador (3,5%)</div>
+          <div class="dur-cov-track"><div class="dur-cov-seg" style="width:${pctOpt}%;background:${cubreOpt?'var(--gold)':'var(--amber)'}">${escOpt.agot?escOpt.anos+' años':'>40 años'}</div></div>
+        </div>
+      </div>
+      <div style="margin-top:10px;font-size:12px;color:var(--stone)">
+        ${cubreOpt?'✅ <strong style="color:var(--sage)">Buenas noticias:</strong> con una rentabilidad conservadora (3,5%) tu capital cubre y supera la fecha de jubilación.':'⚠️ <strong style="color:var(--amber)">Atención:</strong> incluso con rentabilidad conservadora podría agotarse antes de jubilarte. Considera reducir gastos, reactivar ingresos y maximizar el alquiler.'}
+        <a href="#" onclick="openOptModal();return false;" style="color:var(--blue);font-weight:600;margin-left:4px">Ver consejos →</a>
+      </div>
+    </div>
+  `;
 }
 
 function renderOvKPIs(){
@@ -1345,16 +1788,52 @@ function renderOvKPIs(){
   const valInm=calcs.reduce((s,x)=>s+x.p.valActual,0);
   const {totVal:cryptoVal,totPnl:cryptoPnl}=getCryptoTotals();
   const pat=saldoCuenta+valInm+cryptoVal;
-  const netInm=calcs.reduce((s,x)=>s+x.c.benNeto,0);
-  const netFin=lastFin?lastFin.subtot:0;
-  const netTot=netFin+netInm;
+  // El subtot de finRows ya incluye alquileres − gastos inmobiliarios
+  // (consolidado desde recalculate). Usamos directamente esa cifra.
+  const netTot=lastFin?(lastFin.subtot+(lastFin.rendCta||0)):0;
+  // Análisis duración del capital
+  const dur=calcCapitalDuration();
   row.innerHTML=`
     <div class="kpi-card purple"><div class="kpi-badge">🏗️</div><div class="label">Patrimonio neto total</div><div class="value">${fmt(Math.round(pat))}</div><div class="sub">Cuenta + inmuebles + crypto</div></div>
     <div class="kpi-card blue"><div class="kpi-badge">💳</div><div class="label">Saldo cuenta (proyectado)</div><div class="value">${fmt(Math.round(saldoCuenta))}</div><div class="sub">${lastFin?'En '+lastFin.ano:'—'}</div></div>
     <div class="kpi-card teal"><div class="kpi-badge">🏘️</div><div class="label">Valor cartera inmobiliaria</div><div class="value">${fmt(valInm)}</div><div class="sub">${props.length} ${props.length===1?'vivienda':'viviendas'}</div></div>
     <div class="kpi-card gold"><div class="kpi-badge">₿</div><div class="label">Cartera crypto</div><div class="value">${fmt(Math.round(cryptoVal))}</div><div class="sub">${cryptoPnl>=0?'+':''}${fmt(Math.round(cryptoPnl))} P&L total</div></div>
-    <div class="kpi-card ${netTot>=0?'green':'red'}"><div class="kpi-badge">📈</div><div class="label">Flujo neto anual</div><div class="value">${fmt(Math.round(netTot))}</div><div class="sub">Finanzas + inmobiliario</div></div>
-    ${jubData?('<div class="kpi-card rose"><div class="kpi-badge">🏖️</div><div class="label">Pensión ordinaria est.</div><div class="value">'+fmt(Math.round(jubData.ordinary.pensionNetaMes))+'</div><div class="sub">mensual neta en '+jubData.ordinary.anoJubilacion+'</div></div>'):''}`;
+    <div class="kpi-card ${netTot>=0?'green':'red'}"><div class="kpi-badge">📈</div><div class="label">Flujo neto anual</div><div class="value">${fmt(Math.round(netTot))}</div><div class="sub">Nómina+Subsidio+Alquileres − Gastos</div></div>
+    <div class="kpi-card ${dur.cubreJub?'green':'amber'}"><div class="kpi-badge">⏳</div><div class="label">Duración del capital</div><div class="value">${dur.anos>=99?'∞':dur.anos.toFixed(1)+' años'}</div><div class="sub">${dur.anos>=99?'No se agota':'Hasta '+dur.anoAgotamiento+(dur.cubreJub?' ✓ cubre jubilación':' ⚠ antes de jubilarse')}</div></div>
+    ${jubData?('<div class="kpi-card rose"><div class="kpi-badge">🏖️</div><div class="label">Pensión ordinaria est.</div><div class="value">'+fmt(Math.round(jubData.ordinary.pensionNetaMes))+'</div><div class="sub">mensual neta en '+jubData.ordinary.anoJub+'</div></div>'):''}`;
+}
+
+// ── Calcula cuánto durará el capital inicial al ritmo actual de gastos ────
+function calcCapitalDuration(){
+  const saldo0=getVal('saldoInicial');
+  if(!finRows.length||saldo0<=0)return {anos:0,anoAgotamiento:'—',cubreJub:false};
+  let saldo=saldo0;
+  let ano=finRows[0].ano-1;
+  let anoAgota=null;
+  // Reutilizamos los flujos del proyecto hasta el horizonte; después
+  // extendemos con el último flujo conocido (sin nómina, mantenemos subsidio si aplica)
+  for(const r of finRows){
+    ano=r.ano;
+    saldo=r.saldoFin;
+    if(saldo<=0 && anoAgota===null){anoAgota=ano;break;}
+  }
+  if(anoAgota===null){
+    // Extiende proyección años extra con el subtot del último año + IPC
+    const last=finRows[finRows.length-1];
+    let s=last.saldoFin;
+    let flujo=last.subtot+(last.rendCta||0);
+    let y=last.ano;
+    while(s>0 && y<last.ano+40){
+      y++;
+      // Asumimos que tras horizonte ya no hay nómina ni autónomos, solo subsidio+alquiler−gastoshogar−gastosinm
+      s += flujo;
+      if(s<=0){anoAgota=y;break;}
+    }
+    if(anoAgota===null)return {anos:99,anoAgotamiento:'>'+(last.ano+40),cubreJub:true};
+  }
+  const anos=anoAgota-(finRows[0].ano-1);
+  const anoJub=jubData?jubData.ordinary.anoJub:(finRows[0].ano+12);
+  return {anos:anos,anoAgotamiento:anoAgota,cubreJub:anoAgota>=anoJub};
 }
 
 function renderOvWealthBar(){
@@ -1412,14 +1891,12 @@ function renderOvFlujo(){
   const ctx=document.getElementById('ovChartFlujo').getContext('2d');
   killChart(CH.ovFlujo);
   if(!finRows.length)return;
-  const calcs=props.map(p=>({p,c:calcProp(p)}));
-  const netInm=calcs.reduce((s,x)=>s+x.c.benNeto,0);
-  const ingInm=calcs.reduce((s,x)=>s+x.c.ingBruto,0);
-  const gasInm=calcs.reduce((s,x)=>s+x.c.gastosTot,0);
+  // finRows ya integra los flujos inmobiliarios desde recalculate(),
+  // por lo que aquí ingT, gasT y subtot son los TOTALES CONSOLIDADOS.
   const labels=finRows.map(r=>`${r.ano}`);
-  const ingTot=finRows.map(r=>Math.round(r.ingT+ingInm));
-  const gasTot=finRows.map(r=>Math.round(r.gasT+gasInm));
-  const netTot=finRows.map(r=>Math.round(r.subtot+netInm));
+  const ingTot=finRows.map(r=>Math.round(r.ingT));
+  const gasTot=finRows.map(r=>Math.round(r.gasT));
+  const netTot=finRows.map(r=>Math.round(r.subtot+(r.rendCta||0)));
   CH.ovFlujo=new Chart(ctx,{type:'bar',data:{labels,datasets:[
     {label:'Ingresos totales',data:ingTot,backgroundColor:'rgba(127,166,122,.7)',borderColor:'#7fa67a',borderWidth:1.5,borderRadius:4},
     {label:'Gastos totales',  data:gasTot.map(v=>-v),backgroundColor:'rgba(217,95,82,.6)',borderColor:'#d95f52',borderWidth:1.5,borderRadius:4},
@@ -2356,11 +2833,14 @@ function renderOvResumenJub() {
 }
 
 /* ── INIT ────────────────────────────────────────────────────────── */
-document.addEventListener('DOMContentLoaded',()=>{
-  recalculate();
+function initApp(){
+  if(window.__appReady) return;
+  window.__appReady=true;
 
-  // Add demo property
+  // Add demo property (antes de recalculate para que se integre el alquiler)
   addProperty({id:++propCnt,nombre:'Piso ejemplo',dir:'Calle Mayor 1',valCompra:120000,valActual:155000,alquiler:750,meses:11,pctInmob:10,comunidad:600,ibi:380,caldera:150,otros:200,hipoMens:0});
+
+  recalculate();
 
   // Initialize crypto prices then add demo portfolio
   fetchCryptoPrices().then(()=>{
@@ -2397,6 +2877,14 @@ document.addEventListener('DOMContentLoaded',()=>{
     el.addEventListener('input',()=>{clearTimeout(el._t);el._t=setTimeout(recalculate,400);});
   });
 
+  // Live recalc on inmobiliario inputs (para que alquileres se integren en finRows)
+  // (los inputs se generan dinámicamente, así que delegamos en el contenedor)
+  const inmPane=document.getElementById('pane-inmobiliario');
+  if(inmPane){
+    inmPane.addEventListener('change',()=>{clearTimeout(window._inmT);window._inmT=setTimeout(recalculate,250);});
+    inmPane.addEventListener('input', ()=>{clearTimeout(window._inmT);window._inmT=setTimeout(recalculate,500);});
+  }
+
   // Auto-refresh crypto every 2 minutes
   setInterval(fetchCryptoPrices, 120000);
 
@@ -2405,9 +2893,17 @@ document.addEventListener('DOMContentLoaded',()=>{
 
   // Live recalc on jubilacion inputs
   document.querySelectorAll('#pane-jubilacion input, #pane-jubilacion select').forEach(function(el){
-    el.addEventListener('change', calcularJubilacion);
-    el.addEventListener('input', function(){ clearTimeout(el._jt); el._jt = setTimeout(calcularJubilacion, 400); });
+    el.addEventListener('change', function(){ calcularJubilacion(); renderOverview(); });
+    el.addEventListener('input', function(){ clearTimeout(el._jt); el._jt = setTimeout(function(){ calcularJubilacion(); renderOverview(); }, 400); });
   });
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  const authed=checkAuth();
+  if(authed){
+    initApp();
+  }
+  // Si no está autenticado, esperamos a doLogin para llamar initApp()
 });
 </script>
 </body>
